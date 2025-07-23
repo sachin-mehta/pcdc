@@ -101,6 +101,8 @@ class SpeedTestRepositoryImpl : SpeedTestRepository {
       } else {
         return ResultState.Failure(ErrorHandlerImpl().getError(response.errorBody()))
       }
+    } else {
+      Log.d("GIGA SpeedTestRepositoryImpl", "$response")
     }
     return ResultState.Failure(
       ErrorEntity.Unknown("Post speed test data api failed")
