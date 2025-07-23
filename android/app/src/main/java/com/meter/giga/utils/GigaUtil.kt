@@ -1,5 +1,7 @@
 package com.meter.giga.utils
 
+import android.annotation.SuppressLint
+import android.app.AlarmManager
 import android.content.Context
 import android.os.Build
 import com.meter.giga.domain.entity.request.ClientInfoRequestEntity
@@ -38,6 +40,21 @@ object GigaUtil {
     return Build.DEVICE.contains("cheets", ignoreCase = true) ||
       pm.hasSystemFeature("org.chromium.arc") ||
       pm.hasSystemFeature("org.chromium.arc.device_management")
+  }
+
+  /**
+   * This function checks if app has schedule alarm permission if
+   * Device is running above Android 31
+   * @param context : App Context
+   * @return Boolean (True/False)
+   */
+  fun isExactAlarmPermissionGranted(context: Context): Boolean {
+    return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+      val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+      alarmManager.canScheduleExactAlarms()
+    } else {
+      true
+    }
   }
 
   /**

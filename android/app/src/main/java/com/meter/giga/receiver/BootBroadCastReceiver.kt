@@ -8,6 +8,7 @@ import com.meter.giga.ararm_scheduler.AlarmHelper
 import com.meter.giga.prefrences.AlarmSharedPref
 import com.meter.giga.utils.Constants.FIRST_15_MIN
 import com.meter.giga.utils.Constants.NEXT_SLOT
+import com.meter.giga.utils.GigaUtil
 import kotlin.random.Random
 
 /**
@@ -24,13 +25,24 @@ class BootBroadCastReceiver : BroadcastReceiver() {
    */
   override fun onReceive(context: Context, intent: Intent?) {
     Log.d("GIGA BootBroadCastReceiver", "On Boot")
-
-    if (intent?.action == Intent.ACTION_BOOT_COMPLETED) {
+    val prefs = AlarmSharedPref(context)
+    val schoolId = prefs.schoolId
+    if (schoolId != "" && intent?.action == Intent.ACTION_BOOT_COMPLETED && GigaUtil.isExactAlarmPermissionGranted(
+        context
+      )
+    ) {
       try {
         scheduleAlarmOnRestart(context)
       } catch (e: Exception) {
         Log.d("BootBroadCastReceiver", "Failed to schedule due to ${e.toString()}")
         scheduleAlarmOnRestart(context)
+      }
+    } else {
+      if (schoolId == "") {
+        Log.d("BootBroadCastReceiver", "Failed to schedule due no school is registered")
+      } else {
+        Log.d("BootBroadCastReceiver", "Failed to schedule due to No permission granted")
+
       }
     }
   }
