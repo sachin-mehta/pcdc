@@ -94,6 +94,7 @@ class SpeedTestRepositoryImpl : SpeedTestRepository {
     val response =
       RetrofitInstanceBuilder.speedTestApi.postSpeedTestData(body = speedTestData.toModel())
     if (response.isSuccessful) {
+      Log.d("GIGA SpeedTestRepositoryImpl Success", "$response")
       if (response.body() != null) {
         return ResultState.Success(
           response.body()!!
@@ -102,7 +103,7 @@ class SpeedTestRepositoryImpl : SpeedTestRepository {
         return ResultState.Failure(ErrorHandlerImpl().getError(response.errorBody()))
       }
     } else {
-      Log.d("GIGA SpeedTestRepositoryImpl", "$response")
+      Log.d("GIGA SpeedTestRepositoryImpl Failure", "$response")
     }
     return ResultState.Failure(
       ErrorEntity.Unknown("Post speed test data api failed")

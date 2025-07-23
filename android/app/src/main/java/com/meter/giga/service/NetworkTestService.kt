@@ -267,13 +267,8 @@ class NetworkTestService : LifecycleService() {
       if (allDoneInvoked == 2) {
         publishSpeedTestData(
           scheduleType,
-//          schoolId,
-//          gigaSchoolId,
           appVersion,
           isRunningOnChromebook,
-//          browserId,
-//          countryCode,
-//          ipAddress
         )
         allDoneInvoked = 0
       }
@@ -293,13 +288,8 @@ class NetworkTestService : LifecycleService() {
      */
     private fun publishSpeedTestData(
       scheduleType: String,
-//      schoolId: String,
-//      gigaSchoolId: String,
       appVersion: String,
       isRunningOnChromebook: Boolean,
-//      browserId: String,
-//      countryCode: String,
-//      ipAddress: String
     ) {
       Log.d("GIGA NetworkTestService", "publishSpeedTestData Invoked")
       lifecycleScope.launch(Dispatchers.IO) {
