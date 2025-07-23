@@ -16,7 +16,7 @@
       alt="Error Icon" />
     <image *ngIf="secondLabel === 'UPLOAD'" href="assets/images/upload_meter.svg" width="8" height="8" x="24" y="36"
       alt="Error Icon" />
-    <text *ngIf="secondLabel === 'DOWNLOAD' || secondLabel === 'UPLOAD'" x="54" y="44" [attr.font-size]="10"
+    <text *ngIf="secondLabel === 'DOWNLOAD' || secondLabel === 'UPLOAD'" x="54" y="44" [attr.font-size]="9.5"
       text-anchor="middle" alignment-baseline="top" [attr.font-weight]="400" [ngClass]="getTextClass()">
       {{ secondLabel === 'DOWNLOAD' ? ('startTest.download' | translate) : ('startTest.upload' | translate) }}
     </text>

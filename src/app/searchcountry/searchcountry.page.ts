@@ -1063,11 +1063,53 @@ export class SearchcountryPage {
   }
 
   selectCountry(country: Country) {
-    this.selectedCountry = country.code;
     this.selectedFromList = true;
     this.searchTerm = country.name;
     this.filteredCountries = [];
     this.automaticSearched = false;
+
+    // Validate PCDC eligibility immediately
+    this.validateSelectedCountry(country);
+  }
+
+  validateSelectedCountry(country: Country) {
+    // if (!this.selectedCountry) return;
+
+    this.countryService.getPcdcCountryByCode(country.code).subscribe(
+      (response) => {
+        this.pcdcCountry = response;
+        if (this.pcdcCountry.length > 0) {
+          this.isPcdcCountry = true;
+          this.selectedCountry = country.code;
+
+        } else {
+          this.isPcdcCountry = false;
+          // this.selectedCountry = country.code;
+        }
+      },
+      (err) => {
+        console.log('Validation error:', err);
+        this.isPcdcCountry = false;
+        // this.selectedCountry = country.code;
+
+      }
+    );
+  }
+
+  confirmCountry() {
+    if (!this.selectedCountry || !this.isPcdcCountry) return;
+
+    if (this.detectedCountry === undefined || this.detectedCountry === null) {
+      this.detectedCountry = this.selectedCountry;
+    }
+
+    const selectedCountryName = this.pcdcCountry?.[0]?.name || '';
+    this.router.navigate([
+      'searchschool',
+      this.selectedCountry,
+      this.detectedCountry,
+      selectedCountryName
+    ]);
   }
 
   getCountry() {
@@ -1119,53 +1161,53 @@ export class SearchcountryPage {
       this.detectedCountry
     );
   }
-  confirmCountry() {
-    //this.loading.dismiss();
+  // confirmCountry() {
+  //   //this.loading.dismiss();
 
-    if (this.detectedCountry === undefined || this.detectedCountry === null) {
-      this.detectedCountry = this.selectedCountry;
-    }
-    const loadingMsg =
-      // eslint-disable-next-line max-len
-      '<div class="loadContent"><ion-img src="assets/loader/new_loader.gif" class="loaderGif"></ion-img><p class="white" [translate]="\'searchCountry.check\'"></p></div>';
-    this.loading.present(loadingMsg, 9000, 'pdcaLoaderClass', 'null');
+  //   if (this.detectedCountry === undefined || this.detectedCountry === null) {
+  //     this.detectedCountry = this.selectedCountry;
+  //   }
+  //   const loadingMsg =
+  //     // eslint-disable-next-line max-len
+  //     '<div class="loadContent"><ion-img src="assets/loader/new_loader.gif" class="loaderGif"></ion-img><p class="white" [translate]="\'searchCountry.check\'"></p></div>';
+  //   this.loading.present(loadingMsg, 9000, 'pdcaLoaderClass', 'null');
 
-    this.countryService.getPcdcCountryByCode(this.selectedCountry).subscribe(
-      (response) => {
-        this.pcdcCountry = response;
-        console.log('pcdc country', response);
-      },
-      (err) => {
-        console.log('ERROR: ' + err);
-        this.loading.dismiss();
-      },
-      () => {
-        this.loading.dismiss();
-        if (this.pcdcCountry.length > 0) {
-          this.isPcdcCountry = true;
-          console.log(this.pcdcCountry)
-          const selectedCountryName = this.pcdcCountry[0].name
-          this.router.navigate([
-            'searchschool',
-            this.selectedCountry,
-            this.detectedCountry,
-            selectedCountryName
-          ]);
-        } else {
-          this.isPcdcCountry = false;
-        }
-      }
-    );
+  //   this.countryService.getPcdcCountryByCode(this.selectedCountry).subscribe(
+  //     (response) => {
+  //       this.pcdcCountry = response;
+  //       console.log('pcdc country', response);
+  //     },
+  //     (err) => {
+  //       console.log('ERROR: ' + err);
+  //       this.loading.dismiss();
+  //     },
+  //     () => {
+  //       this.loading.dismiss();
+  //       if (this.pcdcCountry.length > 0) {
+  //         this.isPcdcCountry = true;
+  //         console.log(this.pcdcCountry)
+  //         const selectedCountryName = this.pcdcCountry[0].name
+  //         this.router.navigate([
+  //           'searchschool',
+  //           this.selectedCountry,
+  //           this.detectedCountry,
+  //           selectedCountryName
+  //         ]);
+  //       } else {
+  //         this.isPcdcCountry = false;
+  //       }
+  //     }
+  //   );
 
-    console.log(
-      'selected',
-      this.selectedCountry,
-      'detected: ',
-      this.detectedCountry
-    );
-    //this.router.navigate(['schoolnotfound', this.schoolId]);
-    //this.router.navigate(['searchschool', this.selectedCountry, this.detectedCountry]);
-  }
+  //   console.log(
+  //     'selected',
+  //     this.selectedCountry,
+  //     'detected: ',
+  //     this.detectedCountry
+  //   );
+  //   //this.router.navigate(['schoolnotfound', this.schoolId]);
+  //   //this.router.navigate(['searchschool', this.selectedCountry, this.detectedCountry]);
+  // }
   onSearchInput(event: any): void {
     const value = event.target.value?.trim();
 
