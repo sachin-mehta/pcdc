@@ -1,5 +1,8 @@
 import type { CapacitorElectronConfig } from '@capacitor-community/electron';
-import { getCapacitorElectronConfig, setupElectronDeepLinking } from '@capacitor-community/electron';
+import {
+  getCapacitorElectronConfig,
+  setupElectronDeepLinking,
+} from '@capacitor-community/electron';
 import type { MenuItemConstructorOptions } from 'electron';
 import { app, MenuItem, ipcMain, dialog } from 'electron';
 import electronIsDev from 'electron-is-dev';
@@ -8,7 +11,11 @@ import { autoUpdater } from 'electron-updater';
 import fs from 'fs-extra';
 import path from 'path';
 
-import { ElectronCapacitorApp, setupContentSecurityPolicy, setupReloadWatcher } from './setup';
+import {
+  ElectronCapacitorApp,
+  setupContentSecurityPolicy,
+  setupReloadWatcher,
+} from './setup';
 import { captureException } from '@sentry/node';
 
 // Set userData path to use name instead of productName - must be set before app is ready
@@ -21,16 +28,14 @@ unhandled({
   logger: (e) => {
     console.error(e);
     captureException(e);
-    console.log("there is an error occurs")
+    console.log('there is an error occurs');
   },
   showDialog: false,
   reportButton: (error) => {
     console.log('Report Button Initialized');
     captureException(error);
-  }
+  },
 });
-
-
 
 let isQuiting = false;
 let mainWindow = null;
@@ -39,17 +44,19 @@ let isDownloaded = false;
 // Define our menu templates (these are optional)
 const trayMenuTemplate: (MenuItemConstructorOptions | MenuItem)[] = [
   new MenuItem({
-    label: 'Open', click: function () {
+    label: 'Open',
+    click: function () {
       myCapacitorApp.getMainWindow().show();
-    }
+    },
   }),
   new MenuItem({
-    label: 'Quit App', click: function () {
+    label: 'Quit App',
+    click: function () {
       isQuiting = true;
       // myCapacitorApp.getMainWindow().close();
       app.quit();
-    }
-  })
+    },
+  }),
 ];
 const appMenuBarMenuTemplate: (MenuItemConstructorOptions | MenuItem)[] = [
   { role: process.platform === 'darwin' ? 'appMenu' : 'fileMenu' },
@@ -57,16 +64,23 @@ const appMenuBarMenuTemplate: (MenuItemConstructorOptions | MenuItem)[] = [
 ];
 
 // Get Config options from capacitor.config
-const capacitorFileConfig: CapacitorElectronConfig = getCapacitorElectronConfig();
+const capacitorFileConfig: CapacitorElectronConfig =
+  getCapacitorElectronConfig();
 
 // Initialize our app. You can pass menu templates into the app here.
 // const myCapacitorApp = new ElectronCapacitorApp(capacitorFileConfig);
-const myCapacitorApp = new ElectronCapacitorApp(capacitorFileConfig, trayMenuTemplate, appMenuBarMenuTemplate);
+const myCapacitorApp = new ElectronCapacitorApp(
+  capacitorFileConfig,
+  trayMenuTemplate,
+  appMenuBarMenuTemplate
+);
 
 // If deeplinking is enabled then we will set it up here.
 if (capacitorFileConfig.electron?.deepLinkingEnabled) {
   setupElectronDeepLinking(myCapacitorApp, {
-    customProtocol: capacitorFileConfig.electron.deepLinkingCustomProtocol ?? 'mycapacitorapp',
+    customProtocol:
+      capacitorFileConfig.electron.deepLinkingCustomProtocol ??
+      'mycapacitorapp',
   });
 }
 
@@ -97,7 +111,7 @@ if (!gotTheLock) {
   // Wait for electron app to be ready.
   app.whenReady().then(async () => {
     mainWindow = await myCapacitorApp.init();
-  })
+  });
   /*
       app.on('ready', () => {
         updateApp = require('update-electron-app');
@@ -111,19 +125,17 @@ if (!gotTheLock) {
       */
   autoUpdater.autoDownload = true;
 
-
   setInterval(() => {
-    autoUpdater.checkForUpdates()
-  }, 3600000)
+    autoUpdater.checkForUpdates();
+  }, 3600000);
 
-
-  autoUpdater.on("update-downloaded", (_event, releaseNotes, releaseName) => {
+  autoUpdater.on('update-downloaded', (_event, releaseNotes, releaseName) => {
     const dialogOpts = {
       type: 'info' as const,
       buttons: ['Restart / Reinicie. / Перезапуск', 'Later / Después / Позже'],
       title: 'Giga Meter Update',
       message: process.platform === 'win32' ? releaseNotes : releaseName,
-      detail: `A new version of UNICEF's Giga Meter has been downloaded. Restart the application to apply the updates.\n\nUna nueva version de la aplicación Giga Meter de UNICEF ha sido descargada. Reinicie la aplicación para aplicar los cambios.\n\nНовая версия приложения Giga Meter  загружена . Перезапустите приложение, чтобы применить обновления.`
+      detail: `A new version of UNICEF's Giga Meter has been downloaded. Restart the application to apply the updates.\n\nUna nueva version de la aplicación Giga Meter de UNICEF ha sido descargada. Reinicie la aplicación para aplicar los cambios.\n\nНовая версия приложения Giga Meter  загружена . Перезапустите приложение, чтобы применить обновления.`,
     };
     /*
     if (isDownloaded === false) {
@@ -140,18 +152,20 @@ if (!gotTheLock) {
 
         //for auto update comment the below codes, and uncomment the above line of code
 
-
         const dialogOpts = {
           type: 'info' as const,
-          buttons: ['Restart / Reinicie. / Перезапуск', 'Later / Después / Позже'],
+          buttons: [
+            'Restart / Reinicie. / Перезапуск',
+            'Later / Después / Позже',
+          ],
           title: 'Giga Meter Update',
           message: process.platform === 'win32' ? releaseNotes : releaseName,
-          detail: `A new version of UNICEF's Giga Meter  has been downloaded. Restart the application to apply the updates.\n\nUna nueva version de la aplicación Giga Meter de UNICEF ha sido descargada. Reinicie la aplicación para aplicar los cambios.\n\nНовая версия приложения Giga Meter  загружена . Перезапустите приложение, чтобы применить обновления.`
+          detail: `A new version of UNICEF's Giga Meter  has been downloaded. Restart the application to apply the updates.\n\nUna nueva version de la aplicación Giga Meter de UNICEF ha sido descargada. Reinicie la aplicación para aplicar los cambios.\n\nНовая версия приложения Giga Meter  загружена . Перезапустите приложение, чтобы применить обновления.`,
         };
         dialog.showMessageBox(dialogOpts).then((returnValue) => {
-          if (returnValue.response === 0) autoUpdater.quitAndInstall(false, true)
-        })
-
+          if (returnValue.response === 0)
+            autoUpdater.quitAndInstall(false, true);
+        });
 
         //throw new Error("opps there is unexpected error")
       } catch (error) {
@@ -159,24 +173,24 @@ if (!gotTheLock) {
         captureException(error);
         const dialogOpts = {
           type: 'info' as const,
-          buttons: ['Restart / Reinicie. / Перезапуск', 'Later / Después / Позже'],
+          buttons: [
+            'Restart / Reinicie. / Перезапуск',
+            'Later / Después / Позже',
+          ],
           title: 'Giga Meter Update',
           message: process.platform === 'win32' ? releaseNotes : releaseName,
-          detail: `A new version of UNICEF's Giga Meter  has been downloaded. Restart the application to apply the updates.\n\nUna nueva version de la aplicación Giga Meter de UNICEF  ha sido descargada. Reinicie la aplicación para aplicar los cambios.\n\nНовая версия приложения Giga Meter  загружена . Перезапустите приложение, чтобы применить обновления.`
+          detail: `A new version of UNICEF's Giga Meter  has been downloaded. Restart the application to apply the updates.\n\nUna nueva version de la aplicación Giga Meter de UNICEF  ha sido descargada. Reinicie la aplicación para aplicar los cambios.\n\nНовая версия приложения Giga Meter  загружена . Перезапустите приложение, чтобы применить обновления.`,
         };
         dialog.showMessageBox(dialogOpts).then((returnValue) => {
-          if (returnValue.response === 0) autoUpdater.quitAndInstall(false, true)
-        })
+          if (returnValue.response === 0)
+            autoUpdater.quitAndInstall(false, true);
+        });
       }
-
     }
-
-
-
   });
-autoUpdater.on('error', (error) => {
-  console.error('Update Error:', error);
-  captureException(error);
+  autoUpdater.on('error', (error) => {
+    console.error('Update Error:', error);
+    captureException(error);
   });
   /*
     autoUpdater.on('error', (error) => {
@@ -196,8 +210,6 @@ autoUpdater.on('error', (error) => {
     });
   
   */
-    
-
 
   // Security - Set Content-Security-Policy based on whether or not we are in dev mode.
   // setupContentSecurityPolicy(myCapacitorApp.getCustomURLScheme());
@@ -206,17 +218,7 @@ autoUpdater.on('error', (error) => {
   // Check for updates if we are in a packaged app.
   // autoUpdater.checkForUpdatesAndNotify();
 }
-if (mainWindow) {
-  mainWindow.on('close', (event) => {
-    if (!isQuiting) {
-      event.preventDefault();
-      mainWindow.hide();
-      return false;
-    } else {
-      app.quit();
-    }
-  });
-}
+// Close handler is now properly implemented in setup.ts
 // Handle when all of our windows are close (platforms have their own expectations).
 app.on('window-all-closed', function () {
   // On OS X it is common for applications and their menu bar
@@ -234,8 +236,6 @@ app.on('activate', async function () {
     await myCapacitorApp.init();
   }
 });
-
-
 
 // Place all ipc or other electron api calls and custom functionality under this line
 
