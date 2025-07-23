@@ -3,14 +3,20 @@ package com.meter.giga;
 import static com.meter.giga.utils.Constants.REQ_NOTIF_PERMISSION;
 import static com.meter.giga.utils.Constants.REQ_STORAGE_PERMISSION;
 
+import static java.security.AccessController.getContext;
+
+import android.app.Activity;
 import android.app.AlarmManager;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.Log;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
@@ -26,6 +32,11 @@ public class MainActivity extends BridgeActivity {
   private final ActivityResultLauncher<Intent> alarmPermissionLauncher =
     registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
       r -> {
+        Log.d("GIGA MainActivity", "Alarm Permission Status : " + r.toString());
+        AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !am.canScheduleExactAlarms()) {
+          showPermissionDialog();
+        }
       });
 
   @Override
@@ -34,6 +45,39 @@ public class MainActivity extends BridgeActivity {
     super.onCreate(savedInstanceState);
     checkStoragePermission(this);
   }
+
+  private void showPermissionDialog() {
+    Activity activity = this;
+    AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+    builder.setTitle("Exact Alarm Required");
+    builder.setMessage("This app requires exact alarm permission to function properly.");
+    builder.setCancelable(false);
+
+    builder.setPositiveButton("Grant Permission", new DialogInterface.OnClickListener() {
+      @Override
+      public void onClick(DialogInterface dialog, int which) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+          AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
+          if (!am.canScheduleExactAlarms()) {
+            Intent intent = new Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM);
+            intent.setData(Uri.parse("package:" + activity.getPackageName()));
+
+            alarmPermissionLauncher.launch(intent);    // modern API
+          }
+        }
+      }
+    });
+
+    builder.setNegativeButton("Exit App", new DialogInterface.OnClickListener() {
+      @Override
+      public void onClick(DialogInterface dialog, int which) {
+        activity.finishAffinity();
+      }
+    });
+
+    builder.show();
+  }
+
 
   /**
    * This function is used to check the storage permission
