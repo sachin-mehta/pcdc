@@ -4,6 +4,7 @@ interface ExtendedCapacitorConfig extends CapacitorConfig {
   electron?: {
     trayIconAndMenuEnabled?: boolean;
     electronIsDev?: boolean;
+    hideMainWindowOnLaunch?: boolean;
   };
 }
 
@@ -14,8 +15,9 @@ const config: ExtendedCapacitorConfig = {
   bundledWebRuntime: false,
   electron: {
     trayIconAndMenuEnabled: true,
-    electronIsDev: true
-  }
+    electronIsDev: true,
+    hideMainWindowOnLaunch: true,
+  },
 };
 
 export default config;
