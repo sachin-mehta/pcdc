@@ -27,7 +27,6 @@
 
 
       <div class="location">{{mlabInformation.label}}</div>
-
       <!-- </div> -->
       <!---------   Start test Section END ------------------>
       <!----------   Start test progress Section --------------->
@@ -134,14 +133,14 @@
         <ion-item lines="none" class="center-item">
           <ion-label class="position">
             <h3  [translate]="'startTest.isp'"></h3>
-            <p title={{accessInformation.org}}>{{accessInformation.org}}</p>
+            <p title={{measurementISP}}>{{measurementISP?.length ? measurementISP : '---'}}</p>
           </ion-label>
         </ion-item>
       
         <ion-item lines="none" class="right-item">
           <ion-label class="position">
             <h3  [translate]="'startTest.server'"></h3>
-            <p title={{accessInformation.city}}>{{accessInformation.city}}</p>
+            <p title={{measurementnetworkServer}}>{{measurementnetworkServer?.length ? measurementISP : '---' }}</p>
           </ion-label>
         </ion-item>
       </ion-list>
@@ -210,7 +209,7 @@
           </ion-card-header>
         </ion-card>
 
-        <ion-card class="footer-card" color="medium">
+        <ion-card class="footer-card" style="background: #F5F5F5;">
           <!-- <ion-card-header class="footer_card_header">
             <ion-card-title>
               <span class="footer_text">

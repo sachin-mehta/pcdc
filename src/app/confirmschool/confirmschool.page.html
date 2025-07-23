@@ -15,15 +15,15 @@
       <ion-item lines="none" *ngIf="school" class="detail_box">
         <ion-label class="box_margin">
           <span *ngIf="school?.name" class="schoolName">{{school.name}}</span><br  *ngIf="school?.name" />
-          <span *ngIf="school?.education_level" class=" school_detail">{{school.education_level}}</span><br  *ngIf="school?.education_level" />
+          <!-- <span *ngIf="school?.education_level" class=" school_detail">{{school.education_level}}</span><br  *ngIf="school?.education_level" />
           <span *ngIf="school?.admin_1_name" class=" school_detail">{{school.admin_1_name}}- {{school.admin_1_name}}</span><br *ngIf="school?.admin_1_name" />
-          <span *ngIf="school?.lat" class="school_detail"><span class="linkColor">admin_1_name long</span></span><br *ngIf="school?.lat" />
+          <span *ngIf="school?.lat" class="school_detail"><span class="linkColor">admin_1_name long</span></span><br *ngIf="school?.lat" /> -->
           <span *ngIf="school?.school_id" class="school_detail">{{school.school_id}}</span><br  *ngIf="school?.school_id"/>
 
           <span class="school_detail googleCheck linkColor">
             <!-- <span [translate]="'schoolDetails.checkGiga' | translate"></span>
             <ion-img src="assets/images/Launch.png" class="welcome_icon"></ion-img> -->
-          </span><br />
+          </span>
         </ion-label>
         <!-- <div class="schoolid">School ID: {{school.school_id | uppercase}}</div> -->
       </ion-item>
@@ -45,8 +45,8 @@
       <!-- <ion-icon name="close-outline" class="close-icon" (click)="closeNotification()"></ion-icon> -->
     </div>
     <div class="btn-holder" >
-      <ion-button block class="nobtn" (click)="backToSearchDetail()" [translate]="'no'"></ion-button>
-      <ion-button block class="yesbtn" fill="outline" (click)="confirmSchool()" [translate]="'yes'"></ion-button>
+      <ion-button block class="nobtn"  fill="outline" (click)="backToSearchDetail()" [translate]="'no'"></ion-button>
+      <ion-button block class="yesbtn" (click)="confirmSchool()" [translate]="'yes'"></ion-button>
     </div>
   </ion-toolbar>
   <!-- <div class="h-line"></div> -->

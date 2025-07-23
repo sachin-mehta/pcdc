@@ -19,14 +19,14 @@
         <ion-item lines="none">
           <ion-label class="position">
             <h3 [translate]="'startTest.isp'"></h3>
-            <p title={{accessInformation.org}}>{{accessInformation.org}}</p>
+            <p title={{measurementISP}}>{{measurementISP?.length ? measurementISP : '---'}}</p>
           </ion-label>
         </ion-item>
 
         <ion-item lines="none">
           <ion-label class="position">
             <h3  [translate]="'startTest.server'"></h3>
-            <p title={{accessInformation.city}}>{{accessInformation.city}}</p>
+            <p title={{measurementnetworkServer}}>{{measurementnetworkServer?.length ? measurementnetworkServer : '---'}}</p>
           </ion-label>
         </ion-item>
       </ion-list>
