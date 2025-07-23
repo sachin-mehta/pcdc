@@ -351,7 +351,7 @@ span.currentState {
   ion-label p {
     /* Change as per your theme */
     margin: 0;
-    font-size: 12px;
+    font-size: 13px;
     font-weight: 400;
     color: #474747;
   }
@@ -485,13 +485,14 @@ ion-card {
   align-items: stretch;
   width: 91%;
   max-width: 340px;
-  margin: 0 auto;
+  margin: 25px auto 8px;
   padding: 8px 0;
 }
 
 .horizontal-list ion-item {
   flex-shrink: 0;
-  height: 50px;
+  height: 42px;
+  margin-right: 10px;
   border-left: 1px solid #8D8D8D;
   padding-left:6px;
   --padding-start: 0;
@@ -516,4 +517,12 @@ ion-card {
 }
 .error_status{
   color: #F94B4B !important;
+}
+.position {
+  display: flex;
+    justify-content: space-between;
+    flex-direction: column;
+    gap: 7px;
+    margin-top: 0;
+    margin-bottom: 0;
 }

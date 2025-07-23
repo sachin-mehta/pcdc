@@ -308,7 +308,7 @@ export class StarttestPage implements OnInit, OnDestroy {
       this.uploadStarted = false;
       this.progress = 0;
   
-      // ❗ Clear any ongoing timers
+      // Clear any ongoing timers
       if (this.downloadTimer) {
         clearInterval(this.downloadTimer);
         this.downloadTimer = null;
