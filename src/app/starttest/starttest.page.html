@@ -196,7 +196,7 @@
             <ion-card-title> <span class="footer_text">
                 <img src="assets/images/Arrows--horizontal.svg" />
                 <span [translate]="'startTest.latencyDetail'"></span>
-              </span> <span class="time">{{ currentDate | date:'shortTime' }} {{latency}}</span>
+              </span> <span class="time">{{ currentDate | date:'shortTime' }}</span>
 
             </ion-card-title>
             <ion-card-subtitle [ngClass]="{'error_status': (connectionStatus=='error' && currentState == undefined) ||

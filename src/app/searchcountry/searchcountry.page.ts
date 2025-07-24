@@ -1126,7 +1126,7 @@ export class SearchcountryPage {
       };
       this.automaticSearched = true;
       this.searchTerm = this.filterCountryByCode(this.selectedCountry).name;
-      this.selectCountry({name: this.searchTerm, code: c.code})
+      this.selectCountry({name: this.searchTerm, code: c.country})
 
     }, error => {
       this.automaticSearched = false;

@@ -52,7 +52,7 @@
       </div>
       <div class="bottom-layout">
         <ion-button color="primary" appEnterKeyClick tabindex="0" block class="dailycheck_btn btn_margin"
-          [disabled]="!selectedFromList && !automaticSearched || this.isPcdcCountry === false" (click)="confirmCountry()"><span
+          [disabled]="!selectedFromList && !automaticSearched || this.isPcdcCountry === false || !searchTerm.length" (click)="confirmCountry()"><span
             class="submit_button_size" [translate]="'searchCountry.confirm'"></span></ion-button>
       </div>
     </div>
