@@ -1,9 +1,10 @@
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { IonicModule } from '@ionic/angular';
 import { RouterTestingModule } from "@angular/router/testing";
 import { TranslateModule } from '@ngx-translate/core';
 import { SchooldetailsPage } from './schooldetails.page';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 
 describe('SchooldetailsPage', () => {
   let component: SchooldetailsPage;
@@ -11,14 +12,12 @@ describe('SchooldetailsPage', () => {
 
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ SchooldetailsPage ],
-      imports: [
-        IonicModule.forRoot(),
-        RouterTestingModule, 
-        HttpClientTestingModule,
-        TranslateModule.forRoot()
-      ]
-    }).compileComponents();
+    declarations: [SchooldetailsPage],
+    imports: [IonicModule.forRoot(),
+        RouterTestingModule,
+        TranslateModule.forRoot()],
+    providers: [provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
+}).compileComponents();
 
     fixture = TestBed.createComponent(SchooldetailsPage);
     component = fixture.componentInstance;

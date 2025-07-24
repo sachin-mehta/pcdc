@@ -305,3 +305,6 @@
     window.ndt7 = ndt7;
   }
 })();
+
+// Export the ndt7 object as a default export
+export default ndt7;

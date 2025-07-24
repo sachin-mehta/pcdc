@@ -64,7 +64,8 @@
         "go-dashboard": "Go to your dashboard"
     },
     "registerSchool": {
-        "register-step-1": "You’re about to register your school Make sure the computers are connected on a wired connection",
+        "register-step-1": "You’re about to register your school",
+        "register-part-2": "Make sure the computers are connected on a wired connection",
         "register-step-2": "Make sure that the application is Installed on 2 devices that are regularly used",
         "register-step-3": "Make sure you are connected only to the school internet",
         "start-registeration" : "Start Registration"

@@ -110,13 +110,12 @@ ion-item {
   --border-width: 0px;
 
 }
-.yesbtn {
+.nobtn {
   border: 2px solid #277AFF !important;
 
 }
 
 .notification {
-  gap: 16px;
   display: flex;
   align-items: flex-start;
   justify-content: space-around;
@@ -128,7 +127,7 @@ ion-item {
 
   .hydrated {
     background: none !important;
-    width: 50px;
+    width: 32px;
   }
 }
 
@@ -147,7 +146,7 @@ ion-item {
 
 .box_margin{
   margin-top: 20px;
-  margin-bottom: 0px;
+  margin-bottom: 20px;
 
 
 }

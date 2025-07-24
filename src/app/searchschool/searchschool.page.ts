@@ -7,9 +7,10 @@ import { SettingsService } from '../services/settings.service';
 import { TranslateService } from '@ngx-translate/core';
 import { environment } from 'src/environments/environment';
 @Component({
-  selector: 'app-searchschool',
-  templateUrl: 'searchschool.page.html',
-  styleUrls: ['searchschool.page.scss'],
+    selector: 'app-searchschool',
+    templateUrl: 'searchschool.page.html',
+    styleUrls: ['searchschool.page.scss'],
+    standalone: false
 })
 export class SearchschoolPage {
   @ViewChild(IonAccordionGroup, { static: true })

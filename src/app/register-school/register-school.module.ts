@@ -6,6 +6,7 @@ import { SharedModule } from '../shared/shared.module';
 import { IonicModule } from '@ionic/angular';
 import { RegisterSchoolRoutingModule } from './register-school-routing.module';
 import { EnterKeyClickDirective } from '../shared/directives/enter-key-click.directive';
+import { FormsModule } from '@angular/forms';
 
 
 
@@ -15,7 +16,8 @@ import { EnterKeyClickDirective } from '../shared/directives/enter-key-click.dir
     CommonModule,
     SharedModule,
     IonicModule,
-    RegisterSchoolRoutingModule
+    RegisterSchoolRoutingModule,
+    FormsModule
   ]
 })
 export class RegisterSchoolModule { }

@@ -7,18 +7,13 @@
     </ion-item>
 
     <div class="optional" [translate]="'saveEmail.optional'"></div>
-
-    <ion-item class="custom-gray-item" [class.ion-invalid]="emailControl.invalid ">
-      <ion-input type="email" [formControl]="emailControl" placeholder="e.g. info@school.edu">
+    <!-- <ion-item lines="none" class="custom-gray-item" [class.ion-invalid]="emailControl?.value?.length > 0 && emailControl.invalid && emailControl.touched"> -->
+      <ion-input fill="solid"  type="email" [formControl]="emailControl" placeholder="e.g. info@school.edu" class="custom-gray-item">
       </ion-input>
-    </ion-item>
-
-    <!-- <div class="text_under_input" [translate]="'saveEmail.instruction'"></div> -->
+    <!-- </ion-item> -->
 
     <div class="error-msg" *ngIf="emailControl.invalid">
-      <!-- <span *ngIf="emailControl.errors?.['required']" [translate]="'saveEmail.emailRequired'"></span> -->
-      <span *ngIf="emailControl.errors?.['email']" [translate]="'saveEmail.validEmail'"></span><br/>
-      <!-- <span *ngIf="emailControl.errors?.['invalidEmail']" [translate]="'saveEmail.emailFormat'"></span> -->
+      <span *ngIf="emailControl.errors?.['invalidEmail']" [translate]="'saveEmail.validEmail'"></span>
     </div>
     <div class="text_under_input" [translate]="'saveEmail.instruction'"></div>
 
@@ -28,8 +23,9 @@
 <ion-footer class="ion-no-border">
   <ion-toolbar class="ion-padding footer_button">
     <div class="btn-holder" style="margin-bottom: 14px;">
-      <ion-button block class="nobtn"   (click)="skip()" [translate]="'schoolDetails.skip'">Skip</ion-button>
-      <ion-button block class="yesbtn" (click)="addEmail()" [disabled]="emailControl.invalid" [translate]="'schoolDetails.add'">
+      <ion-button block class="nobtn" (click)="skip()" [translate]="'schoolDetails.skip'">Skip</ion-button>
+      <ion-button block class="yesbtn" (click)="addEmail()" [disabled]="emailControl.invalid"
+        [translate]="'schoolDetails.add'">
         Add
       </ion-button>
     </div>

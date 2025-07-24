@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { map, catchError } from 'rxjs/operators';
-import { throwError } from 'rxjs';
+import { throwError, firstValueFrom } from 'rxjs';
 import { Network } from '@awesome-cordova-plugins/network/ngx';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 
@@ -63,9 +63,10 @@ export class NetworkService {
     const options = { headers: this.headers };
     let response = null;
     try {
-      response = this.standardData(await this.http
-        .get(this.accessServiceUrl, options)
-        .toPromise<any>());
+      const httpResponse = await firstValueFrom(
+        this.http.get<IpInfoData>(this.accessServiceUrl, options)
+      );
+      response = this.standardData(httpResponse);
     } catch (error) {
       console.error('Error:', error);
       const ipGeoResponse = await fetch('https://ipv4.geojs.io/v1/ip/geo.json');

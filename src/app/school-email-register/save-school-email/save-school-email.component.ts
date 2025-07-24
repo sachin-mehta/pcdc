@@ -1,6 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { AbstractControl, FormControl, ValidationErrors, Validators } from '@angular/forms';
+import {
+  AbstractControl,
+  FormControl,
+  ValidationErrors,
+  Validators
+} from '@angular/forms';
 
 @Component({
   selector: 'app-save-school-email',
@@ -8,15 +13,24 @@ import { AbstractControl, FormControl, ValidationErrors, Validators } from '@ang
   styleUrls: ['./save-school-email.component.scss'],
 })
 export class SaveSchoolEmailComponent implements OnInit {
-  emailControl = new FormControl('', [Validators.email, this.emailDomainValidator]);
+  emailControl = new FormControl('');
 
   constructor(private readonly router: Router) {}
 
-  ngOnInit() {}
+  ngOnInit() {
+    this.emailControl.valueChanges.subscribe((value: string) => {
+      if (value && value.length >= 1) {
+        this.emailControl.setValidators([this.emailDomainValidator]);
+      } else {
+        this.emailControl.clearValidators();
+      }
+      this.emailControl.updateValueAndValidity({ emitEvent: false });
+    });
+  }
 
   addEmail() {
     if (this.emailControl.invalid) {
-      this.emailControl.markAsTouched(); // Show error if untouched
+      this.emailControl.markAsTouched();
       return;
     }
 
@@ -28,12 +42,12 @@ export class SaveSchoolEmailComponent implements OnInit {
     console.log('User skipped adding email');
     this.router.navigate(['/schoolsuccess']);
   }
+
   emailDomainValidator(control: AbstractControl): ValidationErrors | null {
     const value = control.value;
-    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    
-    // Check if the value matches the pattern
+    const emailPattern =
+      /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9-]+\.[a-zA-Z]{2,}$/;
+
     return emailPattern.test(value) ? null : { invalidEmail: true };
   }
-  
 }

@@ -149,7 +149,7 @@ ion-accordion-group {
       }
     }
     ion-icon {
-      margin-inline: -15px !important;
+      // margin-inline: -15px !important;
       color: $color-no;
       font-size: 18px;
     }
@@ -345,19 +345,20 @@ ion-loading {
   justify-content: space-between;
   align-items: center;
   background-color: #ffffff;
-  padding: 32px 25px 16px 32px;
+  padding: 32px 2px 16px 32px;
 
   .closeIcon {
       font-size: 24px;
       color: $light-text1;
+      cursor: pointer;
   }
 
-  .closeIcon:hover {
-      background-color: #42516E;
-      border-radius: 50%;
-      width: 29px;
-      height: 29px;
-  }
+  // .closeIcon:hover {
+  //     background-color: #42516E;
+  //     border-radius: 50%;
+  //     width: 29px;
+  //     height: 29px;
+  // }
 
   
 }
@@ -368,11 +369,11 @@ ion-loading {
   height: 28px;
 }
 
-.backIcon:hover {
-  background-color: #42516E;
-  border-radius: 50%;
+// .backIcon:hover {
+//   background-color: #42516E;
+//   border-radius: 50%;
   
-}
+// }
 .btn_margin {
   margin-inline-end: 0;
   margin-inline-start:0;
@@ -406,10 +407,9 @@ ion-breadcrumb::part(native) {
     --padding-bottom: 0 !important;  
 }
 
-.accordion-sec ion-accordion-group ion-accordion ion-icon {
-  margin-inline: 15px !important;
-}
-
+// .accordion-sec ion-accordion-group ion-accordion ion-icon {
+//   margin-inline: 15px !important;
+// }
 
 .loadContent {
   display: flex;
@@ -418,4 +418,7 @@ ion-breadcrumb::part(native) {
   justify-content: center; /* Center vertically */
   height: 100vh;           /* Full screen height */
   text-align: center;
+}
+.loading-spinner.sc-ion-loading-md+.loading-content.sc-ion-loading-md {
+  margin-inline-start: 0px !important
 }

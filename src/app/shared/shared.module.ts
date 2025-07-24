@@ -15,7 +15,7 @@ import { DatePipe } from '@angular/common';
 import { TranslateModule, TranslateLoader } from '@ngx-translate/core';
 import { TranslateHttpLoader } from '@ngx-translate/http-loader';
 import { Network } from '@awesome-cordova-plugins/network/ngx';
-import { NgxElectronModule } from 'ngx-electron';
+// import { NgxElectronModule } from 'ngx-electron';
 import { PcdcHeaderComponent } from '../pcdc-header/pcdc-header.component';
 import { CircularProgressBarComponent } from './circular-progress-bar/circular-progress-bar.component';
 import { SelectedDetailComponent } from './selected-detail/selected-detail.component';
@@ -41,7 +41,7 @@ export const createTranslateLoader = (http: HttpClient) =>
   imports: [
     CommonModule,
     NgPipesModule,
-    NgxElectronModule,
+    // NgxElectronModule,
     TranslateModule.forRoot({
       defaultLanguage: 'en',
       loader: {

@@ -1,7 +1,7 @@
 import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouteReuseStrategy } from '@angular/router';
-import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule, provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { IonicModule, IonicRouteStrategy } from '@ionic/angular';
 import { ErrorHandler } from '@angular/core';
 
@@ -22,7 +22,6 @@ export function tokenGetter() {
 
 @NgModule({
   declarations: [AppComponent],
-  entryComponents: [],
   imports: [
     FormsModule,
     BrowserModule, 
@@ -38,6 +37,7 @@ export function tokenGetter() {
       multi: true
     },
     { provide: RouteReuseStrategy, useClass: IonicRouteStrategy },
+    provideHttpClient(withInterceptorsFromDi()),
     SentryService,
     { provide: ErrorHandler, useClass: SentryErrorHandler }
   ],

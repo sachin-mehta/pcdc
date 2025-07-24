@@ -69,6 +69,14 @@
         "go-dashboard": "Aller à votre tableau de bord"
 
     },
+    "registerSchool": {
+        "register-step-1": "Vous êtes sur le point d’enregistrer votre école",
+        "register-part-2": "Assurez-vous que les ordinateurs sont connectés via un câble",
+        "register-step-2": "Assurez-vous que l’application est installée sur 2 appareils utilisés régulièrement",
+        "register-step-3": "Assurez-vous d’être connecté uniquement à l’internet de l’école",
+        "start-registeration": "Commencer l’enregistrement"
+    },
+
     "searchCountry": {
         "loading": "ChargementDétection de votre pays",
         "confirm": "Confirmer",
@@ -77,7 +85,8 @@
         "country": "Pays",
         "country-not-accurate": "Il semble que le pays que vous avez sélectionné ne corresponde pas à votre emplacement. Êtes-vous sûr de vouloir continuer ?",
         "please-double-check": "Veuillez vérifier votre sélection.",
-        "not-available": "l'application {{appName}} {{appNameSuffix}} n'est pas disponible dans ce pays. Veuillez choisir un autre pays."
+        "not-available": "l'application {{appName}} {{appNameSuffix}} n'est pas disponible dans ce pays. Veuillez choisir un autre pays.",
+        "change-country": "Si la sélection ci-dessus n'est pas correcte, sélectionnez votre pays dans la liste déroulante."
     },
     "searchSchool": {
         "search": "Recherche de votre école...",

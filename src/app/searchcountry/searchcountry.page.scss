@@ -89,10 +89,8 @@ ion-select:hover {
   .list-md {
     z-index: 9999;
     position: relative;
-    padding: 10px;
-    margin: 0;
-    border-radius: 5px;
-    padding-left: 0;
+    margin: 0 2px;
+    border-radius: 0px;
   }
 }
 
@@ -132,11 +130,8 @@ ion-select:hover {
 .scrollable {
   max-height: 250px;
   overflow: auto;
-  box-shadow:
-  0 4px 12px rgba(0, 0, 0, 0.15),   /* bottom */
-  4px 0 12px rgba(0, 0, 0, 0.15),   /* right */
- -4px 0 12px rgba(0, 0, 0, 0.15);   /* left */
-   border: 1px solid #ccc;
+  box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.50);
+  border: 1px solid #ccc;
 }
 
 .error {
@@ -151,9 +146,14 @@ ion-select:hover {
 .margin_on_condition{
   margin-left: 12px;
 }
-
+.img_wifi {
+  margin-left: 5px;
+}
 .change-country {
   padding-top: 5px;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 16px;
 }
 .warning_color {
   // border-color: #F1C21B;
@@ -192,4 +192,21 @@ ion-select:hover {
   width: 100%;
   border-bottom: 1px solid #ccc;
   margin-top: 10px; /* space between content and border */
+}
+::ng-deep {
+  ion-list {
+
+    // Target WebKit browsers (Chrome, Edge, Safari)
+  &::-webkit-scrollbar {
+      width: 8px;
+    }
+    &::-webkit-scrollbar-thumb {  
+      border-radius: 4px;
+      border: 2px solid transparent;
+    }  
+    scrollbar-color: #a3acbb transparent;
+    scrollbar-width: thin;
+  }
+  
+   
 }

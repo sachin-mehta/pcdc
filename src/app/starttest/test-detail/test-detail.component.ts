@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { CountryService } from 'src/app/services/country.service';
+import { HistoryService } from 'src/app/services/history.service';
 import { NetworkService } from 'src/app/services/network.service';
 import { StorageService } from 'src/app/services/storage.service';
 
@@ -6,9 +8,12 @@ import { StorageService } from 'src/app/services/storage.service';
   selector: 'app-test-detail',
   templateUrl: './test-detail.component.html',
   styleUrls: ['./test-detail.component.scss'],
+  standalone: false
+  
 })
 export class TestDetailComponent implements OnInit {
   schoolId: string;
+  school: any
   historicalData: any;
   measurementsData: []
   accessInformation = {
@@ -27,19 +32,32 @@ export class TestDetailComponent implements OnInit {
       timezone: '',
       asn: '',
     };
+    measurementnetworkServer: any;
+    measurementISP: any;
+    selectedCountry: any;
   constructor(    private storage: StorageService,
-    private networkService: NetworkService
+    private historyService: HistoryService,
+    private countryService: CountryService
 
   ) { }
 
   ngOnInit() {    
-    this.networkService.getNetInfo().then((res) => {
-      
-      if (res) {
-        this.accessInformation = res;
-        console.log(this.accessInformation)
-      }
-    });
+    if (this.storage.get('schoolId')) {
+      this.school = JSON.parse(this.storage.get('schoolInfo'));
+       this.countryService.getPcdcCountryByCode(this.school.country).subscribe(
+      (response) => {
+        this.selectedCountry = response[0].name;
+      },
+      (err) => {
+        console.log('ERROR: ' + err);
+      })
+    }
+    
+     let historicalData = this.historyService.get();
+        if (historicalData !== null && historicalData !== undefined && historicalData.measurements.length) {
+          this.measurementnetworkServer = historicalData.measurements[historicalData.measurements.length - 1].mlabInformation.city;
+          this.measurementISP = historicalData.measurements[historicalData.measurements.length - 1].accessInformation.org;
+        }
     this.schoolId = this.storage.get('schoolId');
     // if(this.storage.get('historicalDataAll')) {
     //   this.historicalData =  JSON.parse(this.storage.get('historicalDataAll'))

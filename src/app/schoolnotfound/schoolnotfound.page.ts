@@ -8,9 +8,10 @@ import { SettingsService } from '../services/settings.service';
 import { environment } from 'src/environments/environment';
 
 @Component({
-  selector: 'app-schoolnotfound',
-  templateUrl: 'schoolnotfound.page.html',
-  styleUrls: ['schoolnotfound.page.scss'],
+    selector: 'app-schoolnotfound',
+    templateUrl: 'schoolnotfound.page.html',
+    styleUrls: ['schoolnotfound.page.scss'],
+    standalone: false
 })
 export class SchoolnotfoundPage {
   @ViewChild(IonAccordionGroup, { static: true })

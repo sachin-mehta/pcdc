@@ -22,11 +22,13 @@ import { TranslateService } from '@ngx-translate/core';
 import { StorageService } from '../services/storage.service';
 import { Subscription } from 'rxjs';
 import { CountryService } from '../services/country.service';
+import { mlabInformation, accessInformation } from '../models/models';
 
 @Component({
-  selector: 'app-starttest',
-  templateUrl: 'starttest.page.html',
-  styleUrls: ['starttest.page.scss'],
+    selector: 'app-starttest',
+    templateUrl: 'starttest.page.html',
+    styleUrls: ['starttest.page.scss'],
+    standalone: false
 })
 export class StarttestPage implements OnInit, OnDestroy {
   @ViewChild(IonAccordionGroup, { static: true })
@@ -55,6 +57,8 @@ export class StarttestPage implements OnInit, OnDestroy {
     label: '',
     metro: '',
   };
+  measurementISP: any;
+  measurementnetworkServer: any;
   accessInformation = {
     ip: '',
     city: '',
@@ -255,13 +259,13 @@ export class StarttestPage implements OnInit, OnDestroy {
   tryConnectivity() {
     const translatedText = this.translate.instant('searchCountry.loading');
 
-    const loadingMsg =
-      // eslint-disable-next-line max-len
-      `<div class="loadContent">
-     <ion-img src="assets/loader/new_loader.gif" class="loaderGif"></ion-img>
-     <p class="green_loader">${translatedText}</p>
-   </div>`;
-    
+   this.translate.get('searchCountry.loading').subscribe((translatedText) => {
+    const loadingMsg = `
+      <div class="loadContent">
+        <ion-img src="assets/loader/new_loader.gif" class="loaderGif"></ion-img>
+        <p class="green_loader">${translatedText}</p>
+      </div>`;
+  
     this.loading.present(loadingMsg, 15000, 'pdcaLoaderClass', 'null');
     this.networkService.getNetInfo().then((res) => {
       this.connectionStatus = 'success';
@@ -273,6 +277,8 @@ export class StarttestPage implements OnInit, OnDestroy {
         console.log(this.accessInformation)
       }
     });
+  });
+    
   }
 
   refreshHistory() {
@@ -303,9 +309,11 @@ export class StarttestPage implements OnInit, OnDestroy {
       this.uploadProgressStarted = false;
       this.downloadStarted = false;
       this.uploadStarted = false;
+      this.measurementnetworkServer = '';
+      this.measurementISP = '';
       this.progress = 0;
   
-      // ❗ Clear any ongoing timers
+      // Clear any ongoing timers
       if (this.downloadTimer) {
         clearInterval(this.downloadTimer);
         this.downloadTimer = null;
@@ -429,11 +437,11 @@ export class StarttestPage implements OnInit, OnDestroy {
         this.progressGaugeState.current = this.progressGaugeState.maximum;
         this.latency = ((data.passedResults['NDTResult.S2C'].LastServerMeasurement.BBRInfo.MinRTT +
           data.passedResults['NDTResult.C2S'].LastServerMeasurement.BBRInfo.MinRTT) / 2 / 1000).toFixed(0);
-        // let historicalData = this.historyService.get();
-        // if (historicalData !== null && historicalData !== undefined) {
-        //   this.accessInformation =
-        //     historicalData.measurements[0].accessInformation;
-        // }
+        let historicalData = this.historyService.get();
+        if (historicalData !== null && historicalData !== undefined && historicalData.measurements.length) {
+          this.measurementnetworkServer = historicalData.measurements[historicalData.measurements.length - 1].mlabInformation.city;
+          this.measurementISP = historicalData.measurements[historicalData.measurements.length - 1].accessInformation.org;
+        }
         this.ref.markForCheck();
         this.refreshHistory();
       } else if (data.testStatus === 'onerror') {

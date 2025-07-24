@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import * as ndt7 from '../../assets/js/ndt/ndt7.js';
+import ndt7 from '../../assets/js/ndt/ndt7.js';
 import { BehaviorSubject, Observable, Subject, forkJoin } from 'rxjs';
 import { MeasurementService } from './measurement.service';
 import { HistoryService } from './history.service';

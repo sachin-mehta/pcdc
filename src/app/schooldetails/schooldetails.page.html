@@ -28,13 +28,14 @@
                 >
                   <ion-label>
                     <span *ngIf="schoolInfo?.name" class="schoolName">{{ schoolInfo.name }}</span>
-                    <span *ngIf="schoolInfo?.education_level" class="education_level">{{ schoolInfo.education_level }}</span>
+                    <!-- <span *ngIf="schoolInfo?.education_level" class="education_level">{{ schoolInfo.education_level }}</span>
                     <span *ngIf="schoolInfo?.admin_1_name" class="school_detail">{{ schoolInfo.admin_1_name }} - {{ schoolInfo.admin_1_name }}</span>
-                    <div *ngIf="schoolInfo?.lat" class="school_detail"><span class="linkColor">lat long</span> {{ schoolInfo.school_id }}</div>
+                    <div *ngIf="schoolInfo?.lat" class="school_detail"><span class="linkColor">lat long</span> {{ schoolInfo.school_id }}</div> -->
                     <span *ngIf="schoolInfo?.school_id" class="school_detail">{{ schoolInfo.school_id }}</span>
-                    <span class="school_detail linkColor googleCheck"><span [translate]="'schoolDetails.checkGiga' | translate"></span>
-                      <ion-img src="assets/images/Launch.png" class="welcome_icon"></ion-img>
-                    </span>
+                    <!-- <span class="school_detail linkColor googleCheck"> -->
+                      <!-- <span [translate]="'schoolDetails.checkGiga' | translate"></span>
+                      <ion-img src="assets/images/Launch.png" class="welcome_icon"></ion-img> -->
+                    <!-- </span> -->
                     <!-- <br /> -->
                   </ion-label>
                   <ion-radio slot="end" [value]="schoolInfo"></ion-radio>
@@ -48,13 +49,14 @@
             *ngIf="schools?.length" class=" selected-border school_item single_school" >
               <ion-label>
                 <span *ngIf="schools[0]?.name" class="schoolName">{{ schools[0].name }}</span>
-                <span *ngIf="schools[0]?.education_level" class="school_detail">{{ schools[0].education_level }}</span>
+                <!-- <span *ngIf="schools[0]?.education_level" class="school_detail">{{ schools[0].education_level }}</span>
                 <span *ngIf="schools[0]?.admin_1_name" class="school_detail">{{ schools[0].admin_1_name }} - {{ schools[0].admin_1_name }}</span>
-                <div *ngIf="schools[0]?.lat" class="school_detail"><span class="linkColor">lat long</span> {{ schools[0].school_id }}</div>
+                <div *ngIf="schools[0]?.lat" class="school_detail"><span class="linkColor">lat long</span> {{ schools[0].school_id }}</div> -->
                 <span *ngIf="schools[0]?.school_id" class="school_detail">{{ schools[0].school_id }}</span>
-                <span class="school_detail linkColor googleCheck"><span [translate]="'schoolDetails.checkGiga' | translate"></span>
-                  <ion-img src="assets/images/Launch.png" class="welcome_icon"></ion-img>
-                </span>
+                <!-- <span class="school_detail linkColor googleCheck"> -->
+                  <!-- <span [translate]="'schoolDetails.checkGiga' | translate"></span>
+                  <ion-img src="assets/images/Launch.png" class="welcome_icon"></ion-img> -->
+                <!-- </span> -->
                 <!-- <br /> -->
               </ion-label>
             </ion-item>
@@ -65,7 +67,7 @@
 
     <!-- Display the "Select" button only if there are multiple schools -->
     <div class="bottom-layout">
-      <ion-button color="primary" appEnterKeyClick class="searchButton btn_margin" (click)="confirmSchool(selectedSchool.school_id ? selectedSchool  : schools[0])" [disabled]="!selectedSchool.school_id && schools?.length > 1"  [translate]="'schoolDetails.select' | translate">
+      <ion-button color="primary" appEnterKeyClick  class="searchButton btn_margin" (click)="confirmSchool(selectedSchool.school_id ? selectedSchool  : schools[0])" [disabled]="!selectedSchool.school_id && schools?.length > 1"  [translate]="'schoolDetails.select' | translate">
       </ion-button>
     </div>
   </div>

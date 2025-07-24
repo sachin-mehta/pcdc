@@ -25,8 +25,8 @@ import electronServe from 'electron-serve';
 import windowStateKeeper from 'electron-window-state';
 import { join } from 'path';
 import * as Sentry from '@sentry/node';
+import type { SeverityLevel } from '@sentry/types';
 import { Console } from 'console';
-import { Severity } from '@sentry/node';
 var AutoLaunch = require('auto-launch');
 var isQuiting = false;
 
@@ -231,7 +231,7 @@ export class ElectronCapacitorApp {
 
     this.MainWindow?.on('unresponsive', () => {
       Sentry.captureMessage('Window became unresponsive', {
-        level: Severity.Error,
+        level: 'error' as SeverityLevel,
         extra: {
           windowId: this.MainWindow?.id,
         },
@@ -301,10 +301,8 @@ export class ElectronCapacitorApp {
     }
 
     // Setup the main manu bar at the top of our window.
-    if (this.CapacitorFileConfig?.electron?.appMenuBarMenuTemplateEnabled) {
-      Menu.setApplicationMenu(
-        Menu.buildFromTemplate(this.AppMenuBarMenuTemplate)
-      );
+    if ((this.CapacitorFileConfig.electron as any)?.appMenuBarMenuTemplateEnabled) {
+      Menu.setApplicationMenu(Menu.buildFromTemplate(this.AppMenuBarMenuTemplate));
     } else {
       Menu.setApplicationMenu(new Menu());
     }
@@ -364,8 +362,8 @@ export class ElectronCapacitorApp {
         }
       });
       setTimeout(() => {
-        if (this.CapacitorFileConfig?.electron?.electronIsDev) {
-          this.MainWindow?.webContents?.openDevTools();
+        if ((this.CapacitorFileConfig.electron as any)?.electronIsDev) {
+          this.MainWindow.webContents.openDevTools();
           this.MainWindow.setSize(390, 700);
         }
         CapElectronEventEmitter.emit(

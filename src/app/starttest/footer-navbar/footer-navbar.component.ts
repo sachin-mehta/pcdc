@@ -7,6 +7,7 @@ import { ChangeDetectorRef } from '@angular/core';
   selector: 'app-footer-navbar',
   templateUrl: './footer-navbar.component.html',
   styleUrls: ['./footer-navbar.component.scss'],
+  standalone: false
 })
 export class FooterNavbarComponent implements OnInit, OnDestroy{
   activeSegment: string = 'home';

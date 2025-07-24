@@ -8,9 +8,10 @@ import { SettingsService } from '../services/settings.service';
 import { environment } from 'src/environments/environment';
 
 @Component({
-  selector: 'app-schoolsuccess',
-  templateUrl: 'schoolsuccess.page.html',
-  styleUrls: ['schoolsuccess.page.scss'],
+    selector: 'app-schoolsuccess',
+    templateUrl: 'schoolsuccess.page.html',
+    styleUrls: ['schoolsuccess.page.scss'],
+    standalone: false
 })
 export class SchoolsuccessPage {
   @ViewChild(IonAccordionGroup, { static: true })
