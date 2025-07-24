@@ -54,16 +54,13 @@ abstract class NDTTest(private var httpClient: OkHttpClient? = null) : DataPubli
           try {
             val hostInfo: HostnameResponse =
               Gson().fromJson(response.body?.string(), HostnameResponse::class.java)
-            Log.d("GIGA HostDetails", hostInfo.toString())
-            val jsonString = GsonBuilder()
-              .serializeNulls()
-              .create().toJson(hostInfo)
-            Log.d("GIGA NetworkTestService", "sendSpeedTestCompleted $jsonString")
-            Log.d("MainActivity response HostDetails", response.toString())
             val numUrls = hostInfo.results?.size!!
             for (i in 0 until numUrls) {
               try {
                 if (!hostInfo.results[i].urls.ndt7DownloadWSS.contains(".deenet.autojoin.")) {
+                  selectTestType(testType, hostInfo.results[i].urls, speedtestLock)
+                  return
+                } else if (numUrls == 1) {
                   selectTestType(testType, hostInfo.results[i].urls, speedtestLock)
                   return
                 }
@@ -74,7 +71,6 @@ abstract class NDTTest(private var httpClient: OkHttpClient? = null) : DataPubli
             }
           } catch (e: Exception) {
             Log.d("MainActivity  $testType", e.toString())
-
             onFinished(null, e, testType)
             executorService?.shutdown()
             runLock.release()
