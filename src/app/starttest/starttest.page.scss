@@ -485,7 +485,7 @@ ion-card {
   align-items: stretch;
   width: 91%;
   max-width: 340px;
-  margin: 25px auto 8px;
+  margin: 15px auto 8px;
   padding: 8px 0;
 }
 
@@ -510,6 +510,7 @@ ion-card {
 .center-item {
   flex: 0.9;
   text-align: left;
+  border: none !important;
 }
 
 .right-item {

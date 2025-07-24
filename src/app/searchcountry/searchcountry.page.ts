@@ -1044,7 +1044,7 @@ export class SearchcountryPage {
     private translate: TranslateService
   ) {
     const appLang = this.settingsService.get('applicationLanguage');
-    this.translate.use(appLang.code);
+    this.translate.use(appLang?.code);
   }
   ngOnInit() {
     this.getCountry();

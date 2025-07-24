@@ -7,7 +7,7 @@
       <ion-item class="custom-item" lines="none" color="light">
         <ion-label>
           <p class="subtitle">{{selectedCountry}} - {{schoolId}}</p>
-          <h2 class="title" title="schoolId">{{school.name}}</h2>
+          <h2 class="title" title={{school?.name}}>{{school?.name}}</h2>
         </ion-label>
       </ion-item>
       <!---------   Start test Section ------------------>
@@ -140,7 +140,7 @@
         <ion-item lines="none" class="right-item">
           <ion-label class="position">
             <h3  [translate]="'startTest.server'"></h3>
-            <p title={{measurementnetworkServer}}>{{measurementnetworkServer?.length ? measurementISP : '---' }}</p>
+            <p title={{measurementnetworkServer}}>{{measurementnetworkServer?.length ? measurementnetworkServer : '---' }}</p>
           </ion-label>
         </ion-item>
       </ion-list>

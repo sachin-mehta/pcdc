@@ -309,6 +309,8 @@ export class StarttestPage implements OnInit, OnDestroy {
       this.uploadProgressStarted = false;
       this.downloadStarted = false;
       this.uploadStarted = false;
+      this.measurementnetworkServer = '';
+      this.measurementISP = '';
       this.progress = 0;
   
       // Clear any ongoing timers
