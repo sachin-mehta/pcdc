@@ -158,17 +158,25 @@ export class StarttestPage implements OnInit, OnDestroy {
           console.log('GIGA', 'Executed onstart');
         } else if (data.testStatus === 'upload') {
           console.log('Running Test (Upload)');
+          this.downloadStarted = false;
+          this.uploadStarted = true;
+          if (this.downloadTimer) {
+            clearInterval(this.downloadTimer);
+          }
           this.currentState = 'Running Test (Upload)';
           this.currentRateDownload = data.downloadSpeed?.toFixed(2);
           this.currentRate = data.uploadSpeed?.toFixed(2);
           this.currentRateUpload = data.uploadSpeed?.toFixed(2);
           if (!this.uploadProgressStarted) {
+            this.progress = 50;
             this.uploadProgressStarted = true;
             this.startUploadProgress();
           }
           this.ref.markForCheck();
           console.log('GIGA', 'Executed upload ');
         } else if (data.testStatus === 'download') {
+          this.downloadStarted = true;
+          this.uploadStarted = false;
           this.currentState = 'Running Test (Download)';
           this.currentRate = data.downloadSpeed?.toFixed(2);
           this.currentRateDownload = data.downloadSpeed?.toFixed(2);
@@ -179,6 +187,11 @@ export class StarttestPage implements OnInit, OnDestroy {
           this.ref.markForCheck();
           console.log('GIGA', 'Executed download');
         } else if (data.testStatus === 'complete') {
+          this.uploadStarted = false;
+          if (this.uploadTimer) {
+            clearInterval(this.uploadTimer);
+          }
+          this.progress = 100;
           this.currentState = 'Completed';
           this.currentDate = new Date();
           this.currentRate =
@@ -459,7 +472,7 @@ export class StarttestPage implements OnInit, OnDestroy {
           clearInterval(this.downloadTimer);
           this.downloadTimer = null;
         }
-
+        this.ref.markForCheck();
         this.ref.detectChanges(); // trigger UI update
       } else {
         clearInterval(this.downloadTimer);

@@ -31,7 +31,7 @@ data class SpeedTestResultRequestEntity(
   val schoolId: String?,
   @SerializedName("ServerInfo")
   val serverInfo: ServerInfoRequestEntity?,
-  @SerializedName("timestamp")
+  @SerializedName("Timestamp")
   val timestamp: String?,
   @SerializedName("timestamplocal")
   val timestampLocal: String?,
