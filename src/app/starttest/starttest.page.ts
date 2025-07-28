@@ -472,7 +472,6 @@ export class StarttestPage implements OnInit, OnDestroy {
           clearInterval(this.downloadTimer);
           this.downloadTimer = null;
         }
-        this.ref.markForCheck();
         this.ref.detectChanges(); // trigger UI update
       } else {
         clearInterval(this.downloadTimer);
