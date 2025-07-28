@@ -99,7 +99,7 @@ export class TestDetailComponent implements OnInit {
         .sort((a, b) => {
           console.log('a in Historical Data:', JSON.stringify(a));
           console.log('b in Historical Data:', JSON.stringify(b));
-          new Date(b.Timestamp).getTime() - new Date(a.Timestamp).getTime();
+          new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
         }) // descending order
         .slice(0, 10); // take last 10
     } catch (err) {
