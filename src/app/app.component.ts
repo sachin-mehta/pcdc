@@ -24,6 +24,7 @@ export class AppComponent {
   scheduleSemaphore: any;
   // eslint-disable-next-line @typescript-eslint/naming-convention
   app_version: any;
+  device_id:string;
   appName = environment.appName;
   showAboutMenu = environment.showAboutMenu;
   constructor(
@@ -44,6 +45,7 @@ export class AppComponent {
     };
     this.translate.use(appLang.code);
     this.app_version = environment.app_version;
+    this.device_id = this.storage.get('schoolUserId') || 'unknown-device';
     if (this.storage.get('schoolId')) {
       this.school = JSON.parse(this.storage.get('schoolInfo'));
     }
