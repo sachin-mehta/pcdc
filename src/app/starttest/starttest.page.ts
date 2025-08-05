@@ -23,6 +23,8 @@ import { StorageService } from '../services/storage.service';
 import { Subscription } from 'rxjs';
 import { CountryService } from '../services/country.service';
 import { Capacitor, registerPlugin } from '@capacitor/core';
+import { mlabInformation, accessInformation } from '../models/models';
+
 @Component({
   selector: 'app-starttest',
   templateUrl: 'starttest.page.html',
@@ -56,6 +58,8 @@ export class StarttestPage implements OnInit, OnDestroy {
     label: '',
     metro: '',
   };
+  measurementISP: any;
+  measurementnetworkServer: any;
   accessInformation = {
     ip: '',
     city: '',
@@ -415,9 +419,11 @@ export class StarttestPage implements OnInit, OnDestroy {
       this.uploadProgressStarted = false;
       this.downloadStarted = false;
       this.uploadStarted = false;
+      this.measurementnetworkServer = '';
+      this.measurementISP = '';
       this.progress = 0;
 
-      // ❗ Clear any ongoing timers
+      // Clear any ongoing timers
       if (this.downloadTimer) {
         clearInterval(this.downloadTimer);
         this.downloadTimer = null;
@@ -556,11 +562,21 @@ export class StarttestPage implements OnInit, OnDestroy {
           2 /
           1000
         ).toFixed(0);
-        // let historicalData = this.historyService.get();
-        // if (historicalData !== null && historicalData !== undefined) {
-        //   this.accessInformation =
-        //     historicalData.measurements[0].accessInformation;
-        // }
+        let historicalData = this.historyService.get();
+        if (
+          historicalData !== null &&
+          historicalData !== undefined &&
+          historicalData.measurements.length
+        ) {
+          this.measurementnetworkServer =
+            historicalData.measurements[
+              historicalData.measurements.length - 1
+            ].mlabInformation.city;
+          this.measurementISP =
+            historicalData.measurements[
+              historicalData.measurements.length - 1
+            ].accessInformation.org;
+        }
         this.ref.markForCheck();
         this.refreshHistory();
       } else if (data.testStatus === 'onerror') {

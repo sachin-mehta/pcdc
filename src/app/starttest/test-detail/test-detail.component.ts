@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CountryService } from 'src/app/services/country.service';
+import { HistoryService } from 'src/app/services/history.service';
 import { NetworkService } from 'src/app/services/network.service';
 import { StorageService } from 'src/app/services/storage.service';
+import { Router, NavigationEnd } from '@angular/router';
 import { GigaAppPlugin } from '../../android/giga-app-android-plugin';
 import { Capacitor } from '@capacitor/core';
 
@@ -32,12 +34,21 @@ export class TestDetailComponent implements OnInit {
     timezone: '',
     asn: '',
   };
+  measurementnetworkServer: any;
+  measurementISP: any;
   selectedCountry: any;
   constructor(
     private storage: StorageService,
-    private networkService: NetworkService,
-    private countryService: CountryService
-  ) {}
+    private historyService: HistoryService,
+    private countryService: CountryService,
+    private router: Router
+  ) {
+    this.router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        this.loadData();
+      }
+    });
+  }
 
   ngOnInit() {
     if (this.storage.get('schoolId')) {
@@ -51,18 +62,26 @@ export class TestDetailComponent implements OnInit {
         }
       );
     }
+    this.loadData();
+  }
 
-    this.networkService.getNetInfo().then((res) => {
-      if (res) {
-        this.accessInformation = res;
-        console.log(this.accessInformation);
-      }
-    });
+  loadData() {
+    let historicalData = this.historyService.get();
+    if (
+      historicalData !== null &&
+      historicalData !== undefined &&
+      historicalData.measurements.length
+    ) {
+      this.measurementnetworkServer =
+        historicalData.measurements[
+          historicalData.measurements.length - 1
+        ].mlabInformation.city;
+      this.measurementISP =
+        historicalData.measurements[
+          historicalData.measurements.length - 1
+        ].accessInformation.org;
+    }
     this.schoolId = this.storage.get('schoolId');
-    // if(this.storage.get('historicalDataAll')) {
-    //   this.historicalData =  JSON.parse(this.storage.get('historicalDataAll'))
-    //   this.measurementsData = this.historicalData.measurements
-    // }
 
     if (Capacitor.isNativePlatform()) {
       this.loadHistoricalData();
@@ -99,7 +118,7 @@ export class TestDetailComponent implements OnInit {
         .sort((a, b) => {
           console.log('a in Historical Data:', JSON.stringify(a));
           console.log('b in Historical Data:', JSON.stringify(b));
-          new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
+          new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
         }) // descending order
         .slice(0, 10); // take last 10
     } catch (err) {

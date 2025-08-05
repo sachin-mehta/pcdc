@@ -1,7 +1,7 @@
 <app-pcdc-header></app-pcdc-header>
 <ion-content>
   <div class="container">
-    <ion-slides  [options]="slideOpts" (ionSlideReachEnd)="reachedEnd()" class="schoolsuccess" #mySlider>
+    <ion-slides  [options]="slideOpts"  (ionSlideReachEnd)="reachedEnd()" (ionSlideWillChange)="checkCurrentSlide()" class="schoolsuccess" #mySlider>
       <ion-slide>
         <div class="top-layout">
           <div class="successInfo">

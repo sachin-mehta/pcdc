@@ -1,107 +1,124 @@
 @import "../../../theme/variables.scss";
 
 .centerPos {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-    background: #f4f5f8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  background: #f4f5f8;
 }
 
-
+.center-pos {
+  border: none !important;
+}
 .subtitle {
-    font-size: 10px;
-    color: #474747 !important;
-    /* Lighter gray color */
-    margin-bottom: 4px;
-    font-weight: 700;
+  font-size: 10px;
+  color: #474747 !important;
+  /* Lighter gray color */
+  margin-bottom: 4px;
+  font-weight: 700;
 }
 
 .title {
-    font-size: 18px;
-    font-weight: 700;
-    color: black;
-    /* Ensure the main text is white */
+  font-size: 18px;
+  font-weight: 700;
+  color: black;
+  /* Ensure the main text is white */
 }
 
 .custom-item {
-    --color: black;
-    /* Set text color */
-    border-radius: 8px;
-    width: 100%;
+  --color: black;
+  /* Set text color */
+  border-radius: 8px;
+  width: 100%;
 
 }
+
 .horizontal-list {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    gap: 10px;
-    width: 100%;
-    padding: 16px;
-    background: #f4f5f8;
-  
-    ion-item {
-      --padding-start: 8px;
-      flex: 1;
-      border-left: 1px solid gray;
-      /* Divider line */
-      --background: transparent;
-    }
-  
-    ion-label h3,
-    ion-label p {
-      /* Change as per your theme */
-      margin: 0;
-      font-size: 12px;
-      font-weight: 400;
-      color: #474747;
-    }
-    
-    ion-label h3{
-        color: #9E9E9E;
-    }
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 10px;
+  width: 100%;
+  padding: 16px;
+  background: #f4f5f8;
+
+  ion-item {
+    height: 42px;
+    --padding-start: 8px;
+    flex: 1;
+    border-left: 1px solid gray;
+    /* Divider line */
+    --background: transparent;
   }
-  .test_history {
-    font-size: 16px;
-    font-weight: 400;
-    color: #474747 !important;
-  }
-  .table-header {
-    ion-col {
-      font-weight: 400;
-      font-size: 10px;
-    }
-  }
-  
-  ion-row {
-    padding: 0.5rem 0;
-    font-size: 10px;
+
+  ion-label h3,
+  ion-label p {
+    /* Change as per your theme */
+    margin: 0;
+    font-size: 13px;
     font-weight: 400;
     color: #474747;
-    
-
   }
-  
+
+  ion-label h3 {
+    color: #9E9E9E;
+  }
+}
+
+.test_history {
+  font-size: 16px;
+  font-weight: 400;
+  color: #474747 !important;
+}
+
+.table-header {
   ion-col {
-    display: flex;
-    align-items: center;
-    &.green_color{
-        color: #42BE65;
-    }
-    /* Optional text alignment: */
-    /* justify-content: center; */
+    font-weight: 400;
+    font-size: 10px;
   }
-  
-  .card_margin {
-    margin: 0;
-    box-shadow: none !important;
-    border: 4px;
-    background: #F5F5F5;
+}
+
+ion-row {
+  padding: 0.5rem 0;
+  font-size: 10px;
+  font-weight: 400;
+  color: #474747;
+
+
+}
+
+ion-col {
+  display: flex;
+  align-items: center;
+
+  &.green_color {
+    color: #42BE65;
   }
 
-  .footer_card_margin {
-    margin: 10px 0;
-    border-radius: 4px;
-    box-shadow: none !important;
-    background: #F5F5F5;
-  }
+  /* Optional text alignment: */
+  /* justify-content: center; */
+}
+
+.card_margin {
+  margin: 0;
+  box-shadow: none !important;
+  border: 4px;
+  background: #F5F5F5;
+}
+
+.footer_card_margin {
+  margin: 10px 0;
+  border-radius: 4px;
+  box-shadow: none !important;
+  background: #F5F5F5;
+}
+
+.position {
+  display: flex;
+  justify-content: space-between;
+  flex-direction: column;
+  gap: 7px;
+  margin-top: 0;
+  margin-bottom: 0;
+}

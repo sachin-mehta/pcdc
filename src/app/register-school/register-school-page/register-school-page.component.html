@@ -1,12 +1,11 @@
 <app-pcdc-header></app-pcdc-header>
 <ion-content>
   <div class="container" [ngClass]="{'privacy_height': isLast}">
-    <ion-button  class="button_disable_hover" fill="clear" (click)="handleBackClick()">
+    <ion-button class="button_disable_hover" fill="clear" (click)="handleBackClick()">
       <ion-img src="assets/images/back_button.svg" name="arrow-back-outline" class="backIcon"></ion-img>
     </ion-button>
-    <ion-slides (ionSlideDidChange)="checkCurrentSlide()" 
-    (ionSlideWillChange)="checkCurrentSlide()"  [options]="slideOpts" (ionSlideReachEnd)="reachedEnd()"
-      class="schoolsuccess" #mySlider>
+    <ion-slides (ionSlideDidChange)="checkCurrentSlide()" (ionSlideWillChange)="checkCurrentSlide()"
+      [options]="slideOpts" (ionSlideReachEnd)="reachedEnd()" class="schoolsuccess" [ngClass]="{ 'last-slide-active': isLast }" #mySlider>
       <ion-slide>
         <div class="top-layout">
           <div class="successInfo">
@@ -41,15 +40,15 @@
     <div class="middle-layout" *ngIf="isLast">
       <div class="read_content">
 
-        <div class="register_readMore" (click)="openExternalUrl('https://www.unicef.org/legal#privacy-policy')" [translate]="'registerSchoolPage.readMore' | translate">
+        <div class="register_readMore" (click)="openExternalUrl('https://www.unicef.org/legal#privacy-policy')"
+          [translate]="'registerSchoolPage.readMore' | translate">
 
         </div>
         <ion-img src="assets/images/forward_arrow.svg"></ion-img>
       </div>
       <label class="privacy-container">
         <div class="input">
-          <ion-checkbox name="privacy"  [(ngModel)]="isPrivacyChecked" class="checkbox"
-             ></ion-checkbox>
+          <ion-checkbox name="privacy" [(ngModel)]="isPrivacyChecked" class="checkbox"></ion-checkbox>
         </div>
         <div class="learnmore">
           <span class="learnmore" [innerHTML]="'registerSchoolPage.privacy' | translate"></span>

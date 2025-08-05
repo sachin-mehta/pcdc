@@ -149,7 +149,7 @@ ion-accordion-group {
       }
     }
     ion-icon {
-      margin-inline: -15px !important;
+      // margin-inline: -15px !important;
       color: $color-no;
       font-size: 18px;
     }
@@ -427,10 +427,9 @@ ion-breadcrumb::part(native) {
     --padding-bottom: 0 !important;  
 }
 
-.accordion-sec ion-accordion-group ion-accordion ion-icon {
-  margin-inline: 15px !important;
-}
-
+// .accordion-sec ion-accordion-group ion-accordion ion-icon {
+//   margin-inline: 15px !important;
+// }
 
 .loadContent {
   display: flex;
