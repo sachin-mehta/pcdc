@@ -176,10 +176,10 @@ class NetworkTestService : LifecycleService() {
     NDTTest(okHttpClient) {
     var downloadSpeed = 0.0;
     var uploadSpeed = 0.0;
-    var lastDownloadMeasurement: Measurement? = GigaUtil.getDefaultMeasurements()
-    var lastUploadMeasurement: Measurement? = GigaUtil.getDefaultMeasurements()
-    var lastDownloadResponse: ClientResponse? = GigaUtil.getDefaultClientInfo("download")
-    var lastUploadResponse: ClientResponse? = GigaUtil.getDefaultClientInfo("upload")
+    var lastDownloadMeasurement: Measurement? = null//GigaUtil.getDefaultMeasurements()
+    var lastUploadMeasurement: Measurement? = null//GigaUtil.getDefaultMeasurements()
+    var lastDownloadResponse: ClientResponse? = null//GigaUtil.getDefaultClientInfo("download")
+    var lastUploadResponse: ClientResponse? = null//GigaUtil.getDefaultClientInfo("upload")
     var allDoneInvoked: Int = 0
     val schoolId = prefs.schoolId
     val gigaSchoolId = prefs.gigaSchoolId
@@ -382,7 +382,9 @@ class NetworkTestService : LifecycleService() {
               }
             }
 
-            if (clientInfoRequest != null && serverInfoRequest != null) {
+            if (clientInfoRequest != null && serverInfoRequest != null && lastUploadMeasurement != null
+              && lastDownloadMeasurement != null && lastUploadResponse != null && lastDownloadResponse != null
+            ) {
               speedTestResultRequestEntity = GigaUtil.createSpeedTestPayload(
                 lastUploadMeasurement,
                 lastDownloadMeasurement,
@@ -443,11 +445,16 @@ class NetworkTestService : LifecycleService() {
                   GigaAppPlugin.sendSpeedTestCompleted(speedTestResultRequestEntity)
                 }
               }
+            } else {
+              updateNotification("Speed Test Failed")
+              GigaAppPlugin.sendSpeedTestCompletedWithError()
             }
           } else {
+            updateNotification("Speed Test Failed")
             Log.e("NetworkTestService", "Failed to fetch one or both APIs")
           }
         } catch (e: Exception) {
+          updateNotification("Speed Test Failed")
           Log.e("GIGA NetworkTestService", "Error: ${e.message}")
           GigaAppPlugin.sendSpeedTestCompletedWithError()
         } finally {

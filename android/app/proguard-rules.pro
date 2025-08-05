@@ -1,21 +1,40 @@
-# Add project specific ProGuard rules here.
-# You can control the set of applied configuration files using the
-# proguardFiles setting in build.gradle.
-#
-# For more details, see
-#   http://developer.android.com/guide/developing/tools/proguard.html
-
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
-
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
-
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+# Keep all classes in com.example.app.data.models and subpackages
+-keep class com.meter.giga.domain.entity.request.** { *; }
+-keep class com.meter.giga.domain.entity.response.** { *; }
+-keep class com.meter.giga.data.models.requests.** { *; }
+-keep class com.meter.giga.data.models.responses.** { *; }
+-keep interface com.meter.giga.network.api.** { *; }
+-keep class com.meter.giga.network.RetrofitInstanceBuilder { *; }
+-keep class com.meter.giga.domain.entity.SpeedTestResultEntity { *; }
+-keep class com.meter.giga.utils.Constants { *; }
+# Also, keep the Kotlin metadata (important for data classes)
+-keepclassmembers class com.meter.giga.domain.entity.request.** {
+    <fields>;
+    <methods>;
+}
+-keepclassmembers class com.meter.giga.domain.entity.response.** {
+    <fields>;
+    <methods>;
+}
+-keepclassmembers class com.meter.giga.data.models.requests.** {
+    <fields>;
+    <methods>;
+}
+-keepclassmembers class com.meter.giga.data.models.responses.** {
+    <fields>;
+    <methods>;
+}
+# If you use Gson/Moshi or other reflection-based serialization
+-keepattributes Signature, InnerClasses, EnclosingMethod, RuntimeVisibleAnnotations, RuntimeVisibleParameterAnnotations, AnnotationDefault
+-keep,allowobfuscation,allowshrinking interface retrofit2.Call
+-keep,allowobfuscation,allowshrinking class retrofit2.Response
+-keep,allowobfuscation,allowshrinking class kotlin.coroutines.Continuation
+# Remove all Log calls in release build
+-assumenosideeffects class android.util.Log {
+    public static int v(...);
+    public static int d(...);
+    public static int i(...);
+    public static int w(...);
+    public static int e(...);
+    public static int wtf(...);
+}

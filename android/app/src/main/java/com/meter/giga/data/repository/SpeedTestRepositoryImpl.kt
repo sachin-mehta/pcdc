@@ -25,30 +25,38 @@ class SpeedTestRepositoryImpl : SpeedTestRepository {
    * as Failure as String Message with failure message
    */
   override suspend fun getClientInfoData(): ResultState<ClientInfoResponseEntity?> {
-    Log.d("GIGA SpeedTestRepositoryImpl", "getClientInfoData Invoked")
-    val response = RetrofitInstanceBuilder.clintInfoApi.getClientInfo()
-    Log.d("GIGA SpeedTestRepositoryImpl", "response $response")
-    if (response.isSuccessful) {
-      if (response.body() != null) {
-        return ResultState.Success(
-          response.body()!!.toEntity()
-        )
-      } else {
-        val fallbackResponse = RetrofitInstanceBuilder.clintInfoFallbackApi.getClientInfoFallback()
-        if (fallbackResponse.isSuccessful) {
-          return if (fallbackResponse.body() != null) {
-            ResultState.Success(
-              response.body()!!.toEntity()
-            )
-          } else {
-            ResultState.Failure(ErrorHandlerImpl().getError(response.errorBody()))
+    try {
+      Log.d("GIGA SpeedTestRepositoryImpl", "getClientInfoData Invoked")
+      val response = RetrofitInstanceBuilder.clintInfoApi.getClientInfo()
+      Log.d("GIGA SpeedTestRepositoryImpl", "response $response")
+      if (response.isSuccessful) {
+        if (response.body() != null) {
+          return ResultState.Success(
+            response.body()!!.toEntity()
+          )
+        } else {
+          val fallbackResponse =
+            RetrofitInstanceBuilder.clintInfoFallbackApi.getClientInfoFallback()
+          if (fallbackResponse.isSuccessful) {
+            return if (fallbackResponse.body() != null) {
+              ResultState.Success(
+                response.body()!!.toEntity()
+              )
+            } else {
+              ResultState.Failure(ErrorHandlerImpl().getError(response.errorBody()))
+            }
           }
         }
       }
+      return ResultState.Failure(
+        ErrorEntity.Unknown("Get client info api failed")
+      )
+    } catch (e: Exception) {
+      Log.d("GIGA SpeedTestRepositoryImpl", "Exception $e")
+      return ResultState.Failure(
+        ErrorEntity.Unknown("Get client info api failed")
+      )
     }
-    return ResultState.Failure(
-      ErrorEntity.Unknown("Get client info api failed")
-    )
   }
 
   /**

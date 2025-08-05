@@ -3,7 +3,6 @@ package com.meter.giga;
 import static com.meter.giga.utils.Constants.REQ_NOTIF_PERMISSION;
 import static com.meter.giga.utils.Constants.REQ_STORAGE_PERMISSION;
 
-import static java.security.AccessController.getContext;
 
 import android.app.Activity;
 import android.app.AlarmManager;
@@ -23,6 +22,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.view.WindowCompat;
 
 import com.getcapacitor.BridgeActivity;
 import com.meter.giga.ionic_plugin.GigaAppPlugin;
@@ -43,6 +43,7 @@ public class MainActivity extends BridgeActivity {
   protected void onCreate(Bundle savedInstanceState) {
     registerPlugin(GigaAppPlugin.class);
     super.onCreate(savedInstanceState);
+    WindowCompat.setDecorFitsSystemWindows(getWindow(), true);
     checkStoragePermission(this);
   }
 
