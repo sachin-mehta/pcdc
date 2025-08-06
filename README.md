@@ -220,5 +220,5 @@ Giga Meter Website: https://meter.giga.global/contact-us/
 Acknowledgments</h2> 
 
 * Thanks to Ericsson and Mlab for helping build this application! 
-
+* This project is tested with BrowserStack 
 </div>
