@@ -228,6 +228,13 @@ export class StarttestPage implements OnInit, OnDestroy {
               1000
             ).toFixed(0);
           }
+          if (
+            data.speedTestData.ClientInfo !== null &&
+            data.speedTestData.ClientInfo !== undefined
+          ) {
+            this.measurementnetworkServer = data.speedTestData.ClientInfo.City;
+            this.measurementISP = data.speedTestData.ClientInfo.ISP;
+          }
           this.ref.markForCheck();
           this.refreshHistory();
           console.log('GIGA', 'Executed complete');

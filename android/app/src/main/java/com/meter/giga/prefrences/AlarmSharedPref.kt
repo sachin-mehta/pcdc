@@ -135,6 +135,7 @@ class AlarmSharedPref(context: Context) {
     browserId = ""
     countryCode = ""
     ipAddress = ""
+    oldSpeedTestData = "[]"
   }
 }
 
