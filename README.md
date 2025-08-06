@@ -219,6 +219,7 @@ Giga Meter Website: https://meter.giga.global/contact-us/
 <h2><a id="acknowledgements" class="anchor" aria-hidden="true" href="#acknowledgements"><svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true"></path></svg></a>
 Acknowledgments</h2> 
 
-* Thanks to Ericsson and Mlab for helping build this application! 
+* Thanks to Ericsson and Mlab for helping build this application!
+* This project is tested with BrowserStack
 
 </div>
