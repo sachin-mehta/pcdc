@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { MenuController } from '@ionic/angular';
+import { IonPopover, MenuController } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import { StorageService } from '../app/services/storage.service';
 import { SettingsService } from './services/settings.service';
@@ -18,12 +18,15 @@ import { SyncService } from './services/sync.service';
   styleUrls: ['app.component.scss'],
 })
 export class AppComponent {
+  isToastOpen = true;
   school: any;
   historyState: any;
   availableSettings: any;
   scheduleSemaphore: any;
   // eslint-disable-next-line @typescript-eslint/naming-convention
   app_version: any;
+  device_id:string;
+  device_id_short: string;
   appName = environment.appName;
   showAboutMenu = environment.showAboutMenu;
   constructor(
@@ -44,6 +47,8 @@ export class AppComponent {
     };
     this.translate.use(appLang.code);
     this.app_version = environment.app_version;
+    this.device_id = this.storage.get('schoolUserId') || 'unknown-device';
+    this.device_id_short = this.device_id.substring(0, 8) + '...';
     if (this.storage.get('schoolId')) {
       this.school = JSON.parse(this.storage.get('schoolInfo'));
     }
@@ -158,5 +163,15 @@ export class AppComponent {
 
   openExternalUrl(href) {
     this.settingsService.getShell().shell.openExternal(href);
+  }
+  async copy(text: string): Promise<boolean> {
+    try {
+      await navigator.clipboard.writeText(text);
+      this.isToastOpen = true;
+      console.log('Text copied to clipboard:', text);
+      return true;
+    } catch {
+      return false;
+    }
   }
 }
