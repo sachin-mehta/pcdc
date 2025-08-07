@@ -162,9 +162,9 @@
             <ion-icon name="chevron-download"></ion-icon>
           </ion-item>
           <ion-item>
-            <ion-label class="small-font" slot="end" [translate]="'app.device-id'"
-              [translateParams]="{ device_id: device_id }"></ion-label>
-            <ion-icon name="chevron-download"></ion-icon>
+            <ion-label class="small-font" slot="end" [translate]="'app.device-id'" id="click-trigger"
+              [translateParams]="{ device_id: device_id_short }" (click)="copy(device_id)">
+            </ion-label>
           </ion-item>
         </ion-list>
       </div>
