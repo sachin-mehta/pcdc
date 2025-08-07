@@ -20,7 +20,7 @@
     const staticMetadata = {
       'client_library_name': 'ndt7-js',
       'client_library_version': '0.0.6',
-      'client_name': 'giga-client',
+      'client_name': 'giga-meter',
     };
     // cb creates a default-empty callback function, allowing library users to
     // only need to specify callback functions for the events they care about.
