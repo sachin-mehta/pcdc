@@ -1,7 +1,8 @@
 import { Directive, HostListener, ElementRef } from '@angular/core';
 
 @Directive({
-  selector: '[appEnterKeyClick]'
+  selector: '[appEnterKeyClick]',
+  standalone: false 
 })
 export class EnterKeyClickDirective {
   constructor(private el: ElementRef<HTMLElement>) {}

@@ -1,5 +1,5 @@
 <ion-app class="font_open_sans app_margin">
-  <ion-menu side="end" menuId="fourth" contentId="content" class="ionMenubg">
+  <ion-menu side="end" menuId="fourth" contentId="content" class="ionMenubg" [swipeGesture]="false">
     <!-- <div>
       <ion-label>Settings</ion-label>
 
@@ -59,7 +59,7 @@
       </div>
     </ion-content>
   </ion-menu>
-  <ion-menu side="end" menuId="third" contentId="content" class="ionMenubg">
+  <ion-menu side="end" menuId="third" contentId="content" class="ionMenubg" [swipeGesture]="false">
     <div class="headerbar">
       <ion-label class="setting_label">Settings</ion-label>
       <!-- <ion-icon name="close-outline" class="closeIcon" (click)="closeMenu()"></ion-icon> -->
@@ -94,7 +94,7 @@
       </div>
     </ion-content>
   </ion-menu>
-  <ion-menu side="end" menuId="second" contentId="content" class="ionMenubg">
+  <ion-menu side="end" menuId="second" contentId="content" class="ionMenubg" [swipeGesture]="false">
     <div class="headerbar">
       <ion-label class="setting_label">Settings</ion-label>
       <!-- <ion-icon name="close-outline" class="closeIcon" (click)="closeMenu()"></ion-icon> -->
@@ -151,7 +151,7 @@
       </div>
     </ion-content>
   </ion-menu>
-  <ion-menu side="end" menuId="help" contentId="content" class="ionMenubg">
+  <ion-menu side="end" menuId="help" contentId="content" class="ionMenubg" [swipeGesture]="false">
     <div class="headerbar">
       <ion-label class="setting_label">Help</ion-label>
       <!-- <ion-icon name="close-outline" class="closeIcon" (click)="closeHelpenu()"></ion-icon> -->
@@ -175,19 +175,19 @@
             <ion-img src="assets/images/setting_arrow.svg"></ion-img>
 
           </ion-item>
-          <ion-item (click)="openHelpMenu('new')">
+          <!-- <ion-item (click)="openHelpMenu('new')">
             <ion-img src="assets/images/new.svg"></ion-img>
-            <ion-label [innerHTML]="'app.whats-new' | translate"></ion-label>
+            <ion-label [innerHTML]="'app.whats-new' | translate"></ion-label> -->
             <!-- <ion-icon name="chevron-forward-outline"></ion-icon> -->
-            <ion-img src="assets/images/setting_arrow.svg"></ion-img>
+            <!-- <ion-img src="assets/images/setting_arrow.svg"></ion-img> -->
 
-          </ion-item>
+          <!-- </ion-item> -->
 
         </ion-list>
       </div>
     </ion-content>
   </ion-menu>
-  <ion-menu side="end" menuId="faq" contentId="content" class="ionMenubg">
+  <ion-menu side="end" menuId="faq" contentId="content" class="ionMenubg" [swipeGesture]="false">
     <div class="headerbar">
       <ion-label class="setting_label">Help</ion-label>
       <!-- <ion-icon name="close-outline" class="closeIcon" (click)="closeHelpenu()"></ion-icon> -->
@@ -283,7 +283,7 @@
       </div>
     </ion-content>
   </ion-menu>
-  <ion-menu side="end" menuId="about" contentId="content" class="ionMenubg">
+  <ion-menu side="end" menuId="about" contentId="content" class="ionMenubg" [swipeGesture]="false">
     <div class="headerbar">
       <ion-label class="setting_label">Help</ion-label>
       <!-- <ion-icon name="close-outline" class="closeIcon" (click)="closeHelpenu()"></ion-icon> -->
@@ -318,7 +318,7 @@
       </div>
     </ion-content>
   </ion-menu>
-  <ion-menu side="end" menuId="new" contentId="content" class="ionMenubg">
+  <ion-menu side="end" menuId="new" contentId="content" class="ionMenubg" [swipeGesture]="false">
     <div class="headerbar">
       <ion-label class="setting_label">What’s new!</ion-label>
       <!-- <ion-icon name="close-outline" class="closeIcon" (click)="closeHelpenu()"></ion-icon> -->
@@ -354,7 +354,7 @@
       </div>
     </ion-content>
   </ion-menu>
-  <ion-menu side="end" menuId="setting" contentId="content" class="ionMenubg">
+  <ion-menu side="end" menuId="setting" contentId="content" class="ionMenubg" [swipeGesture]="false">
     <div class="headerbar">
       <ion-label class="setting_label">Settings</ion-label>
       <div></div>
@@ -365,13 +365,13 @@
     <ion-content class="menuContent">
       <div class="accordion-sec">
         <ion-list>
-          <ion-item (click)="openSecond()">
+          <!-- <ion-item (click)="openSecond()">
             <ion-img src="assets/images/test-setting.svg"></ion-img>
-            <ion-label [innerHTML]="'app.test-type-setting' | translate"></ion-label>
+            <ion-label [innerHTML]="'app.test-type-setting' | translate"></ion-label> -->
             <!-- <ion-icon name="chevron-forward-outline"></ion-icon> -->
-            <ion-img src="assets/images/setting_arrow.svg"></ion-img>
+            <!-- <ion-img src="assets/images/setting_arrow.svg"></ion-img> -->
 
-          </ion-item>
+          <!-- </ion-item> -->
           <ion-item (click)="openThird()">
             <ion-img src="assets/images/language-setting.svg"></ion-img>
             <ion-label [innerHTML]="'app.language-pref' | translate"></ion-label>

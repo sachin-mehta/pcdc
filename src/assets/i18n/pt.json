@@ -77,7 +77,8 @@
         "country": "País",
         "country-not-accurate": "Parece que o país que você selecionou pode não corresponder à sua localização. Tem certeza de que deseja continuar?",
         "please-double-check": "Verifique novamente a sua seleção.",
-        "not-available": "o aplicativo {{appName}} {{appNameSuffix}} não está disponível neste país. Por favor escolha outro país."
+        "not-available": "o aplicativo {{appName}} {{appNameSuffix}} não está disponível neste país. Por favor escolha outro país.",
+        "change-country": "Se a seleção acima não estiver correta, selecione seu país na caixa de seleção."
     },
     "searchSchool": {
         "search": "Procurando por sua escola...",

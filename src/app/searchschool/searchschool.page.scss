@@ -142,6 +142,11 @@ ion-label {
 .accordion-sec .label_padding {
   padding-left: 15px;
 }
+
+.accordion-sec ion-accordion-group ion-icon {
+  margin-inline: 0px !important;
+}
+
 .accordion-sec ion-accordion-group ion-accordion {
   padding: 0 !important;
   

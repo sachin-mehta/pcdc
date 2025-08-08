@@ -26,9 +26,9 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
   
     getStrokeDashOffset(): string {
       if(!this.error) {
-        return `calc(251.2px - (251.2px * ${this.progressValue}) / 100)`;
+        return `calc(263.9px - (263.9px * ${this.progressValue}) / 100)`;
       } else {
-        return `calc(251.2px - (251.2px * 100}) / 100)`;
+        return `calc(263.9px - (263.9px * 100}) / 100)`;
       }
     }
   

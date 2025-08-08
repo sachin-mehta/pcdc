@@ -4,29 +4,29 @@
     <div class="centerPos">
       <ion-item class="custom-item" lines="none" color="light">
         <ion-label>
-          <p class="subtitle">School id</p>
-          <h2 class="title" title={{schoolId}}>{{schoolId}}</h2>
+          <p class="subtitle">{{selectedCountry}} - {{schoolId}}</p>
+          <h2 class="title" title={{schoolId}}>{{school.name}}</h2>
         </ion-label>
       </ion-item>
       <ion-list lines="none" class="horizontal-list">
-        <ion-item lines="none">
+        <!-- <ion-item lines="none">
           <ion-label>
             <h3 [translate]="'startTest.network'"></h3>
             <p title="--">--</p>
           </ion-label>
-        </ion-item>
+        </ion-item> -->
 
-        <ion-item lines="none">
-          <ion-label>
+        <ion-item lines="none" class="center-pos">
+          <ion-label class="position">
             <h3 [translate]="'startTest.isp'"></h3>
-            <p title={{accessInformation.org}}>{{accessInformation.org}}</p>
+            <p title={{measurementISP}}>{{measurementISP?.length ? measurementISP : '---'}}</p>
           </ion-label>
         </ion-item>
 
         <ion-item lines="none">
-          <ion-label>
+          <ion-label class="position">
             <h3  [translate]="'startTest.server'"></h3>
-            <p title={{accessInformation.city}}>{{accessInformation.city}}</p>
+            <p title={{measurementnetworkServer}}>{{measurementnetworkServer?.length ? measurementnetworkServer : '---'}}</p>
           </ion-label>
         </ion-item>
       </ion-list>

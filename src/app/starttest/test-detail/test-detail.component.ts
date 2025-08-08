@@ -1,64 +1,86 @@
 import { Component, OnInit } from '@angular/core';
+import { CountryService } from 'src/app/services/country.service';
+import { HistoryService } from 'src/app/services/history.service';
 import { NetworkService } from 'src/app/services/network.service';
 import { StorageService } from 'src/app/services/storage.service';
+import { Router, NavigationEnd } from '@angular/router';
 
 @Component({
   selector: 'app-test-detail',
   templateUrl: './test-detail.component.html',
   styleUrls: ['./test-detail.component.scss'],
   standalone: false
-  
+
 })
 export class TestDetailComponent implements OnInit {
   schoolId: string;
+  school: any
   historicalData: any;
   measurementsData: []
   accessInformation = {
-      ip: '',
-      city: '',
-      region: '',
-      country: '',
-      label: '',
-      metro: '',
-      site: '',
-      url: '',
-      fqdn: '',
-      loc: '',
-      org: '',
-      postal: '',
-      timezone: '',
-      asn: '',
-    };
-  constructor(    private storage: StorageService,
-    private networkService: NetworkService
+    ip: '',
+    city: '',
+    region: '',
+    country: '',
+    label: '',
+    metro: '',
+    site: '',
+    url: '',
+    fqdn: '',
+    loc: '',
+    org: '',
+    postal: '',
+    timezone: '',
+    asn: '',
+  };
+  measurementnetworkServer: any;
+  measurementISP: any;
+  selectedCountry: any;
+  constructor(private storage: StorageService,
+    private historyService: HistoryService,
+    private countryService: CountryService,
+    private router: Router
 
-  ) { }
-
-  ngOnInit() {    
-    this.networkService.getNetInfo().then((res) => {
-      
-      if (res) {
-        this.accessInformation = res;
-        console.log(this.accessInformation)
+  ) {
+    this.router.events.subscribe((event) => {
+      if (event instanceof NavigationEnd) {
+        this.loadData()
       }
     });
+  }
+
+  ngOnInit() {
+    if (this.storage.get('schoolId')) {
+      this.school = JSON.parse(this.storage.get('schoolInfo'));
+      this.countryService.getPcdcCountryByCode(this.school.country).subscribe(
+        (response) => {
+          this.selectedCountry = response[0].name;
+        },
+        (err) => {
+          console.log('ERROR: ' + err);
+        })
+    }
+    this.loadData();
+  }
+
+  loadData() {
+    let historicalData = this.historyService.get();
+    if (historicalData !== null && historicalData !== undefined && historicalData.measurements.length) {
+      this.measurementnetworkServer = historicalData.measurements[historicalData.measurements.length - 1].mlabInformation.city;
+      this.measurementISP = historicalData.measurements[historicalData.measurements.length - 1].accessInformation.org;
+    }
     this.schoolId = this.storage.get('schoolId');
-    // if(this.storage.get('historicalDataAll')) {
-    //   this.historicalData =  JSON.parse(this.storage.get('historicalDataAll'))
-    //   this.measurementsData = this.historicalData.measurements
-    // }
+
 
     if (this.storage.get('historicalDataAll')) {
       this.historicalData = JSON.parse(this.storage.get('historicalDataAll'));
       const allMeasurements = this.historicalData.measurements;
-  
+
       // Get the last 10 measurements (sorted by timestamp descending)
       this.measurementsData = allMeasurements
         .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()) // descending order
         .slice(0, 10); // take last 10
     }
-    
-
   }
 
 }

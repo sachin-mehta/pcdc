@@ -8,6 +8,7 @@
     --width: 95%;
 
 }
+
 .label_color {
     color: #131313 !important;
 }
@@ -26,7 +27,6 @@ ion-content {
 
     ion-list {
         ion-item {
-            padding-right: 20px;
             color: #000;
             cursor: pointer;
 
@@ -157,11 +157,14 @@ ion-content {
     width: 98%;
     box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.50);
     margin-bottom: 2px;
+    margin-left: 2px;
+    height: 256px;
 
 }
+
 .select_type_dropdown {
     // Ensure your item has visible text if the background is white
-    
+
     --background: #fff;
     --color: #6F6F6F;
     margin-top: 10px;
@@ -226,13 +229,14 @@ ion-content {
         background: none;
     }
 }
-.dropdown_list {
-  font-size: 14px !important;
-  font-weight: 400 !important;
 
-  &:hover {
-    background: none;
-  }
+.dropdown_list {
+    font-size: 14px !important;
+    font-weight: 400 !important;
+
+    &:hover {
+        background: none;
+    }
 }
 
 .searchCountry {
@@ -310,127 +314,157 @@ ion-content {
     width: 32px;
     height: 32px;
 }
+
 .button_width {
     margin: 12px 0 0 24px;
     width: 50px;
 }
-    
+
 ::ng-deep {
     .searchbar-input.sc-ion-searchbar-md {
-      box-shadow: none !important;
-      font-size: 14px;
-      font-weight: 400;
-  
+        box-shadow: none !important;
+        font-size: 14px;
+        font-weight: 400;
+
     }
-  
+
     .searchbar-search-icon.sc-ion-searchbar-md {
-      left: 0;
+        left: 0;
     }
-  
+
     .searchbar-input.sc-ion-searchbar-md {
-      padding-left: 30px;
-      padding-right: 30px;
+        padding-left: 30px;
+        padding-right: 30px;
     }
-  
+
+    .searchbar-clear-button.sc-ion-searchbar-md {
+        right: 0;
+    }
+
+
+
     .list-md {
-      z-index: 9999;
-      position: relative;
-      padding: 10px;
-      margin: 0;
-      border-radius: 5px;
-      padding-left: 0;
+        z-index: 9999;
+        position: relative;
+        margin: 0;
+        border-radius: 5px;
+        padding-left: 0;
     }
-  }
-  .accordion-sec {
+}
+
+.accordion-sec {
     margin-top: 22px;
     margin-left: 16px;
     font-size: 14px;
     font-weight: 400;
-  }
-  .border_top {
-    border-top: 1px solid #6F6F6F;
-  }
+}
 
-  ::ng-deep {
+.border_top {
+    border-top: 1px solid #6F6F6F;
+}
+
+::ng-deep {
     .searchbar-input.sc-ion-searchbar-md {
-      box-shadow: none !important;
-      font-size: 14px;
-      font-weight: 400;
-  
+        box-shadow: none !important;
+        font-size: 14px;
+        font-weight: 400;
+
     }
-  
+
     .sc-ion-searchbar-md-h {
-      padding: 0;
+        padding: 0;
     }
-  
-    .searchbar-search-icon.sc-ion-searchbar-md {
-      left: 0;
-      display: none;
-    }
-    .searchbar-search-icon.sc-ion-searchbar-md.md.hydrated {
-      display: none;
-    }
-  
-    .searchbar-clear-icon.sc-ion-searchbar-md {
-      width: 16px;
-      height: 16px;
-    }
-  
-    .searchbar-input.sc-ion-searchbar-md {
-      padding-left: 0px;
-      padding-right: 30px;
-    }
-  
-    .list-md {
-      z-index: 9999;
-      position: relative;
-      padding: 10px;
-      margin: 0;
-      border-radius: 5px;
-      padding-left: 0;
-    }
-  }
-  ::ng-deep {
+
     .searchbar-search-icon.sc-ion-searchbar-md {
         left: 0;
         display: none;
-      }
-      .searchbar-search-icon.sc-ion-searchbar-md.md.hydrated {
-        display: none;
-      }
-  }
-  
-  
-  ion-breadcrumb::part(separator) {
-    color: #3880ff; // light gray or any desired color
-  }
+    }
 
-  .sc-ion-label-md-h {
+    .searchbar-search-icon.sc-ion-searchbar-md.md.hydrated {
+        display: none;
+    }
+
+    .searchbar-clear-icon.sc-ion-searchbar-md {
+        width: 16px;
+        height: 16px;
+    }
+
+    .searchbar-input.sc-ion-searchbar-md {
+        padding-left: 0px;
+        padding-right: 30px;
+    }
+
+    .list-md {
+        z-index: 9999;
+        position: relative;
+        margin: 0;
+        border-radius: 5px;
+        padding-left: 0;
+    }
+}
+
+::ng-deep {
+    .searchbar-search-icon.sc-ion-searchbar-md {
+        left: 0;
+        display: none;
+    }
+
+    .searchbar-search-icon.sc-ion-searchbar-md.md.hydrated {
+        display: none;
+    }
+}
+
+
+ion-breadcrumb::part(separator) {
+    color: #3880ff; // light gray or any desired color
+}
+
+.sc-ion-label-md-h {
     color: #474747;
-  }
-  
-  .half-border-bottom::after {
+}
+
+.half-border-bottom::after {
     content: "";
     display: block;
-    width: 100%;
+    width: 108%;
     border-bottom: 1px solid #ccc;
-    margin-top: 1px; /* space between content and border */
-  }
-  ::ng-deep {
+    margin-top: 1px;
+    /* space between content and border */
+}
+
+::ng-deep {
     ion-content {
-  
-      // Target WebKit browsers (Chrome, Edge, Safari)
-    &::-webkit-scrollbar {
-        width: 8px;
-      }
-      &::-webkit-scrollbar-thumb {  
-        border-radius: 4px;
-        border: 2px solid transparent;
-      }  
-      scrollbar-color: #a3acbb transparent;
-      scrollbar-width: thin;
+
+        // Target WebKit browsers (Chrome, Edge, Safari)
+        &::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            border-radius: 4px;
+            border: 2px solid transparent;
+        }
+
+        scrollbar-color: #a3acbb transparent;
+        scrollbar-width: thin;
     }
-    
-     
-  }
-  
+
+    .border_top ion-accordion-group ion-accordion ion-icon {
+    margin-inline: -15px !important;
+}
+
+
+
+
+}
+
+ion-content.menuContent::part(scroll) {
+    scrollbar-width: thin;
+    /* For Firefox */
+}
+
+ion-content.menuContent::part(scroll)::-webkit-scrollbar {
+    width: 6px;
+    /* For Chrome, Edge, Safari */
+}
+

@@ -1,12 +1,11 @@
 <app-pcdc-header></app-pcdc-header>
 <ion-content>
   <div class="container" [ngClass]="{'privacy_height': isLast}">
-    <ion-button *ngIf="isFirst" class="button_disable_hover" fill="clear" [routerLink]="['/home']">
+    <ion-button class="button_disable_hover" fill="clear" (click)="handleBackClick()">
       <ion-img src="assets/images/back_button.svg" name="arrow-back-outline" class="backIcon"></ion-img>
     </ion-button>
-    <ion-slides (ionSlideDidChange)="checkCurrentSlide()" 
-    (ionSlideWillChange)="checkCurrentSlide()"  [options]="slideOpts" (ionSlideReachEnd)="reachedEnd()"
-      class="schoolsuccess" #mySlider>
+    <ion-slides (ionSlideDidChange)="checkCurrentSlide()" (ionSlideWillChange)="checkCurrentSlide()"
+      [options]="slideOpts" (ionSlideReachEnd)="reachedEnd()" class="schoolsuccess" [ngClass]="{ 'last-slide-active': isLast }" #mySlider>
       <ion-slide>
         <div class="top-layout">
           <div class="successInfo">
@@ -21,17 +20,14 @@
           <div class="successInfo">
             <ion-img src="assets/images/installing_register.svg" class="icon2"></ion-img>
             <div class="success-txt" [innerHtml]="'registerSchool.register-step-2' | translate"></div>
-            <!-- <div class="success-desc-txt" [innerHtml]="'schoolSuccess.internet-checks' | translate"></div> -->
           </div>
         </div>
       </ion-slide>
       <ion-slide>
         <div class="top-layout">
-          <div class="successInfo">
+          <div class="successInfo-slide3">
             <ion-img src="assets/images/start_registeration.svg" class="icon3"></ion-img>
             <div class="success-txt last-step" [innerHtml]="'registerSchool.register-step-3' | translate"></div>
-            <!-- <div class="success-desc-txt" [innerHtml]="'schoolSuccess.app-run-desc' | translate"></div>
-            <div class="success-desc-txt" [innerHtml]="'schoolSuccess.you-can-close' | translate"></div> -->
 
           </div>
 
@@ -44,15 +40,15 @@
     <div class="middle-layout" *ngIf="isLast">
       <div class="read_content">
 
-        <div class="register_readMore" (click)="openExternalUrl('https://www.unicef.org/legal#privacy-policy')" [translate]="'registerSchoolPage.readMore' | translate">
+        <div class="register_readMore" (click)="openExternalUrl('https://www.unicef.org/legal#privacy-policy')"
+          [translate]="'registerSchoolPage.readMore' | translate">
 
         </div>
         <ion-img src="assets/images/forward_arrow.svg"></ion-img>
       </div>
       <label class="privacy-container">
         <div class="input">
-          <ion-checkbox name="privacy"  [(ngModel)]="isPrivacyChecked" class="checkbox"
-             ></ion-checkbox>
+          <ion-checkbox name="privacy" [(ngModel)]="isPrivacyChecked" class="checkbox"></ion-checkbox>
         </div>
         <div class="learnmore">
           <span class="learnmore" [innerHTML]="'registerSchoolPage.privacy' | translate"></span>

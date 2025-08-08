@@ -45,6 +45,13 @@ export class SchoolsuccessPage {
   reachedEnd() {
     this.isLast = true;
   }
+
+  async checkCurrentSlide() {
+    const index = await this.slides.getActiveIndex();
+    const total = await this.slides.length(); // Total number of slides
+
+    this.isLast = index === total - 1;
+  }
   moveToStartTest() {
     this.router.navigate(['starttest']);
   }

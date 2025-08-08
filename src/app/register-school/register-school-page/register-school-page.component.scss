@@ -1,7 +1,7 @@
 @import "../../../theme/variables.scss";
 
 .container {
-  margin: 30px 0 0px 0;
+  margin: 0px 0 0px 0;
   height: 90%;
   min-height: 88%;
   background-size: 100% 100%;
@@ -27,8 +27,52 @@ ion-label {
   font-size: 20px;
 }
 
+.successInfo-slide3 {
+  padding-top: 50px;
+
+  ion-img {
+    width: auto !important;
+    margin: 20px auto;
+    display: flex;
+    justify-content: center;
+  }
+
+  .icon1 {
+    width: 124px !important;
+  }
+
+  .icon2 {
+    width: 110px !important;
+  }
+
+  .icon3 {
+    width: 125px !important;
+    height: 125px; // 
+    object-fit: contain; // or `cover` if needed
+    display: block;
+    margin: 20px auto;
+  }
+
+
+  .success-txt {
+    color: #46C66D;
+    text-align: center;
+    font-size: 20px;
+    text-transform: unset;
+    font-weight: 400;
+  }
+
+  .success-desc-txt {
+    color: #222222;
+    text-align: center;
+    padding-top: 16px;
+    font-size: 14px;
+    font-weight: 400;
+  }
+}
+
 .successInfo {
-  padding-top: 10px;
+  padding-top: 100px;
 
   ion-img {
     width: auto !important;
@@ -127,11 +171,8 @@ ion-label {
 }
 
 .middle-layout ion-checkbox {
-  --size: 18px;
-  /* Adjust checkbox size */
-  min-width: 18px;
-  min-height: 18px;
-  margin-top: 3px;
+  --size: 20px;
+
   /* Align checkbox with text */
   flex-shrink: 0;
   /* Prevent checkbox from shrinking */
@@ -164,6 +205,7 @@ ion-label {
   letter-spacing: 0.32px;
 
 }
+
 .checkbox {
   z-index: 10;
   pointer-events: auto;
@@ -201,4 +243,7 @@ ion-label {
 .top-layout {
   padding-right: 26px;
   padding-left: 26px;
-}
+}  
+.last-slide-active {
+    height: 63% !important;
+  }

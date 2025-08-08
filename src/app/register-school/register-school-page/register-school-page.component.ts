@@ -100,11 +100,22 @@ export class RegisterSchoolPageComponent implements OnInit {
           paginationEl.classList.remove(cls);
         }
       });
-  
+
       // Add the current index class
       paginationEl.classList.add(`index-${index}`);
     }
   }
-  
+  handleBackClick() {
+    this.slides.getActiveIndex().then(index => {
+      if (index === 0) {
+        // First slide → go to home
+        this.router.navigate(['/home']);
+      } else {
+        // Slide back to previous
+        this.slides.slidePrev();
+      }
+    });
+  }
+
 
 }

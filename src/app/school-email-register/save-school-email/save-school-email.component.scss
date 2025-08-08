@@ -40,8 +40,13 @@
     margin-top: 4px;
 }
 
-ion-item.ion-invalid {
-    --highlight-color-invalid: red;
+.ion-invalid {
+    --highlight-color-invalid: red;    
+    border-bottom: 1px solid red !important;
+
+}
+.ion-valid {
+    --highlight-color-valid: transparent;
 }
 
 .footer_button {
@@ -64,6 +69,13 @@ ion-item.ion-invalid {
 
 .custom-gray-item {
     --background: #E5E5E5; // Light gray
+    display: flex;
+    height: 48px;
+    padding: 15px 16px;
+    align-items: flex-start;
+    gap: 16px;
+    align-self: stretch;
+    border-bottom: 1px solid #6F6F6F;
 }
 
 .optional {
