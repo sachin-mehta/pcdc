@@ -66,26 +66,25 @@ export class TestDetailComponent implements OnInit {
   }
 
   loadData() {
-    let historicalData = this.historyService.get();
-    if (
-      historicalData !== null &&
-      historicalData !== undefined &&
-      historicalData.measurements.length
-    ) {
-      this.measurementnetworkServer =
-        historicalData.measurements[
-          historicalData.measurements.length - 1
-        ].mlabInformation.city;
-      this.measurementISP =
-        historicalData.measurements[
-          historicalData.measurements.length - 1
-        ].accessInformation.org;
-    }
     this.schoolId = this.storage.get('schoolId');
-
     if (Capacitor.isNativePlatform()) {
       this.loadHistoricalData();
     } else {
+      let historicalData = this.historyService.get();
+      if (
+        historicalData !== null &&
+        historicalData !== undefined &&
+        historicalData.measurements.length
+      ) {
+        this.measurementnetworkServer =
+          historicalData.measurements[
+            historicalData.measurements.length - 1
+          ].mlabInformation.city;
+        this.measurementISP =
+          historicalData.measurements[
+            historicalData.measurements.length - 1
+          ].accessInformation.org;
+      }
       if (this.storage.get('historicalDataAll')) {
         this.historicalData = JSON.parse(this.storage.get('historicalDataAll'));
         const allMeasurements = this.historicalData.measurements;
@@ -93,7 +92,10 @@ export class TestDetailComponent implements OnInit {
         // Get the last 10 measurements (sorted by timestamp descending)
         this.measurementsData = allMeasurements
           .sort(
-            (a, b) =>
+            (
+              a: { timestamp: string | number | Date },
+              b: { timestamp: string | number | Date }
+            ) =>
               new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
           ) // descending order
           .slice(0, 10); // take last 10
@@ -112,14 +114,27 @@ export class TestDetailComponent implements OnInit {
       this.historicalData = result.historicalData;
 
       const allMeasurements = this.historicalData;
-
+      if (
+        allMeasurements !== null &&
+        allMeasurements !== undefined &&
+        allMeasurements.length
+      ) {
+        this.measurementnetworkServer =
+          allMeasurements[allMeasurements.length - 1].ClientInfo.City;
+        this.measurementISP =
+          allMeasurements[allMeasurements.length - 1].ClientInfo.ISP;
+      }
+      console.log('allMeasurements:', allMeasurements);
       // Get the last 10 measurements (sorted by timestamp descending)
       this.measurementsData = allMeasurements
-        .sort((a, b) => {
-          console.log('a in Historical Data:', JSON.stringify(a));
-          console.log('b in Historical Data:', JSON.stringify(b));
-          new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
-        }) // descending order
+        .sort(
+          (
+            a: { timestamp: string | number | Date },
+            b: { timestamp: string | number | Date }
+          ) => {
+            new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
+          }
+        ) // descending order
         .slice(0, 10); // take last 10
     } catch (err) {
       console.error('Error fetching queue:', err);

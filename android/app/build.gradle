@@ -1,15 +1,14 @@
 apply plugin: 'com.android.application'
 apply plugin: 'org.jetbrains.kotlin.android'
 android {
-
   namespace "com.meter.giga"
   compileSdk rootProject.ext.compileSdkVersion
   defaultConfig {
     applicationId "com.meter.giga"
     minSdkVersion rootProject.ext.minSdkVersion
     targetSdkVersion rootProject.ext.targetSdkVersion
-    versionCode 4
-    versionName "1.1.3"
+    versionCode 5
+    versionName "1.1.4"
     testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     aaptOptions {
       // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -30,16 +29,25 @@ android {
   }
   buildTypes {
     debug {
+      buildConfigField "String", "CLIENT_INFO_TOKEN", "\"${CLIENT_INFO_API_TOKEN}\""
+      buildConfigField "String", "SPEED_TEST_TOKEN", "\"${SPEED_TEST_API_TOKEN}\""
+      debuggable true
       minifyEnabled false
-      applicationIdSuffix ".debug"
+      applicationIdSuffix
       versionNameSuffix
     }
     release {
+      buildConfigField "String", "CLIENT_INFO_TOKEN", "\"${CLIENT_INFO_API_TOKEN}\""
+      buildConfigField "String", "SPEED_TEST_TOKEN", "\"${SPEED_TEST_API_TOKEN}\""
+      debuggable false
       minifyEnabled true
       shrinkResources true
       proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
       signingConfig signingConfigs.release
     }
+  }
+  buildFeatures {
+    buildConfig true
   }
 }
 

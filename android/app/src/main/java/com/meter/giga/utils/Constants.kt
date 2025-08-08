@@ -26,13 +26,7 @@ object Constants {
   const val KEY_LAST_SLOT_EXECUTION_HOUR = "KEY_LAST_SLOT_EXECUTION_HOUR"
   const val CLIENT_INFO_FALLBACK_END_URL = "https://ipv4.geojs.io/v1/"
   const val CLIENT_INFO_END_URL = "https://ipinfo.io/"
-
-  // Add token to fetch client info
-  const val CLIENT_INFO_TOKEN = ""
   const val SPEED_TEST_END_URL = "https://uni-ooi-giga-meter-backend-dev.azurewebsites.net/api/v1/"
-
-  // Add ndt7 token to perform speedtest
-  const val SPEED_TEST_TOKEN = ""
   const val SERVER_INFO_END_URL = "https://mlab-ns.appspot.com/"
   const val SCHEDULE_TYPE_DAILY = "daily"
   const val SCHEDULE_TYPE_START = "start"

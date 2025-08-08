@@ -1,11 +1,10 @@
 package com.meter.giga.network.api
 
+import com.meter.giga.BuildConfig
 import com.meter.giga.data.models.requests.SpeedTestResultRequestModel
 import com.meter.giga.data.models.responses.ClientInfoFallbackResponseModel
 import com.meter.giga.data.models.responses.ClientInfoResponseModel
 import com.meter.giga.data.models.responses.ServerInfoResponseModel
-import com.meter.giga.utils.Constants.CLIENT_INFO_TOKEN
-import com.meter.giga.utils.Constants.SPEED_TEST_TOKEN
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.GET
@@ -28,7 +27,7 @@ interface ApiService {
    */
   @GET("json")
   suspend fun getClientInfo(
-    @Query("token") token: String = CLIENT_INFO_TOKEN
+    @Query("token") token: String = BuildConfig.CLIENT_INFO_TOKEN
   ): Response<ClientInfoResponseModel>
 
   /**
@@ -47,7 +46,7 @@ interface ApiService {
 
   @POST("measurements")
   suspend fun postSpeedTestData(
-    @Header("Authorization") authorization: String = "Bearer $SPEED_TEST_TOKEN",
+    @Header("Authorization") authorization: String = "Bearer ${BuildConfig.SPEED_TEST_TOKEN}",
     @Body body: SpeedTestResultRequestModel
   ): Response<Unit>
 
