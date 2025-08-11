@@ -224,7 +224,7 @@ export class ElectronCapacitorApp {
 
     this.MainWindow?.on('unresponsive', () => {
       Sentry.captureMessage('Window became unresponsive', {
-        level: Severity.Error,
+        level: 'error',
         extra: {
           windowId: this.MainWindow?.id,
         },
