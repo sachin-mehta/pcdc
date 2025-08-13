@@ -318,7 +318,7 @@ export class ScheduleService {
       this.storageService.set(this.STARTUP_TEST_SCHEDULED_KEY, scheduledTime.getTime().toString());
       console.log(`Scheduling startup test for ${scheduledTime.toISOString()}`);
       setTimeout(async () => {
-        // await this.runWeekdayLocationIfNeeded();
+        await this.runWeekdayLocationIfNeeded();
         await this.runStartupTest();
          // 👈 Trigger location after startup test
       }, startupDelay);
