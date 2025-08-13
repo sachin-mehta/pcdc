@@ -4,7 +4,7 @@ import type { MenuItemConstructorOptions } from 'electron';
 import { app, MenuItem, ipcMain, dialog } from 'electron';
 import electronIsDev from 'electron-is-dev';
 import unhandled from 'electron-unhandled';
-import { autoUpdater } from 'electron-updater';
+import { autoUpdater, UpdateDownloadedEvent } from 'electron-updater';
 import fs from 'fs-extra';
 import path from 'path';
 
@@ -117,7 +117,10 @@ if (!gotTheLock) {
   }, 3600000)
 
 
-  autoUpdater.on("update-downloaded", (_event, releaseNotes, releaseName) => {
+  autoUpdater.on("update-downloaded", (_event: UpdateDownloadedEvent) => {
+    const releaseNotes = _event.releaseNotes.toString();
+    const releaseName = _event.releaseName.toString();
+
     const dialogOpts = {
       type: 'info' as const,
       buttons: ['Restart / Reinicie. / Перезапуск', 'Later / Después / Позже'],
