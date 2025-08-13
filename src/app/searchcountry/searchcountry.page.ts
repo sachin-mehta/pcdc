@@ -11,13 +11,6 @@ import { Country } from '../shared/country.model';
 import { CountryService } from '../services/country.service';
 import { TranslateService } from '@ngx-translate/core';
 import { environment } from 'src/environments/environment';
-declare global {
-  interface Window {
-    electronAPI: {
-      getWifiList: () => Promise<{ ssid: string; signal: number; macAddress: string }[]>;
-    };
-  }
-}
 @Component({
   selector: 'app-searchcountry',
   templateUrl: 'searchcountry.page.html',
@@ -1052,22 +1045,7 @@ export class SearchcountryPage {
     const appLang = this.settingsService.get('applicationLanguage');
     this.translate.use(appLang?.code);
   }
-  async ngOnInit() {
-    const wifiList = await window.electronAPI.getWifiList();
-
-    const wifiAccessPoints = wifiList.map(wifi => ({
-      macAddress: wifi.macAddress,
-      signalStrength: wifi.signal
-    }));
-
-    const locationRes = await fetch(`https://www.googleapis.com/geolocation/v1/geolocate?key=${environment.googleAPI}`, {
-      method: 'POST',
-      body: JSON.stringify({ wifiAccessPoints }),
-      headers: { 'Content-Type': 'application/json' }
-    });
-
-    const location = await locationRes.json();
-    console.log('Estimated Location:', location);
+  ngOnInit() {
     this.getCountry();
   }
 
@@ -1149,7 +1127,7 @@ export class SearchcountryPage {
       };
       this.automaticSearched = true;
       this.searchTerm = this.filterCountryByCode(this.selectedCountry).name;
-      this.selectCountry({name: this.searchTerm, code: c.country})
+      this.selectCountry({ name: this.searchTerm, code: c.country })
 
     }, error => {
       this.automaticSearched = false;

@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpRequest, HttpParams } from '@angular/common/http';
-import { catchError, map, tap } from 'rxjs/operators';
+import { catchError, map, switchMap, tap } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
-import { Observable, throwError } from 'rxjs';
+import { from, Observable, of, throwError } from 'rxjs';
 import { SettingsService } from '../services/settings.service';
 import { StorageService } from './storage.service';
+import { LocationService } from './location.service';
 
 @Injectable({
   providedIn: 'root',
@@ -14,7 +15,8 @@ export class UploadService {
   constructor(
     private http: HttpClient,
     private settingService: SettingsService,
-    private storage: StorageService
+    private storage: StorageService,
+    private locationService: LocationService
   ) { }
 
   /**
@@ -116,8 +118,6 @@ export class UploadService {
     }
     let uploadURL = environment.restAPI + 'measurements';
     const apiKey = this.settingService.get('uploadAPIKey');
-    // const browserID = this.settingService.get("browserID");
-    // const deviceType = this.settingService.get("deviceType");
 
     const notes = record.Notes;
     let measurement = this.makeMeasurement(record);
@@ -133,7 +133,6 @@ export class UploadService {
       : (measurement.ip_address = this.storage.get('ip_address'));
     measurement.country_code = measurement.ClientInfo.Country;
 
-    // Add measure-saver-specific metadata.
     measurement.BrowserID = this.storage.get('schoolUserId');
     measurement.Timestamp = this.ts.toISOString();
     measurement.timestamplocal = this.ts.toLocaleString();
@@ -144,17 +143,23 @@ export class UploadService {
     measurement.app_version = environment.app_version;
     measurement.ip_address = measurement.ClientInfo.IP;
 
-    // Add API key if configured.
-
     if (apiKey != '') {
       uploadURL = uploadURL + '?key=' + apiKey;
     }
 
-    return this.http.post(uploadURL, measurement).pipe(
-      map((res: any) => res), // ...and calling .json() on the response to return data
+    return from(this.locationService.getAndStoreGeolocation(this.storage, true)).pipe(
+      catchError(err => {
+        console.warn('Geolocation failed, continuing without it:', err);
+        return of(null); // fallback value
+      }),
+      switchMap(geo => {
+        measurement['geolocation'] = geo;
+        return this.http.post(uploadURL, measurement);
+      }),
+      map((res: any) => res),
       tap((data) => data),
       catchError(this.handleError)
-    ); // ...errors if any
+    );
   }
 
   private handleError(error: Response) {

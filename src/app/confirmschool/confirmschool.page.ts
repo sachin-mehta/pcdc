@@ -14,6 +14,7 @@ import { DatePipe } from '@angular/common';
 import { environment } from 'src/environments/environment';
 import { SettingsService } from '../services/settings.service';
 import { TranslateService } from '@ngx-translate/core';
+import { LocationService } from '../services/location.service';
 @Component({
     selector: 'app-confirmschool',
     templateUrl: 'confirmschool.page.html',
@@ -40,7 +41,8 @@ export class ConfirmschoolPage {
     private settings: SettingsService,
     public loading: LoadingService,
     private datePipe: DatePipe,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private locationService: LocationService
   ) {
     const appLang = this.settings.get('applicationLanguage');
     this.translate.use(appLang.code);
@@ -58,6 +60,10 @@ export class ConfirmschoolPage {
 
   confirmSchool() {
     /* Store school id and giga id inside storage */
+    // this.storage.set(
+    //   'geolocation',
+    //   JSON.stringify({"lat":28.6588928,"lng":77.479936})
+    // );
     let schoolData = {};
     let flaggedSchoolData = {};
     const today = this.datePipe.transform(
@@ -71,9 +77,9 @@ export class ConfirmschoolPage {
     this.loading.present(loadingMsg, 4000, 'pdcaLoaderClass', 'null');
 
     // this.networkService.getAccessInformation().subscribe(c => {
-    this.getIPAddress().then((c) => {
+     this.getIPAddress().then((c) => {
       this.getDeviceInfo().then((a) => {
-        this.getDeviceId().then((b) => {
+         this.getDeviceId().then(async (b) => {
           schoolData = {
             giga_id_school: this.school.giga_id_school,
             mac_address: b.identifier,
@@ -84,6 +90,9 @@ export class ConfirmschoolPage {
             //country_code: c.country,
             country_code: this.selectedCountry,
             //school_id: this.school.school_id
+            geolocation: await this.locationService.getAndStoreGeolocation(this.storage, false),
+
+
           };
 
           // if(this.school.code === c.country){
@@ -98,7 +107,6 @@ export class ConfirmschoolPage {
               this.storage.set('gigaId', this.school.giga_id_school);
               this.storage.set('ip_address', c?.ip);
               this.storage.set('version', environment.app_version);
-              //this.storage.set('country_code', c.country);
               this.storage.set('country_code', this.selectedCountry);
               this.storage.set('school_id', this.school.school_id);
               this.storage.set('schoolInfo', JSON.stringify(this.school));

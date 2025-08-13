@@ -6,6 +6,7 @@ import { MeasurementClientService } from '../services/measurement-client.service
 import { SettingsService } from '../services/settings.service';
 import { SharedService } from '../services/shared-service.service';
 import { NetworkService } from './network.service';
+import { LocationService } from './location.service';
 
 @Injectable({
   providedIn: 'root',
@@ -22,13 +23,16 @@ export class ScheduleService {
   private readonly STARTUP_TEST_KEY = 'lastStartupTest';
   private readonly STARTUP_TEST_SCHEDULED_KEY = 'startupTestScheduled';
   private readonly TEN_MINUTE = 60 * 1000 * 10; // 10 minutes in milliseconds
-
+  private readonly LAST_WEEK_LOCATION_WEEK = 'lastWeekLocationWeek'; // ISO week number we last recorded runs.
+  private readonly LAST_WEEK_LOCATION_COUNT = 'lastWeekLocationCount'; //number of runs this week.
   constructor(
     private storageService: StorageService,
     private measurementClientService: MeasurementClientService,
     private settingsService: SettingsService,
     private sharedService: SharedService,
-    private networkService: NetworkService
+    private networkService: NetworkService,
+    private locationService: LocationService
+
   ) {
     console.log('ScheduleService constructor called');
   }
@@ -313,11 +317,72 @@ export class ScheduleService {
       const scheduledTime = new Date(Date.now() + startupDelay);
       this.storageService.set(this.STARTUP_TEST_SCHEDULED_KEY, scheduledTime.getTime().toString());
       console.log(`Scheduling startup test for ${scheduledTime.toISOString()}`);
-      setTimeout(() => this.runStartupTest(), startupDelay);
+      setTimeout(async () => {
+        // await this.runWeekdayLocationIfNeeded();
+        await this.runStartupTest();
+         // 👈 Trigger location after startup test
+      }, startupDelay);
     } else {
       console.log('Startup test already run today, skipping.');
+      await this.runWeekdayLocationIfNeeded();
     }
   }
+
+  private async runWeekdayLocationIfNeeded() {
+    const today = new Date();
+    const day = today.getDay(); // 0 = Sun, 1 = Mon, ..., 6 = Sat
+
+    // Only Mon–Thu
+    if (day < 1 || day > 4) {
+      console.log('Not a weekday (Mon–Thu), skipping location fetch.');
+      return;
+    }
+
+    // Get current ISO week number
+    const weekNumber = this.getISOWeek(today);
+
+    // Get stored week and count
+    const storedWeek = parseInt(await this.storageService.get(this.LAST_WEEK_LOCATION_WEEK) || '0', 10);
+    let storedCount = parseInt(await this.storageService.get(this.LAST_WEEK_LOCATION_COUNT) || '0', 10);
+
+    // Reset if new week
+    if (weekNumber !== storedWeek) {
+      storedCount = 0;
+      await this.storageService.set(this.LAST_WEEK_LOCATION_WEEK, weekNumber.toString());
+      await this.storageService.set(this.LAST_WEEK_LOCATION_COUNT, '0');
+    }
+
+    // Skip if already run twice this week
+    if (storedCount >= 2) {
+      console.log(`Location already fetched twice this week (week ${weekNumber}). Skipping.`);
+      return;
+    }
+
+    try {
+      console.log(`Fetching weekday location (run #${storedCount + 1} this week)...`);
+      await this.locationService.getAndStoreGeolocation(this.storageService, false);
+      storedCount++;
+      await this.storageService.set(this.LAST_WEEK_LOCATION_COUNT, storedCount.toString());
+      console.log('Weekday location stored successfully.');
+    } catch (err) {
+      console.error('Failed to fetch weekday location:', err);
+    }
+  }
+
+  // Helper to get ISO week number
+  private getISOWeek(date: Date): number {
+    const target = new Date(date.valueOf());
+    const dayNumber = (date.getDay() + 6) % 7;
+    target.setDate(target.getDate() - dayNumber + 3);
+    const firstThursday = target.valueOf();
+    target.setMonth(0, 1);
+    if (target.getDay() !== 4) {
+      target.setMonth(0, 1 + ((4 - target.getDay()) + 7) % 7);
+    }
+    return 1 + Math.ceil((firstThursday - target.valueOf()) / 604800000);
+  }
+
+
 
   // Run the startup test
   private async runStartupTest() {

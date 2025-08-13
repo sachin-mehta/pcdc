@@ -1,49 +1,57 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { environment } from 'src/environments/environment';
-
-
 @Injectable({
   providedIn: 'root'
 })
 export class LocationService {
 
-  constructor(private http: HttpClient) {}
+  constructor() { }
 
-  getLocation() {
-    const url = `https://www.googleapis.com/geolocation/v1/geolocate?key=${environment.googleAPI}`;
-    return this.http.post(url, {}); // Payload is empty
-  }
-  getCurrentLocation(): Promise<GeolocationPosition> {
-    return new Promise((resolve, reject) => {
-      if ('geolocation' in navigator) {
-        navigator.geolocation.getCurrentPosition(
-          position => resolve(position),
-          error => reject(error),
-          {
-            enableHighAccuracy: true,
-            timeout: 10000,
-            maximumAge: 0
-          }
-        );
-      } else {
-        reject(new Error('Geolocation is not supported by this browser.'));
-      }
-    });
+  private canRunGeoToday(): boolean {
+    const today = new Date().toISOString().slice(0, 10);
+    const log = JSON.parse(localStorage.getItem('geoLog') || '[]')
+      .filter((date: string) => date.startsWith(today));
+    return log.length < 3;
   }
 
-  getAccurateLocation(wifiList: any[]) {
-    const wifiAccessPoints = wifiList.map(ap => ({
-      macAddress: ap.mac || ap.bssid,
-      signalStrength: Math.round(ap.signal_level), // must be integer
-      signalToNoiseRatio: 40 // Optional, fixed value or computed if available
+  private logGeoRun(): void {
+    const log = JSON.parse(localStorage.getItem('geoLog') || '[]');
+    log.push(new Date().toISOString());
+    localStorage.setItem('geoLog', JSON.stringify(log));
+  }
+
+  async getAndStoreGeolocation(storage: any, measurementFlow): Promise<any> {
+    if (!this.canRunGeoToday() && measurementFlow) {
+      console.log('Daily geolocation limit reached — using last stored value.');
+      return JSON.parse(storage.get('geolocation'));
+    }
+
+    const wifiList = await (window as any).electronAPI.getWifiList();
+    const wifiAccessPoints = wifiList.map((wifi: any) => ({
+      macAddress: wifi.macAddress,
+      signalStrength: wifi.signal
     }));
-    const body = {
-      considerIp: false, // optional: set false to ignore IP-based geolocation
-      wifiAccessPoints
-    };
-    const url = `https://www.googleapis.com/geolocation/v1/geolocate?key=${environment.googleAPI}`;
 
-    return this.http.post<{ location: { lat: number, lng: number }, accuracy: number }>(url, body);
+    const locationRes = await fetch(
+      `https://www.googleapis.com/geolocation/v1/geolocate?key=AIzaSyCNqHJyhVBbmk3ANhjM9FSYL2w0vQEudrU`,
+      {
+        method: 'POST',
+        body: JSON.stringify({ wifiAccessPoints }),
+        headers: { 'Content-Type': 'application/json' }
+      }
+    );
+
+    const location = await locationRes.json();
+
+    const geolocation: Record<string, any> = {};
+    Object.entries(location.location).forEach(([key, value]) => {
+      geolocation[key] = value;
+    });
+
+    storage.set('geolocation', JSON.stringify(geolocation));
+    if (measurementFlow) {
+      this.logGeoRun();
+    }
+
+    return geolocation;
   }
 }
