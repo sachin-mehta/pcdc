@@ -24,6 +24,7 @@ import { Subscription } from 'rxjs';
 import { CountryService } from '../services/country.service';
 import { Capacitor, registerPlugin } from '@capacitor/core';
 import { mlabInformation, accessInformation } from '../models/models';
+import { isAndroid } from '../android/android_util';
 
 @Component({
   selector: 'app-starttest',
@@ -130,7 +131,9 @@ export class StarttestPage implements OnInit, OnDestroy {
       this.school = JSON.parse(this.storage.get('schoolInfo'));
       console.log(this.school, 'heheh');
     }
-    this.isNative = Capacitor.isNativePlatform();
+    isAndroid().then((isAndroid) => {
+      this.isNative = isAndroid;
+    });
     this.gigaAppPlugin = registerPlugin<any>('GigaAppPlugin');
     this.onlineStatus = navigator.onLine;
     this.route.params.subscribe((params) => {

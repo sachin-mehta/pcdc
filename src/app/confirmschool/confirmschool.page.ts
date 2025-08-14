@@ -15,6 +15,7 @@ import { environment } from 'src/environments/environment';
 import { SettingsService } from '../services/settings.service';
 import { TranslateService } from '@ngx-translate/core';
 import { Capacitor, registerPlugin } from '@capacitor/core';
+import { isAndroid } from '../android/android_util';
 @Component({
   selector: 'app-confirmschool',
   templateUrl: 'confirmschool.page.html',
@@ -47,7 +48,9 @@ export class ConfirmschoolPage {
   ) {
     const appLang = this.settings.get('applicationLanguage');
     this.translate.use(appLang.code);
-    this.isNative = Capacitor.isNativePlatform();
+    isAndroid().then((isAndroid) => {
+      this.isNative = isAndroid;
+    });
     this.gigaAppPlugin = registerPlugin<any>('GigaAppPlugin');
     this.sub = this.activatedroute.params.subscribe((params) => {
       this.schoolId = params.schoolId;

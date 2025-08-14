@@ -11,6 +11,7 @@ import { PingResult, PingService } from './services/ping.service';
 import { IndexedDBService } from './services/indexed-db.service';
 import { SyncService } from './services/sync.service';
 import { Capacitor } from '@capacitor/core';
+import { isAndroid } from './android/android_util';
 
 // const shell = require('electron').shell;
 @Component({
@@ -56,7 +57,9 @@ export class AppComponent {
     private localStorageService: IndexedDBService,
     private syncService: SyncService
   ) {
-    this.isNative = Capacitor.isNativePlatform();
+    isAndroid().then((isAndroid) => {
+      this.isNative = isAndroid;
+    });
     this.filteredOptions = [];
     this.selectedLanguage =
       this.settingsService.get('applicationLanguage')?.code ??

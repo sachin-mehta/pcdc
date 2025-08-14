@@ -4,6 +4,7 @@ import { environment as env } from '../../environments/environment';
 import { SettingsService } from '../services/settings.service';
 import { MenuController } from '@ionic/angular';
 import { Capacitor } from '@capacitor/core';
+import { isAndroid } from '../android/android_util';
 
 @Component({
   selector: 'app-pcdc-header',
@@ -33,7 +34,9 @@ export class PcdcHeaderComponent implements OnInit {
       '';
     translate.use(this.selectedLanguage);
     this.test = env?.mode === 'dev';
-    this.isNative = Capacitor.isNativePlatform();
+    isAndroid().then((isAndroid) => {
+      this.isNative = isAndroid;
+    });
   }
 
   isNativeApp(): boolean {
