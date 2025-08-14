@@ -60,11 +60,21 @@ const appMenuBarMenuTemplate: (MenuItemConstructorOptions | MenuItem)[] = [
 const capacitorFileConfig: CapacitorElectronConfig = getCapacitorElectronConfig();
 
 // Enable features for unresponsive renderer call stacks and global shortcuts portal
+// Note: app.commandLine converts uppercase switches to lowercase
 app.commandLine.appendSwitch(
   'enable-features',
   'DocumentPolicyIncludeJSCallStacksInCrashReports,GlobalShortcutsPortal',
 );
 
+// Handle GTK version for Linux users
+if (process.platform === 'linux') {
+  // GTK 4 is now default on GNOME, but some apps may need GTK 3
+  // Users can override this by setting GTK_VERSION environment variable
+  const gtkVersion = process.env.GTK_VERSION;
+  if (gtkVersion) {
+    app.commandLine.appendSwitch('gtk-version', gtkVersion);
+  }
+}
 // Initialize our app. You can pass menu templates into the app here.
 // const myCapacitorApp = new ElectronCapacitorApp(capacitorFileConfig);
 const myCapacitorApp = new ElectronCapacitorApp(capacitorFileConfig, trayMenuTemplate, appMenuBarMenuTemplate);
