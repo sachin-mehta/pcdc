@@ -59,6 +59,12 @@ const appMenuBarMenuTemplate: (MenuItemConstructorOptions | MenuItem)[] = [
 // Get Config options from capacitor.config
 const capacitorFileConfig: CapacitorElectronConfig = getCapacitorElectronConfig();
 
+// Enable feature for unresponsive renderer call stacks
+app.commandLine.appendSwitch(
+  'enable-features',
+  'DocumentPolicyIncludeJSCallStacksInCrashReports',
+);
+
 // Initialize our app. You can pass menu templates into the app here.
 // const myCapacitorApp = new ElectronCapacitorApp(capacitorFileConfig);
 const myCapacitorApp = new ElectronCapacitorApp(capacitorFileConfig, trayMenuTemplate, appMenuBarMenuTemplate);
@@ -98,6 +104,22 @@ if (!gotTheLock) {
   app.whenReady().then(async () => {
     mainWindow = await myCapacitorApp.init();
   })
+
+  // Add web-contents-created event handler
+  app.on('web-contents-created', (_, webContents) => {
+    webContents.on('unresponsive', async () => {
+      try {
+        // Interrupt execution and collect call stack from unresponsive renderer
+        const callStack = await webContents.mainFrame.collectJavaScriptCallStack();
+        console.log('Renderer unresponsive - JavaScript call stack:', callStack);
+        captureException(new Error(`Renderer unresponsive: ${callStack}`));
+      } catch (error) {
+        console.error('Error collecting call stack from unresponsive renderer:', error);
+        captureException(error);
+      }
+    });
+  });
+
   /*
       app.on('ready', () => {
         updateApp = require('update-electron-app');
