@@ -237,13 +237,14 @@ export class ElectronCapacitorApp {
 
     this.MainWindow?.webContents?.on(
       'console-message',
-      (event, level, message, line, sourceId) => {
-        if (level === 2) {
+      ({ level, message, lineNumber, sourceId, frame }) => {
+        if (level === 'error') {
           // error level
           Sentry.captureMessage(`Console Error: ${message}`, {
             extra: {
-              line,
+              line: lineNumber,
               sourceId,
+              frame,
             },
           });
         }

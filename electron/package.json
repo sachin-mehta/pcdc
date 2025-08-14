@@ -36,9 +36,9 @@
     "fs-extra": "^11.2.0"
   },
   "devDependencies": {
-    "electron-rebuild": "^3.2.3",
+    "electron": "^35.7.4",
     "electron-builder": "^26.0.0",
-    "electron": "^34.0.0",
+    "electron-rebuild": "^3.2.3",
     "typescript": "^5.5.2"
   },
   "keywords": [

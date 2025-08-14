@@ -59,10 +59,10 @@ const appMenuBarMenuTemplate: (MenuItemConstructorOptions | MenuItem)[] = [
 // Get Config options from capacitor.config
 const capacitorFileConfig: CapacitorElectronConfig = getCapacitorElectronConfig();
 
-// Enable feature for unresponsive renderer call stacks
+// Enable features for unresponsive renderer call stacks and global shortcuts portal
 app.commandLine.appendSwitch(
   'enable-features',
-  'DocumentPolicyIncludeJSCallStacksInCrashReports',
+  'DocumentPolicyIncludeJSCallStacksInCrashReports,GlobalShortcutsPortal',
 );
 
 // Initialize our app. You can pass menu templates into the app here.
