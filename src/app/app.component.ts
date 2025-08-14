@@ -57,9 +57,7 @@ export class AppComponent {
     private localStorageService: IndexedDBService,
     private syncService: SyncService
   ) {
-    isAndroid().then((isAndroid) => {
-      this.isNative = isAndroid;
-    });
+    this.isNative = Capacitor.isNativePlatform();
     this.filteredOptions = [];
     this.selectedLanguage =
       this.settingsService.get('applicationLanguage')?.code ??

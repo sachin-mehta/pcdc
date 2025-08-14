@@ -34,9 +34,7 @@ export class PcdcHeaderComponent implements OnInit {
       '';
     translate.use(this.selectedLanguage);
     this.test = env?.mode === 'dev';
-    isAndroid().then((isAndroid) => {
-      this.isNative = isAndroid;
-    });
+    this.isNative = Capacitor.isNativePlatform();
   }
 
   isNativeApp(): boolean {

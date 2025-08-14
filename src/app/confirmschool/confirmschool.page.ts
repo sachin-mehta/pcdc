@@ -48,9 +48,7 @@ export class ConfirmschoolPage {
   ) {
     const appLang = this.settings.get('applicationLanguage');
     this.translate.use(appLang.code);
-    isAndroid().then((isAndroid) => {
-      this.isNative = isAndroid;
-    });
+    this.isNative = Capacitor.isNativePlatform();
     this.gigaAppPlugin = registerPlugin<any>('GigaAppPlugin');
     this.sub = this.activatedroute.params.subscribe((params) => {
       this.schoolId = params.schoolId;

@@ -38,7 +38,6 @@ export class TestDetailComponent implements OnInit {
   measurementnetworkServer: any;
   measurementISP: any;
   selectedCountry: any;
-  isNative: boolean;
   constructor(
     private storage: StorageService,
     private historyService: HistoryService,
@@ -139,6 +138,8 @@ export class TestDetailComponent implements OnInit {
             a: { timestamp: string | number | Date },
             b: { timestamp: string | number | Date }
           ) => {
+            console.log('allMeasurements:', new Date(a.timestamp).getTime());
+            console.log('allMeasurements:', new Date(b.timestamp).getTime());
             new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
           }
         ) // descending order
