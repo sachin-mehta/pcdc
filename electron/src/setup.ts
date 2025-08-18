@@ -25,7 +25,6 @@ import electronServe from 'electron-serve';
 import windowStateKeeper from 'electron-window-state';
 import { join } from 'path';
 import * as Sentry from '@sentry/node';
-import type { SeverityLevel } from '@sentry/types';
 import { Console } from 'console';
 var AutoLaunch = require('auto-launch');
 var isQuiting = false;
@@ -34,7 +33,7 @@ var isQuiting = false;
 Sentry.init({
   dsn: 'https://e52e97fc558344bc80a218fc22a9a6a9@excubo.unicef.io/47',
   environment: 'production',
-  beforeSend: (event)=> {
+  beforeSend: (event) => {
     // Add app version to help with debugging
     event.extra = {
       ...event.extra,
@@ -198,35 +197,43 @@ export class ElectronCapacitorApp {
       height: this.mainWindowState?.height,
       // titleBarStyle: 'hidden',
       maximizable: false,
-      minimizable: false,
+      minimizable: true,
       resizable: false,
       frame: true,
-      useContentSize: true,    //Make content area exactly 390x700
+      useContentSize: true, //Make content area exactly 390x700
       transparent: false,
+      focusable: true,
       webPreferences: {
-        nodeIntegration: true,
+        nodeIntegration: false,
         contextIsolation: true,
-        // Use preload to inject the electron varriant overrides for capacitor plugins.
-        // preload: join(app.getAppPath(), "node_modules", "@capacitor-community", "electron", "dist", "runtime", "electron-rt.js"),
+        sandbox: false,
+        webSecurity: true,
+        allowRunningInsecureContent: false,
         preload: preloadPath,
+        backgroundThrottling: false, // Disable throttling to ensure API calls work reliably
+        spellcheck: false,
+        experimentalFeatures: false,
       },
     });
 
     // Add error tracking for renderer process
-    this.MainWindow?.webContents?.on('render-process-gone', (event, details) => {
-      const crashData = {
-        reason: details?.reason,
-        exitCode: details?.exitCode,
-        processType: 'renderer',
-      };
-      Sentry.captureException(new Error('Renderer Process Gone'), {
-        extra: crashData,
-      });
-    });
+    this.MainWindow?.webContents?.on(
+      'render-process-gone',
+      (event, details) => {
+        const crashData = {
+          reason: details?.reason,
+          exitCode: details?.exitCode,
+          processType: 'renderer',
+        };
+        Sentry.captureException(new Error('Renderer Process Gone'), {
+          extra: crashData,
+        });
+      }
+    );
 
     this.MainWindow?.on('unresponsive', () => {
       Sentry.captureMessage('Window became unresponsive', {
-        level: 'error' as SeverityLevel,
+        level: 'error',
         extra: {
           windowId: this.MainWindow?.id,
         },
@@ -235,13 +242,14 @@ export class ElectronCapacitorApp {
 
     this.MainWindow?.webContents?.on(
       'console-message',
-      (event, level, message, line, sourceId) => {
-        if (level === 2) {
+      ({ level, message, lineNumber, sourceId, frame }) => {
+        if (level === 'error') {
           // error level
           Sentry.captureMessage(`Console Error: ${message}`, {
             extra: {
-              line,
+              line: lineNumber,
               sourceId,
+              frame,
             },
           });
         }
@@ -296,8 +304,12 @@ export class ElectronCapacitorApp {
     }
 
     // Setup the main manu bar at the top of our window.
-    if ((this.CapacitorFileConfig.electron as any)?.appMenuBarMenuTemplateEnabled) {
-      Menu.setApplicationMenu(Menu.buildFromTemplate(this.AppMenuBarMenuTemplate));
+    if (
+      (this.CapacitorFileConfig.electron as any)?.appMenuBarMenuTemplateEnabled
+    ) {
+      Menu.setApplicationMenu(
+        Menu.buildFromTemplate(this.AppMenuBarMenuTemplate)
+      );
     } else {
       Menu.setApplicationMenu(new Menu());
     }
@@ -327,7 +339,9 @@ export class ElectronCapacitorApp {
       }
     });
     this.MainWindow?.webContents?.on('will-navigate', (event, _newURL) => {
-      if (!this.MainWindow?.webContents?.getURL()?.includes(this.customScheme)) {
+      if (
+        !this.MainWindow?.webContents?.getURL()?.includes(this.customScheme)
+      ) {
         event.preventDefault();
       }
     });

@@ -11,7 +11,6 @@ const config: ExtendedCapacitorConfig = {
   appId: 'com.meter.giga',
   appName: 'unicef-pdca',
   webDir: 'www',
-  bundledWebRuntime: false,
   electron: {
     trayIconAndMenuEnabled: true,
     electronIsDev: false
