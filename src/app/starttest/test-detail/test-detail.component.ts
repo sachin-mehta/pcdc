@@ -5,9 +5,9 @@ import { NetworkService } from 'src/app/services/network.service';
 import { StorageService } from 'src/app/services/storage.service';
 import { Router, NavigationEnd } from '@angular/router';
 import { GigaAppPlugin } from '../../android/giga-app-android-plugin';
-import { Capacitor } from '@capacitor/core';
 import { isAndroid } from 'src/app/android/android_util';
-
+import { App } from '@capacitor/app';
+import { Capacitor } from '@capacitor/core';
 @Component({
   selector: 'app-test-detail',
   templateUrl: './test-detail.component.html',
@@ -38,12 +38,15 @@ export class TestDetailComponent implements OnInit {
   measurementnetworkServer: any;
   measurementISP: any;
   selectedCountry: any;
+  isNative: boolean;
   constructor(
     private storage: StorageService,
     private historyService: HistoryService,
     private countryService: CountryService,
     private router: Router
   ) {
+    this.isNative = Capacitor.isNativePlatform();
+    this.handleBackButton();
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
         this.loadData();
@@ -51,6 +54,17 @@ export class TestDetailComponent implements OnInit {
     });
   }
 
+  handleBackButton() {
+    App.addListener('backButton', ({ canGoBack }) => {
+      if (this.isNative) {
+        // Exit app if Native App
+        App.exitApp();
+      } else {
+        // Let Ionic handle the navigation
+        window.history.back();
+      }
+    });
+  }
   ngOnInit() {
     if (this.storage.get('schoolId')) {
       this.school = JSON.parse(this.storage.get('schoolInfo'));
@@ -68,45 +82,40 @@ export class TestDetailComponent implements OnInit {
 
   loadData() {
     this.schoolId = this.storage.get('schoolId');
-    isAndroid().then((isAndroid) => {
-      if (isAndroid) {
-        this.loadHistoricalData();
-      } else {
-        let historicalData = this.historyService.get();
-        if (
-          historicalData !== null &&
-          historicalData !== undefined &&
-          historicalData.measurements.length
-        ) {
-          this.measurementnetworkServer =
-            historicalData.measurements[
-              historicalData.measurements.length - 1
-            ].mlabInformation.city;
-          this.measurementISP =
-            historicalData.measurements[
-              historicalData.measurements.length - 1
-            ].accessInformation.org;
-        }
-        if (this.storage.get('historicalDataAll')) {
-          this.historicalData = JSON.parse(
-            this.storage.get('historicalDataAll')
-          );
-          const allMeasurements = this.historicalData.measurements;
-
-          // Get the last 10 measurements (sorted by timestamp descending)
-          this.measurementsData = allMeasurements
-            .sort(
-              (
-                a: { timestamp: string | number | Date },
-                b: { timestamp: string | number | Date }
-              ) =>
-                new Date(b.timestamp).getTime() -
-                new Date(a.timestamp).getTime()
-            ) // descending order
-            .slice(0, 10); // take last 10
-        }
+    if (this.isNative) {
+      this.loadHistoricalData();
+    } else {
+      let historicalData = this.historyService.get();
+      if (
+        historicalData !== null &&
+        historicalData !== undefined &&
+        historicalData.measurements.length
+      ) {
+        this.measurementnetworkServer =
+          historicalData.measurements[
+            historicalData.measurements.length - 1
+          ].mlabInformation.city;
+        this.measurementISP =
+          historicalData.measurements[
+            historicalData.measurements.length - 1
+          ].accessInformation.org;
       }
-    });
+      if (this.storage.get('historicalDataAll')) {
+        this.historicalData = JSON.parse(this.storage.get('historicalDataAll'));
+        const allMeasurements = this.historicalData.measurements;
+
+        // Get the last 10 measurements (sorted by timestamp descending)
+        this.measurementsData = allMeasurements
+          .sort(
+            (
+              a: { timestamp: string | number | Date },
+              b: { timestamp: string | number | Date }
+            ) =>
+              new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+          ) // descending order
+          .slice(0, 10); // take last 10
+      }
+    }
   }
 
   async loadHistoricalData() {

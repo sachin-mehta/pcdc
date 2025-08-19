@@ -15,7 +15,6 @@ import { environment } from 'src/environments/environment';
 import { SettingsService } from '../services/settings.service';
 import { TranslateService } from '@ngx-translate/core';
 import { Capacitor, registerPlugin } from '@capacitor/core';
-import { isAndroid } from '../android/android_util';
 @Component({
   selector: 'app-confirmschool',
   templateUrl: 'confirmschool.page.html',

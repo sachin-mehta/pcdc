@@ -24,8 +24,7 @@ import { Subscription } from 'rxjs';
 import { CountryService } from '../services/country.service';
 import { Capacitor, registerPlugin } from '@capacitor/core';
 import { mlabInformation, accessInformation } from '../models/models';
-import { isAndroid } from '../android/android_util';
-
+import { App } from '@capacitor/app';
 @Component({
   selector: 'app-starttest',
   templateUrl: 'starttest.page.html',
@@ -131,9 +130,7 @@ export class StarttestPage implements OnInit, OnDestroy {
       this.school = JSON.parse(this.storage.get('schoolInfo'));
       console.log(this.school, 'heheh');
     }
-    isAndroid().then((isAndroid) => {
-      this.isNative = isAndroid;
-    });
+    this.isNative = Capacitor.isNativePlatform();
     this.gigaAppPlugin = registerPlugin<any>('GigaAppPlugin');
     this.onlineStatus = navigator.onLine;
     this.route.params.subscribe((params) => {
@@ -300,6 +297,18 @@ export class StarttestPage implements OnInit, OnDestroy {
     if (!this.storage.get('schoolId')) {
       this.router.navigate(['/']);
     }
+    this.handleBackButton();
+  }
+  handleBackButton() {
+    App.addListener('backButton', ({ canGoBack }) => {
+      if (this.isNative) {
+        // Exit app if there's no page to go back to
+        App.exitApp();
+      } else {
+        // Let Ionic handle the navigation
+        window.history.back();
+      }
+    });
   }
   ngOnInit() {
     this.schoolId = this.storage.get('schoolId');
