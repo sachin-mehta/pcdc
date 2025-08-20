@@ -186,6 +186,7 @@ class NetworkTestService : LifecycleService() {
     val browserId = prefs.browserId
     val ipAddress = prefs.ipAddress
     val countryCode = prefs.countryCode
+    val uploadKey = prefs.mlabUploadKey
 
     /**
      * Callback function implementation when download measurement are available
@@ -421,7 +422,7 @@ class NetworkTestService : LifecycleService() {
               prefs.oldSpeedTestData = updateSpeedTestData
               val postSpeedTestUseCase = PostSpeedTestUseCase()
               val postSpeedTestResultState =
-                postSpeedTestUseCase.invoke(speedTestResultRequestEntity)
+                postSpeedTestUseCase.invoke(speedTestResultRequestEntity, uploadKey)
               when (postSpeedTestResultState) {
                 is ResultState.Failure -> {
                   Log.d(

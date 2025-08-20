@@ -107,12 +107,16 @@ export class ConfirmschoolPage {
               this.storage.set('school_id', this.school.school_id);
               this.storage.set('schoolInfo', JSON.stringify(this.school));
               if (this.isNative) {
+                //This we need to pass to native background servie to execute the
+                // api calls to publish speed test data
+                const apiKey = environment.token;
                 this.storeRegistrationDataAndScheduleSpeedTest(
                   response,
                   this.school.school_id,
                   this.school.giga_id_school,
                   this.selectedCountry,
-                  c?.ip
+                  c?.ip,
+                  apiKey
                 );
               }
               this.loading.dismiss();
@@ -201,7 +205,8 @@ export class ConfirmschoolPage {
     schoolId: String,
     gigaSchoolId: String,
     countryCode: String,
-    ipAddress: String
+    ipAddress: String,
+    apiKey: String
   ) {
     console.log('GIGA GigaAppPlugin : Schedule Speed Test ');
     console.log('GIGA Params : browserId : ', browserId);
@@ -209,12 +214,14 @@ export class ConfirmschoolPage {
     console.log('GIGA Params : gigaSchoolId : ', gigaSchoolId);
     console.log('GIGA Params : countryCode : ', countryCode);
     console.log('GIGA Params : ipAddress : ', ipAddress);
+    console.log('GIGA Params : uploadKey : ', apiKey);
     const result = await this.gigaAppPlugin.storeAndScheduleSpeedTest({
       browser_id: browserId || '',
       school_id: schoolId || '',
       giga_school_id: gigaSchoolId || '',
       country_code: countryCode || '',
       ip_address: ipAddress || '',
+      mlab_uploadKey: apiKey || '',
     });
     console.log('GIGA Plugin Call Result : ', result);
   }

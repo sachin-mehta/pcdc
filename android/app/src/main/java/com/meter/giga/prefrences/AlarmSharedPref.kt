@@ -12,6 +12,7 @@ import com.meter.giga.utils.Constants.KEY_GIGA_SCHOOL_ID
 import com.meter.giga.utils.Constants.KEY_IP_ADDRESS
 import com.meter.giga.utils.Constants.KEY_LAST_EXECUTION_DAY
 import com.meter.giga.utils.Constants.KEY_LAST_SLOT_EXECUTION_HOUR
+import com.meter.giga.utils.Constants.KEY_MLAB_UPLOAD_KEY
 import com.meter.giga.utils.Constants.KEY_OLD_SPEEDTEST_DATA
 import com.meter.giga.utils.Constants.KEY_SCHOOL_ID
 import java.util.Calendar
@@ -95,6 +96,14 @@ class AlarmSharedPref(context: Context) {
   var ipAddress: String
     get() = prefs.getString(KEY_IP_ADDRESS, null).toString()
     set(value) = prefs.edit() { putString(KEY_IP_ADDRESS, value) }
+
+  /**
+   * This provides ip address which
+   * user has registered
+   */
+  var mlabUploadKey: String
+    get() = prefs.getString(KEY_MLAB_UPLOAD_KEY, null).toString()
+    set(value) = prefs.edit() { putString(KEY_MLAB_UPLOAD_KEY, value) }
 
   /**
    * This provides ip address which

@@ -18,8 +18,11 @@ class PostSpeedTestUseCase() {
    *   as Success if posted the data successfully
    *   as Failure if post request failed with message
    */
-  suspend fun invoke(speedTestResultRequestEntity: SpeedTestResultRequestEntity): ResultState<Any?> {
+  suspend fun invoke(
+    speedTestResultRequestEntity: SpeedTestResultRequestEntity,
+    uploadKey: String
+  ): ResultState<Any?> {
     val speedTestRepository = SpeedTestRepositoryImpl()
-    return speedTestRepository.publishSpeedTestData(speedTestResultRequestEntity)
+    return speedTestRepository.publishSpeedTestData(speedTestResultRequestEntity, uploadKey)
   }
 }

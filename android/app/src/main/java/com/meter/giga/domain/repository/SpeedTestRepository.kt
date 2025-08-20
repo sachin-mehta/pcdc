@@ -40,5 +40,5 @@ interface SpeedTestRepository {
    *   as Success if posted the data successfully
    *   as Failure if post request failed with message
    */
-  suspend fun publishSpeedTestData(speedTestData: SpeedTestResultRequestEntity): ResultState<Unit?>
+  suspend fun publishSpeedTestData(speedTestData: SpeedTestResultRequestEntity,  uploadKey: String): ResultState<Unit?>
 }

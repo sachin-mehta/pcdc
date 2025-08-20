@@ -22,6 +22,7 @@ import com.meter.giga.domain.entity.SpeedTestResultEntity
 import com.meter.giga.domain.entity.request.SpeedTestResultRequestEntity
 import com.meter.giga.prefrences.AlarmSharedPref
 import com.meter.giga.service.NetworkTestService
+import com.meter.giga.utils.Constants.MLAB_UPLOAD_KEY
 import com.meter.giga.utils.Constants.REGISTRATION_BROWSER_ID
 import com.meter.giga.utils.Constants.REGISTRATION_COUNTRY_CODE
 import com.meter.giga.utils.Constants.REGISTRATION_GIGA_SCHOOL_ID
@@ -172,6 +173,8 @@ class GigaAppPlugin : Plugin() {
     val gigaSchoolId = call.getString(REGISTRATION_GIGA_SCHOOL_ID)
     val countryCode = call.getString(REGISTRATION_COUNTRY_CODE)
     val ipAddress = call.getString(REGISTRATION_IP_ADDRESS)
+    val mlabUploadKey = call.getString(MLAB_UPLOAD_KEY)
+    Log.d("GIGA GigaAppPlugin mlabUploadKey", "$mlabUploadKey")
     val alarmPrefs = AlarmSharedPref(context)
     //Reset the existing stored data from shared preferences
     alarmPrefs.resetAllData()
@@ -181,6 +184,7 @@ class GigaAppPlugin : Plugin() {
     alarmPrefs.gigaSchoolId = gigaSchoolId ?: ""
     alarmPrefs.ipAddress = ipAddress ?: ""
     alarmPrefs.browserId = browserId ?: ""
+    alarmPrefs.mlabUploadKey = mlabUploadKey ?: ""
     scheduleAlarm(context, alarmPrefs)
     call.resolve()
   }

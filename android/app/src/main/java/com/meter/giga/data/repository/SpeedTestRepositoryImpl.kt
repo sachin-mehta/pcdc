@@ -1,6 +1,7 @@
 package com.meter.giga.data.repository
 
 import android.util.Log
+import com.meter.giga.BuildConfig
 import com.meter.giga.domain.entity.request.SpeedTestResultRequestEntity
 import com.meter.giga.domain.entity.response.ClientInfoResponseEntity
 import com.meter.giga.domain.entity.response.ServerInfoResponseEntity
@@ -98,9 +99,15 @@ class SpeedTestRepositoryImpl : SpeedTestRepository {
    *   as Success if posted the data successfully
    *   as Failure if post request failed with message
    */
-  override suspend fun publishSpeedTestData(speedTestData: SpeedTestResultRequestEntity): ResultState<Unit?> {
+  override suspend fun publishSpeedTestData(
+    speedTestData: SpeedTestResultRequestEntity,
+    uploadKey: String
+  ): ResultState<Unit?> {
     val response =
-      RetrofitInstanceBuilder.speedTestApi.postSpeedTestData(body = speedTestData.toModel())
+      RetrofitInstanceBuilder.speedTestApi.postSpeedTestData(
+        body = speedTestData.toModel(),
+        authorization = "Bearer $uploadKey"
+      )
     if (response.isSuccessful) {
       Log.d("GIGA SpeedTestRepositoryImpl Success", "$response")
       if (response.body() != null) {

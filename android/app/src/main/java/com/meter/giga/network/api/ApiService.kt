@@ -46,7 +46,7 @@ interface ApiService {
 
   @POST("measurements")
   suspend fun postSpeedTestData(
-    @Header("Authorization") authorization: String = "Bearer ${BuildConfig.SPEED_TEST_TOKEN}",
+    @Header("Authorization") authorization: String,
     @Body body: SpeedTestResultRequestModel
   ): Response<Unit>
 
