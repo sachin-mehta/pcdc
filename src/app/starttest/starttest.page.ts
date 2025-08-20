@@ -6,12 +6,15 @@ import {
   ElementRef,
   OnDestroy,
 } from '@angular/core';
-import { IonAccordionGroup, ModalController } from '@ionic/angular';
+import {
+  IonAccordionGroup,
+  ModalController,
+  MenuController,
+} from '@ionic/angular';
 import { ActivatedRoute, Router } from '@angular/router';
 import { AlertController } from '@ionic/angular';
 import { SchoolService } from '../services/school.service';
 import { LoadingService } from '../services/loading.service';
-import { MenuController } from '@ionic/angular';
 import { NetworkService } from '../services/network.service';
 import { SettingsService } from '../services/settings.service';
 import { MlabService } from '../services/mlab.service';
@@ -300,9 +303,15 @@ export class StarttestPage implements OnInit, OnDestroy {
     this.handleBackButton();
   }
   handleBackButton() {
-    App.addListener('backButton', ({ canGoBack }) => {
+    App.addListener('backButton', async () => {
       if (this.isNative) {
         // Exit app if there's no page to go back to
+        const isMenuOpen = await this.menu.isOpen();
+        if (isMenuOpen) {
+          // ✅ If side menu is open → close it
+          this.menu.close();
+          return;
+        }
         App.exitApp();
       } else {
         // Let Ionic handle the navigation

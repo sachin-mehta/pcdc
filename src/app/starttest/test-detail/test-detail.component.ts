@@ -5,9 +5,9 @@ import { NetworkService } from 'src/app/services/network.service';
 import { StorageService } from 'src/app/services/storage.service';
 import { Router, NavigationEnd } from '@angular/router';
 import { GigaAppPlugin } from '../../android/giga-app-android-plugin';
-import { isAndroid } from 'src/app/android/android_util';
 import { App } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
+import { MenuController } from '@ionic/angular';
 @Component({
   selector: 'app-test-detail',
   templateUrl: './test-detail.component.html',
@@ -43,7 +43,8 @@ export class TestDetailComponent implements OnInit {
     private storage: StorageService,
     private historyService: HistoryService,
     private countryService: CountryService,
-    private router: Router
+    private router: Router,
+    private menu: MenuController
   ) {
     this.isNative = Capacitor.isNativePlatform();
     this.handleBackButton();
@@ -55,9 +56,15 @@ export class TestDetailComponent implements OnInit {
   }
 
   handleBackButton() {
-    App.addListener('backButton', ({ canGoBack }) => {
+    App.addListener('backButton', async () => {
       if (this.isNative) {
         // Exit app if Native App
+        const isMenuOpen = await this.menu.isOpen();
+        if (isMenuOpen) {
+          // ✅ If side menu is open → close it
+          this.menu.close();
+          return;
+        }
         App.exitApp();
       } else {
         // Let Ionic handle the navigation
