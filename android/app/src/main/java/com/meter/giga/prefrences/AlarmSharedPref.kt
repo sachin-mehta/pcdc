@@ -101,14 +101,6 @@ class AlarmSharedPref(context: Context) {
    * This provides ip address which
    * user has registered
    */
-  var mlabUploadKey: String
-    get() = prefs.getString(KEY_MLAB_UPLOAD_KEY, null).toString()
-    set(value) = prefs.edit() { putString(KEY_MLAB_UPLOAD_KEY, value) }
-
-  /**
-   * This provides ip address which
-   * user has registered
-   */
   var oldSpeedTestData: String
     get() = prefs.getString(KEY_OLD_SPEEDTEST_DATA, "[]").toString()
     set(value) = prefs.edit() { putString(KEY_OLD_SPEEDTEST_DATA, value) }

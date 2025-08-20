@@ -21,6 +21,7 @@ import com.meter.giga.ararm_scheduler.AlarmHelper.getSlotStartHour
 import com.meter.giga.domain.entity.SpeedTestResultEntity
 import com.meter.giga.domain.entity.request.SpeedTestResultRequestEntity
 import com.meter.giga.prefrences.AlarmSharedPref
+import com.meter.giga.prefrences.SecureDataStore
 import com.meter.giga.service.NetworkTestService
 import com.meter.giga.utils.Constants.MLAB_UPLOAD_KEY
 import com.meter.giga.utils.Constants.REGISTRATION_BROWSER_ID
@@ -30,6 +31,9 @@ import com.meter.giga.utils.Constants.REGISTRATION_IP_ADDRESS
 import com.meter.giga.utils.Constants.REGISTRATION_SCHOOL_ID
 import com.meter.giga.utils.Constants.SCHEDULE_TYPE
 import com.meter.giga.utils.Constants.SCHEDULE_TYPE_MANUAL
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
@@ -184,7 +188,12 @@ class GigaAppPlugin : Plugin() {
     alarmPrefs.gigaSchoolId = gigaSchoolId ?: ""
     alarmPrefs.ipAddress = ipAddress ?: ""
     alarmPrefs.browserId = browserId ?: ""
-    alarmPrefs.mlabUploadKey = mlabUploadKey ?: ""
+    CoroutineScope(Dispatchers.IO).launch {
+      val secureDataStore = SecureDataStore(context)
+      secureDataStore.setMlabUploadKey(mlabUploadKey ?: "")
+      val savedKey = secureDataStore.getMlabUploadKey()
+      println("GIGA Last Executed Time: $savedKey")
+    }
     scheduleAlarm(context, alarmPrefs)
     call.resolve()
   }
