@@ -10,13 +10,14 @@ import { environment } from '../environments/environment'; // './esrc/environmen
 import { PingResult, PingService } from './services/ping.service';
 import { IndexedDBService } from './services/indexed-db.service';
 import { SyncService } from './services/sync.service';
+import { DeviceAuthService } from './services/device.auth.service';
 
 // const shell = require('electron').shell;
 @Component({
-    selector: 'app-root',
-    templateUrl: 'app.component.html',
-    styleUrls: ['app.component.scss'],
-    standalone: false
+  selector: 'app-root',
+  templateUrl: 'app.component.html',
+  styleUrls: ['app.component.scss'],
+  standalone: false
 })
 export class AppComponent {
   languages = environment.languages;
@@ -52,8 +53,10 @@ export class AppComponent {
     private scheduleService: ScheduleService,
     private pingService: PingService,
     private localStorageService: IndexedDBService,
-    private syncService: SyncService
+    private syncService: SyncService,
+    private deviceAuth: DeviceAuthService
   ) {
+    this.authenticateDevice();
     this.filteredOptions = [];
     this.selectedLanguage =
       this.settingsService.get('applicationLanguage')?.code ??
@@ -106,6 +109,15 @@ export class AppComponent {
     setInterval(() => {
       this.scheduleService.initiate();
     }, 60000);
+  }
+
+  async authenticateDevice() {
+    try {
+      const token = await this.deviceAuth.authenticateDevice();
+      console.log('Received token:', token);
+    } catch (err) {
+      console.error('Auth failed:', err);
+    }
   }
 
   startSyncingPeriodicProcess() {

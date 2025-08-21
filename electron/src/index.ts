@@ -1,7 +1,7 @@
 import type { CapacitorElectronConfig } from '@capacitor-community/electron';
 import { getCapacitorElectronConfig, setupElectronDeepLinking } from '@capacitor-community/electron';
 import type { MenuItemConstructorOptions } from 'electron';
-import { app, MenuItem, ipcMain, dialog } from 'electron';
+import { app, MenuItem, ipcMain, dialog, safeStorage } from 'electron';
 import electronIsDev from 'electron-is-dev';
 import unhandled from 'electron-unhandled';
 import { autoUpdater } from 'electron-updater';
@@ -11,6 +11,7 @@ import path from 'path';
 import { ElectronCapacitorApp, setupContentSecurityPolicy, setupReloadWatcher } from './setup';
 import { captureException } from '@sentry/node';
 
+let encryptedToken: Buffer | null = null;
 // Set userData path to use name instead of productName - must be set before app is ready
 const userDataPath = path.join(app.getPath('appData'), 'unicef-pdca');
 app.setPath('userData', userDataPath);
@@ -69,6 +70,21 @@ if (capacitorFileConfig.electron?.deepLinkingEnabled) {
     customProtocol: capacitorFileConfig.electron.deepLinkingCustomProtocol ?? 'mycapacitorapp',
   });
 }
+
+ipcMain.handle("save-token", async (_event, token: string) => {
+  if (safeStorage.isEncryptionAvailable()) {
+    encryptedToken = safeStorage.encryptString(token);
+    return true;
+  }
+  return false;
+});
+
+ipcMain.handle("get-token", async () => {
+  if (encryptedToken && safeStorage.isEncryptionAvailable()) {
+    return safeStorage.decryptString(encryptedToken);
+  }
+  return null;
+});
 
 // If we are in Dev mode, use the file watcher components.
 if (electronIsDev) {
