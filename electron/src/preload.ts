@@ -2,7 +2,7 @@ require('./rt/electron-rt');
 //////////////////////////////
 // User Defined Preload scripts below
 console.log('User Preload!');
-import { contextBridge, ipcRenderer, shell } from "electron";   
+import { contextBridge, ipcRenderer, shell } from "electron";
 import si from "systeminformation";
 const { v4: uuidv4 } = require('uuid');
 
@@ -33,9 +33,20 @@ contextBridge.exposeInMainWorld("deviceAPI", {
   getDeviceFingerprint: async () => {
     return await getDeviceFingerprint();
   },
-  saveToken: (token: string) => ipcRenderer.invoke('save-token', token),
+  saveToken: async (token: string) => {
+    console.log("[preload] forwarding save-token:", token);
+    return await ipcRenderer.invoke('save-token', token);
+  },
   getToken: () => ipcRenderer.invoke('get-token')
 });
 
+contextBridge.exposeInMainWorld("hmac", {
+  sign: (args: { token: string; nonce: string; payload?: any; timestamp?: number }) =>
+    ipcRenderer.invoke("hmac-sign", args),
+});
 
-contextBridge.exposeInMainWorld("shell", {shell});
+
+
+
+
+contextBridge.exposeInMainWorld("shell", { shell });

@@ -7,9 +7,11 @@ import unhandled from 'electron-unhandled';
 import { autoUpdater } from 'electron-updater';
 import fs from 'fs-extra';
 import path from 'path';
+import { createHmac, randomBytes } from "crypto";
 
 import { ElectronCapacitorApp, setupContentSecurityPolicy, setupReloadWatcher } from './setup';
 import { captureException } from '@sentry/node';
+import { environment } from './environments/environment';
 
 let encryptedToken: Buffer | null = null;
 // Set userData path to use name instead of productName - must be set before app is ready
@@ -71,17 +73,54 @@ if (capacitorFileConfig.electron?.deepLinkingEnabled) {
   });
 }
 
-ipcMain.handle("save-token", async (_event, token: string) => {
-  if (safeStorage.isEncryptionAvailable()) {
-    encryptedToken = safeStorage.encryptString(token);
-    return true;
-  }
-  return false;
+ipcMain.handle("hmac-sign", async (_event, { token, nonce, payload, timestamp }) => {
+  const ts = timestamp ?? Date.now();
+  const payloadStr = payload ? JSON.stringify(payload) : "";
+
+  // Construct message
+  const msg = [token, nonce, ts.toString(), payloadStr].join("|");
+console.log('environment.HMAC_SECRET', environment.HMAC_SECRET)
+
+  // Use token or a separate secret key as HMAC secret
+  const signature = createHmac("sha256", environment.HMAC_SECRET)
+    .update(msg, "utf8")
+    .digest("base64");
+
+  return { signature, timestamp: ts };
 });
 
+// Optional helper if you want Electron to generate nonce centrally
+ipcMain.handle("generate-nonce", async () => {
+  return randomBytes(32).toString("base64");
+});
+
+ipcMain.handle("save-token", async (_event, token: string) => {
+  try {
+    if (safeStorage.isEncryptionAvailable()) {
+      encryptedToken = safeStorage.encryptString(token);
+      console.log('Encrypted & saved token:', encryptedToken.toString("base64"));
+      return true; 
+    } else {
+      console.warn("Encryption not available on this platform.");
+      return false;
+    }
+  } catch (e) {
+    console.error('Error while saving token:', e);
+    return false;
+  }
+});
+
+
 ipcMain.handle("get-token", async () => {
-  if (encryptedToken && safeStorage.isEncryptionAvailable()) {
-    return safeStorage.decryptString(encryptedToken);
+  try {
+    if (encryptedToken && safeStorage.isEncryptionAvailable()) {
+      return safeStorage.decryptString(encryptedToken);
+    }
+  }
+
+  catch (error) {
+    console.log('envruptoon failed', error)
+
   }
   return null;
 });
@@ -190,9 +229,9 @@ if (!gotTheLock) {
 
 
   });
-autoUpdater.on('error', (error) => {
-  console.error('Update Error:', error);
-  captureException(error);
+  autoUpdater.on('error', (error) => {
+    console.error('Update Error:', error);
+    captureException(error);
   });
   /*
     autoUpdater.on('error', (error) => {
@@ -212,7 +251,7 @@ autoUpdater.on('error', (error) => {
     });
   
   */
-    
+
 
 
   // Security - Set Content-Security-Policy based on whether or not we are in dev mode.

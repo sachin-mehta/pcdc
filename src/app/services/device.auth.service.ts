@@ -17,7 +17,7 @@ declare global {
   providedIn: 'root'
 })
 export class DeviceAuthService {
-  private apiUrl = environment.restAPI + 'device/auth'; // adjust endpoint if needed
+  private apiUrl = 'http://localhost:3000/api/v1/auth/initialize'; // adjust endpoint if needed
 
   constructor(private http: HttpClient) {}
 
@@ -40,13 +40,15 @@ export class DeviceAuthService {
 
       // 3. Send to backend
       const response = await firstValueFrom(
-        this.http.post<{ token: string }>(this.apiUrl, { fingerprint })
+        this.http.post<{ token: string }>(this.apiUrl, { deviceId: fingerprint })
       );
 
       const token = response.token;
 
       // 4. Save token securely
-      await window.deviceAPI.saveToken(token);
+      console.log('trigger svae token')
+const result = await window.deviceAPI.saveToken(token);
+console.log('saveToken result from main:', result);
 
       return token;
     } catch (error) {
