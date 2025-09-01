@@ -3,7 +3,7 @@ import { environment as env } from './_environment.prod';
 
 const token = env.token;
 export const environment = {
-    googleAPI: '',
+  googleAPI: '',
   production: env.mode,
   isElectron: window && window.process && window.process.type,
   mode: env.mode,

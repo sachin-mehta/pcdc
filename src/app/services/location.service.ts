@@ -32,7 +32,7 @@ export class LocationService {
     }));
 
     const locationRes = await fetch(
-      `https://www.googleapis.com/geolocation/v1/geolocate?key=AIzaSyCNqHJyhVBbmk3ANhjM9FSYL2w0vQEudrU`,
+      `https://www.googleapis.com/geolocation/v1/geolocate?key=`,
       {
         method: 'POST',
         body: JSON.stringify({ wifiAccessPoints }),
