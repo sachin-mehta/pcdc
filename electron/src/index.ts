@@ -4,7 +4,7 @@ import type { MenuItemConstructorOptions } from 'electron';
 import { app, MenuItem, ipcMain, dialog } from 'electron';
 import electronIsDev from 'electron-is-dev';
 import unhandled from 'electron-unhandled';
-import { autoUpdater } from 'electron-updater';
+import { autoUpdater, UpdateDownloadedEvent } from 'electron-updater';
 import fs from 'fs-extra';
 import path from 'path';
 
@@ -59,6 +59,22 @@ const appMenuBarMenuTemplate: (MenuItemConstructorOptions | MenuItem)[] = [
 // Get Config options from capacitor.config
 const capacitorFileConfig: CapacitorElectronConfig = getCapacitorElectronConfig();
 
+// Enable features for unresponsive renderer call stacks and global shortcuts portal
+// Note: app.commandLine converts uppercase switches to lowercase
+app.commandLine.appendSwitch(
+  'enable-features',
+  'DocumentPolicyIncludeJSCallStacksInCrashReports,GlobalShortcutsPortal',
+);
+
+// Handle GTK version for Linux users
+if (process.platform === 'linux') {
+  // GTK 4 is now default on GNOME, but some apps may need GTK 3
+  // Users can override this by setting GTK_VERSION environment variable
+  const gtkVersion = process.env.GTK_VERSION;
+  if (gtkVersion) {
+    app.commandLine.appendSwitch('gtk-version', gtkVersion);
+  }
+}
 // Initialize our app. You can pass menu templates into the app here.
 // const myCapacitorApp = new ElectronCapacitorApp(capacitorFileConfig);
 const myCapacitorApp = new ElectronCapacitorApp(capacitorFileConfig, trayMenuTemplate, appMenuBarMenuTemplate);
@@ -98,6 +114,22 @@ if (!gotTheLock) {
   app.whenReady().then(async () => {
     mainWindow = await myCapacitorApp.init();
   })
+
+  // Add web-contents-created event handler
+  app.on('web-contents-created', (_, webContents) => {
+    webContents.on('unresponsive', async () => {
+      try {
+        // Interrupt execution and collect call stack from unresponsive renderer
+        const callStack = await webContents.mainFrame.collectJavaScriptCallStack();
+        console.log('Renderer unresponsive - JavaScript call stack:', callStack);
+        captureException(new Error(`Renderer unresponsive: ${callStack}`));
+      } catch (error) {
+        console.error('Error collecting call stack from unresponsive renderer:', error);
+        captureException(error);
+      }
+    });
+  });
+
   /*
       app.on('ready', () => {
         updateApp = require('update-electron-app');
@@ -117,7 +149,10 @@ if (!gotTheLock) {
   }, 3600000)
 
 
-  autoUpdater.on("update-downloaded", (_event, releaseNotes, releaseName) => {
+  autoUpdater.on("update-downloaded", (_event: UpdateDownloadedEvent) => {
+    const releaseNotes = _event.releaseNotes.toString();
+    const releaseName = _event.releaseName.toString();
+
     const dialogOpts = {
       type: 'info' as const,
       buttons: ['Restart / Reinicie. / Перезапуск', 'Later / Después / Позже'],

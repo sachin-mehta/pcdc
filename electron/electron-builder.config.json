@@ -22,6 +22,8 @@
     "target": "nsis",
     "icon": "assets/appIcon.ico"
   },
+  "compression": "store",
+  "removePackageScripts": true,
   "mac": {
     "category": "your.app.category.type",
     "target": "dmg"
