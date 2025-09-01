@@ -18,6 +18,7 @@ declare global {
     };
     hmac: {
       sign: (args: {
+        secretkey: string;
         token: string;
         nonce: string;
         payload?: any;
@@ -51,7 +52,9 @@ export class TokenInterceptor implements HttpInterceptor {
         const nonce = btoa(String.fromCharCode(...nonceBytes));
 
         // Ask main process to sign
+        const secretkey = environment.HMAC_SECRET;
         const { signature, timestamp } = await window.hmac.sign({
+          secretkey,
           token,
           nonce,
         });

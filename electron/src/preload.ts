@@ -41,7 +41,7 @@ contextBridge.exposeInMainWorld("deviceAPI", {
 });
 
 contextBridge.exposeInMainWorld("hmac", {
-  sign: (args: { token: string; nonce: string; payload?: any; timestamp?: number }) =>
+  sign: (args: { secretkey: string; token: string; nonce: string; timestamp?: number }) =>
     ipcRenderer.invoke("hmac-sign", args),
 });
 

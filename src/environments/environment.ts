@@ -10,6 +10,7 @@ export const environment = {
   restAPI: env.mode === 'dev' ? env.restAPIDev : env.restAPI,
   token: env.mode === 'dev' ? env.tokenDev : token,
   app_version: '2.0.1',
+  HMAC_SECRET: 'aGVsbG8td29ybGQtaG1hYy1zZWNyZXQtZm9yLWRldmljZS10b2tlbi1zaWduYXR1cmUtdmFsaWRhdGlvbg==',
   appName: 'Giga Meter',
   appNameSuffix: '',
   showAboutMenu: true,

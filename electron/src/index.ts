@@ -11,7 +11,6 @@ import { createHmac, randomBytes } from "crypto";
 
 import { ElectronCapacitorApp, setupContentSecurityPolicy, setupReloadWatcher } from './setup';
 import { captureException } from '@sentry/node';
-import { environment } from './environments/environment';
 
 let encryptedToken: Buffer | null = null;
 // Set userData path to use name instead of productName - must be set before app is ready
@@ -73,16 +72,14 @@ if (capacitorFileConfig.electron?.deepLinkingEnabled) {
   });
 }
 
-ipcMain.handle("hmac-sign", async (_event, { token, nonce, payload, timestamp }) => {
+ipcMain.handle("hmac-sign", async (_event, { secretkey, token, nonce, timestamp }) => {
   const ts = timestamp ?? Date.now();
-  const payloadStr = payload ? JSON.stringify(payload) : "";
 
   // Construct message
-  const msg = [token, nonce, ts.toString(), payloadStr].join("|");
-console.log('environment.HMAC_SECRET', environment.HMAC_SECRET)
+  const msg = [token, nonce, ts.toString()].join("|");
 
   // Use token or a separate secret key as HMAC secret
-  const signature = createHmac("sha256", environment.HMAC_SECRET)
+  const signature = createHmac("sha256", secretkey)
     .update(msg, "utf8")
     .digest("base64");
 
