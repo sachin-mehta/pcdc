@@ -20,7 +20,7 @@ import { HistoryService } from '../services/history.service';
 import { TranslateService } from '@ngx-translate/core';
 import { StorageService } from '../services/storage.service';
 import SpeedTest from '@cloudflare/speedtest';
-import type { Results } from '@cloudflare/speedtest'; 
+import type { Results } from '@cloudflare/speedtest';
 
 @Component({
   selector: 'app-starttest',
@@ -192,10 +192,18 @@ export class StarttestPage implements OnInit {
     }
   }
 
-  getCloudFlareResults(){
-    const speedTest = new SpeedTest();
+  getCloudFlareResults() {
+    const speedTest = new SpeedTest({});
+    speedTest.onRunningChange = (isRunning: boolean) => {
+      console.log('CloudFlare SpeedTest running status: ', isRunning);
+    };
+    speedTest.onResultsChange = (param: { type: string; results: any }) => {
+      console.log('CloudFlare SpeedTest results changed: ', param);
+      console.log('CloudFlare SpeedTest summary: ', speedTest.results.getSummary());
+    };
     speedTest.onFinish = (results: Results) => {
-      console.log("CloudFlare SpeedTest Summary: ", results.getSummary());
+      console.log('CloudFlare SpeedTest Summary: ', results.getSummary());
+      console.log('CloudFlare SpeedTest Download: ', results.getScores());
     };
   }
 
@@ -209,8 +217,8 @@ export class StarttestPage implements OnInit {
         this.loading.dismiss();
       }
     });
-    console.log("Starting Cloudflare test...")
-    this.getCloudFlareResults()
+    console.log('Starting Cloudflare test...');
+    this.getCloudFlareResults();
   }
 
   refreshHistory() {
@@ -258,23 +266,40 @@ export class StarttestPage implements OnInit {
         console.log('Running Test (Upload)');
         this.currentState = 'Running Test (Upload)';
         this.currentRate = (
-          (data.passedResults.Data.TCPInfo.BytesReceived / data.passedResults.Data.TCPInfo.ElapsedTime) *
+          (data.passedResults.Data.TCPInfo.BytesReceived /
+            data.passedResults.Data.TCPInfo.ElapsedTime) *
           8
         ).toFixed(2);
         this.currentRateUpload = this.currentRate;
       } else if (data.testStatus === 'interval_s2c') {
         this.currentState = 'Running Test (Download)';
         this.currentRate = data.passedResults.Data.MeanClientMbps?.toFixed(2);
-        this.currentRateDownload = data.passedResults.Data.MeanClientMbps?.toFixed(2);
+        this.currentRateDownload =
+          data.passedResults.Data.MeanClientMbps?.toFixed(2);
       } else if (data.testStatus === 'complete') {
         this.currentState = 'Completed';
         this.currentDate = new Date();
-        this.currentRate = data.passedResults['NDTResult.S2C'].LastClientMeasurement.MeanClientMbps?.toFixed(2);
-        this.currentRateUpload = data.passedResults['NDTResult.C2S'].LastClientMeasurement.MeanClientMbps?.toFixed(2);
-        this.currentRateDownload = data.passedResults['NDTResult.S2C'].LastClientMeasurement.MeanClientMbps?.toFixed(2);
+        this.currentRate =
+          data.passedResults[
+            'NDTResult.S2C'
+          ].LastClientMeasurement.MeanClientMbps?.toFixed(2);
+        this.currentRateUpload =
+          data.passedResults[
+            'NDTResult.C2S'
+          ].LastClientMeasurement.MeanClientMbps?.toFixed(2);
+        this.currentRateDownload =
+          data.passedResults[
+            'NDTResult.S2C'
+          ].LastClientMeasurement.MeanClientMbps?.toFixed(2);
         this.progressGaugeState.current = this.progressGaugeState.maximum;
-        this.latency = ((data.passedResults['NDTResult.S2C'].LastServerMeasurement.BBRInfo.MinRTT +
-          data.passedResults['NDTResult.C2S'].LastServerMeasurement.BBRInfo.MinRTT) / 2 / 1000).toFixed(0);
+        this.latency = (
+          (data.passedResults['NDTResult.S2C'].LastServerMeasurement.BBRInfo
+            .MinRTT +
+            data.passedResults['NDTResult.C2S'].LastServerMeasurement.BBRInfo
+              .MinRTT) /
+          2 /
+          1000
+        ).toFixed(0);
         let historicalData = this.historyService.get();
         if (historicalData !== null && historicalData !== undefined) {
           this.accessInformation =
@@ -306,7 +331,7 @@ export class StarttestPage implements OnInit {
       buttons: [
         {
           text: 'Okay',
-          handler: () => { },
+          handler: () => {},
         },
       ],
     });
@@ -326,7 +351,7 @@ export class StarttestPage implements OnInit {
       buttons: [
         {
           text: 'Okay',
-          handler: () => { },
+          handler: () => {},
         },
       ],
     });
