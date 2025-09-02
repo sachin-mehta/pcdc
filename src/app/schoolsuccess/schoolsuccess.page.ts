@@ -41,9 +41,9 @@ export class SchoolsuccessPage {
     this.isLast = true;
   }
   moveToStartTest() {
-    this.measurementClientService.runTest(
-      'registration',
-    );
+    // this.measurementClientService.runTest(
+    //   'registration',
+    // );
     this.router.navigate(['starttest']);
   }
 }
