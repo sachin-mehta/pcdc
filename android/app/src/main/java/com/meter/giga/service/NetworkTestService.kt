@@ -191,6 +191,8 @@ class NetworkTestService : LifecycleService() {
     var browserId = prefs.browserId
     var ipAddress = prefs.ipAddress
     var countryCode = prefs.countryCode
+    val s2cRate = arrayListOf<Double>()
+    val c2sRate = arrayListOf<Double>()
 
     /**
      * Callback function implementation when download measurement are available
@@ -230,6 +232,17 @@ class NetworkTestService : LifecycleService() {
       val msg = "DL: %.2f Mbps | UL: %.2f Mbps".format(downloadSpeed, uploadSpeed)
       lastDownloadResponse = clientResponse
       updateNotification(msg)
+      var meanDownloadClientMbps: Double? = null
+      clientResponse.appInfo.let {
+        meanDownloadClientMbps = if (it.elapsedTime == 0L) {
+          0.0
+        } else {
+          (it.numBytes / (it.elapsedTime / 1000)) * 0.008
+        }
+      }
+      meanDownloadClientMbps?.let {
+        s2cRate.add(meanDownloadClientMbps)
+      }
       GigaAppPlugin.sendSpeedUpdate(downloadSpeed, uploadSpeed, "download")
     }
 
@@ -248,6 +261,17 @@ class NetworkTestService : LifecycleService() {
       val msg = "DL: %.2f Mbps | UL: %.2f Mbps".format(downloadSpeed, uploadSpeed)
       lastUploadResponse = clientResponse
       updateNotification(msg)
+      var meanUploadClientMbps: Double? = null
+      clientResponse.appInfo.let {
+        meanUploadClientMbps = if (it.elapsedTime == 0L) {
+          0.0
+        } else {
+          (it.numBytes / (it.elapsedTime / 1000)) * 0.008
+        }
+      }
+      meanUploadClientMbps?.let {
+        c2sRate.add(meanUploadClientMbps)
+      }
       GigaAppPlugin.sendSpeedUpdate(downloadSpeed, uploadSpeed, "upload")
     }
 
@@ -313,12 +337,14 @@ class NetworkTestService : LifecycleService() {
           val clientInfo = clientInfoState.await()
           val serverInfo = serverInfoState.await()
           var speedTestResultRequestEntity: SpeedTestResultRequestEntity? = null
+          var clientInfoResponse: ClientInfoResponseEntity? = null
+          var serverInfoResponse: ServerInfoResponseEntity? = null
           if (clientInfo != null && serverInfo != null) {
             var clientInfoRequest: ClientInfoRequestEntity? = null
             var serverInfoRequest: ServerInfoRequestEntity? = null
             when (clientInfo) {
               is ResultState.Success<*> -> {
-                val clientInfoResponse = clientInfo.data as ClientInfoResponseEntity
+                clientInfoResponse = clientInfo.data as ClientInfoResponseEntity
                 val location = clientInfoResponse.loc?.split(",")
                 var latitude = 0.0
                 var longitude = 0.0
@@ -358,7 +384,7 @@ class NetworkTestService : LifecycleService() {
             }
             when (serverInfo) {
               is ResultState.Success<*> -> {
-                val serverInfoResponse = serverInfo.data as ServerInfoResponseEntity
+                serverInfoResponse = serverInfo.data as ServerInfoResponseEntity
                 serverInfoRequest = ServerInfoRequestEntity(
                   city = serverInfoResponse.city?.replace('_', ' ') ?: "",
                   country = serverInfoResponse.country,
@@ -411,19 +437,23 @@ class NetworkTestService : LifecycleService() {
                 lastUploadResponse
               )
               val existingSpeedTestData = prefs.oldSpeedTestData
+              val historyDataIndex = prefs.historyDataIndex
+              val measurementsItem = GigaUtil.getMeasurementItem(
+                clientInfoResponse = clientInfoResponse,
+                c2sLastServerManagement = lastUploadMeasurement,
+                s2cLastServerManagement = lastDownloadMeasurement,
+                serverInfoResponse = serverInfoResponse,
+                scheduleType = scheduleType,
+                results = speedTestResultRequestEntity.results,
+                c2sRate = c2sRate,
+                s2cRate = s2cRate,
+                historyDataIndex
+              )
+              prefs.historyDataIndex = historyDataIndex + 1
               Log.d(
                 "GIGA NetworkTestService",
                 "Existing Speed Test Data $existingSpeedTestData"
               )
-              val updateSpeedTestData = GigaUtil.addJsonItem(
-                existingSpeedTestData,
-                Gson().toJson(speedTestResultRequestEntity)
-              )
-              Log.d(
-                "GIGA NetworkTestService",
-                "Updated Speed Test Data $updateSpeedTestData"
-              )
-              prefs.oldSpeedTestData = updateSpeedTestData
               val postSpeedTestUseCase = PostSpeedTestUseCase()
               val uploadKey = secureDataStore.getMlabUploadKey()
               val postSpeedTestResultState =
@@ -434,6 +464,16 @@ class NetworkTestService : LifecycleService() {
                     "GIGA NetworkTestService",
                     "Speed Test Not Published Successfully Due to ${postSpeedTestResultState.error}"
                   )
+                  measurementsItem.uploaded = false
+                  val updateSpeedTestData = GigaUtil.addJsonItem(
+                    existingSpeedTestData,
+                    Gson().toJson(measurementsItem)
+                  )
+                  Log.d(
+                    "GIGA NetworkTestService",
+                    "Updated Speed Test Data $updateSpeedTestData"
+                  )
+                  prefs.oldSpeedTestData = updateSpeedTestData
                 }
 
                 ResultState.Loading -> {
@@ -448,7 +488,20 @@ class NetworkTestService : LifecycleService() {
                     "GIGA NetworkTestService",
                     "Speed Test Data Published Successfully"
                   )
-                  GigaAppPlugin.sendSpeedTestCompleted(speedTestResultRequestEntity)
+                  measurementsItem.uploaded = true
+                  val updateSpeedTestData = GigaUtil.addJsonItem(
+                    existingSpeedTestData,
+                    Gson().toJson(measurementsItem)
+                  )
+                  Log.d(
+                    "GIGA NetworkTestService",
+                    "Updated Speed Test Data $updateSpeedTestData"
+                  )
+                  prefs.oldSpeedTestData = updateSpeedTestData
+                  GigaAppPlugin.sendSpeedTestCompleted(
+                    speedTestResultRequestEntity,
+                    measurementsItem
+                  )
                 }
               }
             } else {

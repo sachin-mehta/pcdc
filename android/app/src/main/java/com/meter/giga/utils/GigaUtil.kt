@@ -1,15 +1,21 @@
 package com.meter.giga.utils
 
-import android.annotation.SuppressLint
 import android.app.AlarmManager
 import android.content.Context
 import android.os.Build
+import com.meter.giga.domain.entity.history.AccessInformation
+import com.meter.giga.domain.entity.history.DataUsage
+import com.meter.giga.domain.entity.history.MeasurementsItem
+import com.meter.giga.domain.entity.history.MlabInformation
+import com.meter.giga.domain.entity.history.SnapLog
 import com.meter.giga.domain.entity.request.ClientInfoRequestEntity
 import com.meter.giga.domain.entity.request.LastClientMeasurementRequestEntity
 import com.meter.giga.domain.entity.request.ResultsRequestEntity
 import com.meter.giga.domain.entity.request.ServerInfoRequestEntity
 import com.meter.giga.domain.entity.request.SpeedTestMeasurementRequestEntity
 import com.meter.giga.domain.entity.request.SpeedTestResultRequestEntity
+import com.meter.giga.domain.entity.response.ClientInfoResponseEntity
+import com.meter.giga.domain.entity.response.ServerInfoResponseEntity
 import com.meter.giga.utils.Constants.M_D_YYYY_H_MM_SS_A
 import net.measurementlab.ndt7.android.models.AppInfo
 import net.measurementlab.ndt7.android.models.BBRInfo
@@ -296,5 +302,70 @@ object GigaUtil {
     // Store updated array
     val updatedArray = JSONArray(itemList)
     return updatedArray.toString()
+  }
+
+  fun getDataUsage(
+    c2sLastServerManagement: Measurement?,
+    s2cLastServerManagement: Measurement?,
+  ): DataUsage {
+    val bytesReceived = (s2cLastServerManagement?.tcpInfo?.bytesReceived
+      ?: 0) + (c2sLastServerManagement?.tcpInfo?.bytesReceived ?: 0)
+    val bytesSent = (s2cLastServerManagement?.tcpInfo?.bytesAcked
+      ?: 0) + (c2sLastServerManagement?.tcpInfo?.bytesAcked ?: 0)
+    val totalBytes = bytesSent + bytesReceived
+    return DataUsage(
+      download = bytesReceived,
+      upload = bytesSent,
+      total = totalBytes,
+    )
+  }
+
+  fun getMeasurementItem(
+    clientInfoResponse: ClientInfoResponseEntity?,
+    c2sLastServerManagement: Measurement?,
+    s2cLastServerManagement: Measurement?,
+    serverInfoResponse: ServerInfoResponseEntity?,
+    scheduleType: String?,
+    results: ResultsRequestEntity?,
+    c2sRate: ArrayList<Double>,
+    s2cRate: ArrayList<Double>,
+    historyDataIndex: Int
+  ): MeasurementsItem {
+    return MeasurementsItem(
+      accessInformation = AccessInformation(
+        asn = clientInfoResponse?.asn,
+        city = clientInfoResponse?.city,
+        country = clientInfoResponse?.country,
+        hostname = clientInfoResponse?.isp,
+        ip = clientInfoResponse?.ip,
+        loc = clientInfoResponse?.loc,
+        org = clientInfoResponse?.org,
+        postal = clientInfoResponse?.postal,
+        region = clientInfoResponse?.region,
+        timezone = clientInfoResponse?.timezone
+      ),
+      dataUsage = getDataUsage(c2sLastServerManagement, s2cLastServerManagement),
+      index = historyDataIndex + 1,
+      mlabInformation = MlabInformation(
+        city = serverInfoResponse?.city,
+        country = serverInfoResponse?.country,
+        fqdn = serverInfoResponse?.fqdn,
+        ip = listOf(serverInfoResponse?.ipv4 ?: "", serverInfoResponse?.ipv6 ?: ""),
+        label = serverInfoResponse?.city,
+        metro = serverInfoResponse?.city,
+        site = serverInfoResponse?.site,
+        url = serverInfoResponse?.url
+      ),
+      notes = scheduleType,
+      results = results,
+      snapLog = SnapLog(
+        c2sRate = c2sRate,
+        s2cRate = s2cRate
+      ),
+      timestamp = System.currentTimeMillis(),
+      uploaded = false,
+      uuid = c2sLastServerManagement?.connectionInfo?.uuid,
+      version = 1
+    )
   }
 }

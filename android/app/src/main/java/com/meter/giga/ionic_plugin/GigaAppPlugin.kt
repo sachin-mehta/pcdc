@@ -4,7 +4,6 @@ package com.meter.giga.ionic_plugin
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.util.Log
 import com.getcapacitor.JSArray
 import com.getcapacitor.JSObject
@@ -12,13 +11,12 @@ import com.getcapacitor.Plugin
 import com.getcapacitor.PluginCall
 import com.getcapacitor.PluginMethod
 import com.getcapacitor.annotation.CapacitorPlugin
-import com.google.gson.Gson
 import com.google.gson.GsonBuilder
-import com.google.gson.JsonParser
 import com.meter.giga.ararm_scheduler.AlarmHelper
 import com.meter.giga.ararm_scheduler.AlarmHelper.getNextSlotRange
 import com.meter.giga.ararm_scheduler.AlarmHelper.getSlotStartHour
 import com.meter.giga.domain.entity.SpeedTestResultEntity
+import com.meter.giga.domain.entity.history.MeasurementsItem
 import com.meter.giga.domain.entity.request.SpeedTestResultRequestEntity
 import com.meter.giga.prefrences.AlarmSharedPref
 import com.meter.giga.prefrences.SecureDataStore
@@ -70,12 +68,16 @@ class GigaAppPlugin : Plugin() {
      * @param speedTestData : Speed Test Result Entity contains all
      * speed test details
      */
-    fun sendSpeedTestCompleted(speedTestData: SpeedTestResultRequestEntity) {
+    fun sendSpeedTestCompleted(
+      speedTestData: SpeedTestResultRequestEntity,
+      measurementsItem: MeasurementsItem
+    ) {
       pluginInstance?.let {
         Log.d("GIGA NetworkTestService", "sendSpeedTestCompleted")
         val speedTestResultEntity = SpeedTestResultEntity(
           speedTestData = speedTestData,
-          testStatus = "complete"
+          testStatus = "complete",
+          measurementsItem = measurementsItem
         )
         val jsonString = GsonBuilder()
           .serializeNulls()
@@ -152,9 +154,10 @@ class GigaAppPlugin : Plugin() {
         Log.d("GIGA GigaAppPlugin jsonArray", "$innerJsonObject")
         jsArray.put(innerJsonObject)
       }
-
+      val measurements = JSObject()
+      measurements.put("measurements", jsArray)
       val result = JSObject()
-      result.put("historicalData", jsArray)
+      result.put("historicalData", measurements)
       call.resolve(result)
     } catch (e: JSONException) {
       call.reject("Failed to parse JSON array", e)

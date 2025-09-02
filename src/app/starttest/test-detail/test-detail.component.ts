@@ -89,79 +89,35 @@ export class TestDetailComponent implements OnInit {
 
   loadData() {
     this.schoolId = this.storage.get('schoolId');
-    if (this.isNative) {
-      this.loadHistoricalData();
-    } else {
-      let historicalData = this.historyService.get();
-      if (
-        historicalData !== null &&
-        historicalData !== undefined &&
-        historicalData.measurements.length
-      ) {
-        this.measurementnetworkServer =
-          historicalData.measurements[
-            historicalData.measurements.length - 1
-          ].mlabInformation.city;
-        this.measurementISP =
-          historicalData.measurements[
-            historicalData.measurements.length - 1
-          ].accessInformation.org;
-      }
-      if (this.storage.get('historicalDataAll')) {
-        this.historicalData = JSON.parse(this.storage.get('historicalDataAll'));
-        const allMeasurements = this.historicalData.measurements;
 
-        // Get the last 10 measurements (sorted by timestamp descending)
-        this.measurementsData = allMeasurements
-          .sort(
-            (
-              a: { timestamp: string | number | Date },
-              b: { timestamp: string | number | Date }
-            ) =>
-              new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
-          ) // descending order
-          .slice(0, 10); // take last 10
-      }
+    let historicalData = this.historyService.get();
+    if (
+      historicalData !== null &&
+      historicalData !== undefined &&
+      historicalData.measurements.length
+    ) {
+      this.measurementnetworkServer =
+        historicalData.measurements[
+          historicalData.measurements.length - 1
+        ].mlabInformation.city;
+      this.measurementISP =
+        historicalData.measurements[
+          historicalData.measurements.length - 1
+        ].accessInformation.org;
     }
-  }
+    if (this.storage.get('historicalDataAll')) {
+      this.historicalData = JSON.parse(this.storage.get('historicalDataAll'));
+      const allMeasurements = this.historicalData.measurements;
 
-  async loadHistoricalData() {
-    try {
-      const result = await GigaAppPlugin.getHistoricalSpeedTestData();
-      console.log(
-        'Queue from native:',
-        JSON.parse(JSON.stringify(result.historicalData))
-      );
-      //this.historicalData = JSON.parse(JSON.stringify(result.historicalData));
-      this.historicalData = result.historicalData;
-
-      const allMeasurements = this.historicalData;
-      if (
-        allMeasurements !== null &&
-        allMeasurements !== undefined &&
-        allMeasurements.length
-      ) {
-        this.measurementnetworkServer =
-          allMeasurements[allMeasurements.length - 1].ClientInfo.City;
-        this.measurementISP =
-          allMeasurements[allMeasurements.length - 1].ClientInfo.ISP;
-      }
-      console.log('allMeasurements:', allMeasurements);
       // Get the last 10 measurements (sorted by timestamp descending)
       this.measurementsData = allMeasurements
         .sort(
           (
             a: { timestamp: string | number | Date },
             b: { timestamp: string | number | Date }
-          ) => {
-            console.log('allMeasurements:', new Date(a.timestamp).getTime());
-            console.log('allMeasurements:', new Date(b.timestamp).getTime());
-            new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime();
-          }
+          ) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
         ) // descending order
         .slice(0, 10); // take last 10
-    } catch (err) {
-      console.error('Error fetching queue:', err);
     }
   }
 }

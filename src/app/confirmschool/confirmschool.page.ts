@@ -15,6 +15,7 @@ import { environment } from 'src/environments/environment';
 import { SettingsService } from '../services/settings.service';
 import { TranslateService } from '@ngx-translate/core';
 import { Capacitor, registerPlugin } from '@capacitor/core';
+import { HistoryService } from '../services/history.service';
 @Component({
   selector: 'app-confirmschool',
   templateUrl: 'confirmschool.page.html',
@@ -40,6 +41,7 @@ export class ConfirmschoolPage {
     private schoolService: SchoolService,
     private storage: StorageService,
     private networkService: NetworkService,
+    private historyService: HistoryService,
     private settings: SettingsService,
     public loading: LoadingService,
     private datePipe: DatePipe,
@@ -223,6 +225,8 @@ export class ConfirmschoolPage {
       ip_address: ipAddress || '',
       mlab_uploadKey: apiKey || '',
     });
+    this.historyService.set({});
+    this.historyService.setAll({});
     console.log('GIGA Plugin Call Result : ', result);
   }
 

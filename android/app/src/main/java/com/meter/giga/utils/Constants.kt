@@ -26,6 +26,7 @@ object Constants {
   const val KEY_FIRST_15_SCHEDULED_TIME = "KEY_FIRST_15_SCHEDULED_TIME"
   const val KEY_LAST_EXECUTION_DAY = "KEY_LAST_EXECUTION_DAY"
   const val KEY_LAST_SLOT_EXECUTION_HOUR = "KEY_LAST_SLOT_EXECUTION_HOUR"
+  const val KEY_HISTORY_DATA_INDEX = "KEY_HISTORY_DATA_INDEX"
   const val CLIENT_INFO_FALLBACK_END_URL = "https://ipv4.geojs.io/v1/"
   const val CLIENT_INFO_END_URL = "https://ipinfo.io/"
   const val SPEED_TEST_END_URL = "https://uni-ooi-giga-meter-backend-dev.azurewebsites.net/api/v1/"

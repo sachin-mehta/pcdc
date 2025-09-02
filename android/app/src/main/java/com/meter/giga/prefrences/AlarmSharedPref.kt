@@ -58,6 +58,15 @@ class AlarmSharedPref(context: Context) {
     set(value) = prefs.edit() { putInt(KEY_LAST_SLOT_EXECUTION_HOUR, value) }
 
   /**
+   * This provides last speedtest data index
+   * speed test executed else 0
+   */
+  var historyDataIndex: Int
+    get() = prefs.getInt(KEY_LAST_SLOT_EXECUTION_HOUR, 0)
+    set(value) = prefs.edit() { putInt(KEY_LAST_SLOT_EXECUTION_HOUR, value) }
+
+
+  /**
    * This provides country code which
    * user has registered
    */
@@ -98,12 +107,13 @@ class AlarmSharedPref(context: Context) {
     set(value) = prefs.edit() { putString(KEY_IP_ADDRESS, value) }
 
   /**
-   * This provides ip address which
-   * user has registered
+   * This provides ip old historical speed
+   * test data
    */
   var oldSpeedTestData: String
     get() = prefs.getString(KEY_OLD_SPEEDTEST_DATA, "[]").toString()
     set(value) = prefs.edit() { putString(KEY_OLD_SPEEDTEST_DATA, value) }
+
 
   /**
    * This checks if last executed speed test date is
@@ -137,6 +147,7 @@ class AlarmSharedPref(context: Context) {
     countryCode = ""
     ipAddress = ""
     oldSpeedTestData = "[]"
+    historyDataIndex = 0
   }
 }
 

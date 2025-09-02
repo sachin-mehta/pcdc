@@ -20,7 +20,9 @@ export class MeasurementClientService {
   public uploadStarted$ = new Subject<any>();
 
   private TIME_EXPECTED = 10;
-  private readonly measurementNotificationActivity = new BehaviorSubject<any>({}).asObservable();
+  private readonly measurementNotificationActivity = new BehaviorSubject<any>(
+    {}
+  ).asObservable();
   private readonly testConfig = {
     userAcceptedDataPolicy: true,
     downloadworkerfile: 'assets/js/ndt/ndt7-download-worker.js',
@@ -75,7 +77,7 @@ export class MeasurementClientService {
     private networkService: NetworkService,
     private uploadService: UploadService,
     private sharedService: SharedService
-  ) { }
+  ) {}
 
   async runTest(notes = 'manual'): Promise<void> {
     console.log('Starting ndt7 test', ndt7);
@@ -117,9 +119,9 @@ export class MeasurementClientService {
   private async getTestInfo() {
     return {
       accessInformation: await this.networkService.getNetInfo(),
-      mlabInformation: await this.mlabService.findServer(
-        this.settingsService.get('metroSelection')
-      ).toPromise(),
+      mlabInformation: await this.mlabService
+        .findServer(this.settingsService.get('metroSelection'))
+        .toPromise(),
     };
   }
 
@@ -151,7 +153,7 @@ export class MeasurementClientService {
     if (data.Source === 'client') {
       console.log(`Download: ${data.Data.MeanClientMbps.toFixed(2)} Mb/s`);
       measurementRecord.snapLog.s2cRate.push(data.Data.MeanClientMbps);
-      this.downloadStarted$.next(data)
+      this.downloadStarted$.next(data);
       this.updateProgress('interval_s2c', data, data.Data.ElapsedTime);
     }
   };
@@ -164,7 +166,11 @@ export class MeasurementClientService {
     Mean client goodput: ${clientGoodput} Mbps`);
     measurementRecord.results['NDTResult.S2C'] = data;
     this.downloadComplete$.next(data); // Emit event
-    this.updateProgress('finished_s2c', data, data.LastClientMeasurement.ElapsedTime);
+    this.updateProgress(
+      'finished_s2c',
+      data,
+      data.LastClientMeasurement.ElapsedTime
+    );
   };
 
   private onUploadMeasurement = (data: any, measurementRecord: any): void => {
@@ -197,8 +203,15 @@ export class MeasurementClientService {
     this.broadcastMeasurementStatus('error', { error: err.message });
   };
 
-  private updateProgress(testStatus: string, passedResults: any, elapsedTime: number): void {
-    this.progress = elapsedTime > this.TIME_EXPECTED * 2 ? 1.0 : elapsedTime / (this.TIME_EXPECTED * 2) + 0.5;
+  private updateProgress(
+    testStatus: string,
+    passedResults: any,
+    elapsedTime: number
+  ): void {
+    this.progress =
+      elapsedTime > this.TIME_EXPECTED * 2
+        ? 1.0
+        : elapsedTime / (this.TIME_EXPECTED * 2) + 0.5;
     this.broadcastMeasurementStatus(testStatus, {
       passedResults,
       running: true,
@@ -208,7 +221,8 @@ export class MeasurementClientService {
 
   private async finalizeMeasurement(measurementRecord: any): Promise<void> {
     measurementRecord.uuid =
-      measurementRecord.results['NDTResult.S2C'].LastServerMeasurement.ConnectionInfo.UUID || '';
+      measurementRecord.results['NDTResult.S2C'].LastServerMeasurement
+        .ConnectionInfo.UUID || '';
     measurementRecord.version = 1;
 
     const dataUsage = this.calculateDataUsage(measurementRecord.results);
@@ -217,7 +231,10 @@ export class MeasurementClientService {
     if (this.settingsService.get('uploadEnabled')) {
       try {
         this.historyService.add(measurementRecord);
-        this.sharedService.broadcast('history:measurement:change', 'history:measurement:change');
+        this.sharedService.broadcast(
+          'history:measurement:change',
+          'history:measurement:change'
+        );
         await this.uploadService
           .uploadMeasurement(measurementRecord)
           .toPromise();
@@ -234,13 +251,25 @@ export class MeasurementClientService {
     });
   }
 
-  private calculateDataUsage(passedResults: any): { download: number; upload: number; total: number } {
-    const bytesSent = Number(passedResults['NDTResult.S2C'].LastServerMeasurement.TCPInfo.BytesAcked +
-      passedResults['NDTResult.C2S'].LastServerMeasurement.TCPInfo.BytesAcked
-    ) || 0;
-    const bytesReceived = Number(passedResults['NDTResult.S2C'].LastServerMeasurement.TCPInfo.BytesReceived +
-      passedResults['NDTResult.C2S'].LastServerMeasurement.TCPInfo.BytesReceived
-    ) || 0;
+  private calculateDataUsage(passedResults: any): {
+    download: number;
+    upload: number;
+    total: number;
+  } {
+    const bytesSent =
+      Number(
+        passedResults['NDTResult.S2C'].LastServerMeasurement.TCPInfo
+          .BytesAcked +
+          passedResults['NDTResult.C2S'].LastServerMeasurement.TCPInfo
+            .BytesAcked
+      ) || 0;
+    const bytesReceived =
+      Number(
+        passedResults['NDTResult.S2C'].LastServerMeasurement.TCPInfo
+          .BytesReceived +
+          passedResults['NDTResult.C2S'].LastServerMeasurement.TCPInfo
+            .BytesReceived
+      ) || 0;
 
     const totalBytes = bytesSent + bytesReceived;
 
@@ -263,14 +292,10 @@ export class MeasurementClientService {
     testStatus: string,
     additionalData: any
   ): void {
-    this.sharedService.broadcast(
-      'measurement:status',
-      'measurement:status',
-      {
-        testStatus,
-        ...additionalData,
-      }
-    );
+    this.sharedService.broadcast('measurement:status', 'measurement:status', {
+      testStatus,
+      ...additionalData,
+    });
     this.measurementStatus.next({
       testStatus,
       ...additionalData,

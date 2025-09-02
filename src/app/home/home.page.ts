@@ -8,30 +8,36 @@ import { SchoolService } from '../services/school.service';
 import { StorageService } from '../services/storage.service';
 import { checkRightGigaId, removeUnregisterSchool } from './home.utils';
 import { environment } from '../../environments/environment';
+import { Capacitor } from '@capacitor/core';
+import { GigaAppPlugin } from '../android/giga-app-android-plugin';
+import { HistoryService } from '../services/history.service';
 
 @Component({
-    selector: 'app-home',
-    templateUrl: 'home.page.html',
-    styleUrls: ['home.page.scss'],
-    standalone: false
+  selector: 'app-home',
+  templateUrl: 'home.page.html',
+  styleUrls: ['home.page.scss'],
+  standalone: false,
 })
 export class HomePage {
   appName = environment.appName;
   appNameSuffix = environment.appNameSuffix;
-  privacyUrl1 = "https://opendatacommons.org/licenses/odbl/1-0/";
-  privacyUrl2= "https://www.measurementlab.net/privacy/";
-  targetUrl="_blank"
+  privacyUrl1 = 'https://opendatacommons.org/licenses/odbl/1-0/';
+  privacyUrl2 = 'https://www.measurementlab.net/privacy/';
+  targetUrl = '_blank';
   isPrivacyChecked = false;
+  isNative: boolean;
   constructor(
     public router: Router,
     public translate: TranslateService,
     private settingsService: SettingsService,
     private storage: StorageService,
     private loading: LoadingService,
+    private historyService: HistoryService,
     private readonly schoolService: SchoolService
   ) {
     translate.setDefaultLang('en');
     const applicationLanguage = this.settingsService.get('applicationLanguage');
+    this.isNative = Capacitor.isNativePlatform();
     if (!applicationLanguage) {
       this.settingsService.setSetting('applicationLanguage', {
         code: 'en',
@@ -68,6 +74,9 @@ export class HomePage {
           ).then((response) => {
             if (response) {
               loading.dismiss();
+              if (this.isNative) {
+                this.getHistoricalDataForNativeApp();
+              }
               this.router.navigate(['/starttest']);
             } else {
               loading.dismiss();
@@ -81,6 +90,9 @@ export class HomePage {
             }
           });
         } catch (e) {
+          if (this.isNative) {
+            await this.getHistoricalDataForNativeApp();
+          }
           this.router.navigate(['/starttest']);
           this.loading.dismiss();
         }
@@ -88,6 +100,27 @@ export class HomePage {
       getFlagsAndCheckGigaId();
     } else {
       this.loading.dismiss();
+    }
+  }
+
+  async getHistoricalDataForNativeApp() {
+    try {
+      const result = await GigaAppPlugin.getHistoricalSpeedTestData();
+      console.log(
+        'Queue from native: home',
+        JSON.parse(JSON.stringify(result.historicalData))
+      );
+      let historicalData = result.historicalData;
+      if (
+        historicalData !== null &&
+        historicalData !== undefined &&
+        historicalData.measurements.length
+      ) {
+        this.historyService.set(historicalData);
+        this.historyService.setAll(historicalData);
+      }
+    } catch (err) {
+      console.error('Error fetching queue:', err);
     }
   }
 
