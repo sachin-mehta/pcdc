@@ -28,6 +28,26 @@ import * as Sentry from '@sentry/node';
 import { Console } from 'console';
 var AutoLaunch = require('auto-launch');
 var isQuiting = false;
+const si = require('systeminformation');
+const { ipcMain } = require('electron');
+
+ipcMain.handle('get-wifi-list', async () => {
+  try {
+    const wifiList = await si.wifiNetworks();
+
+    const transformed = wifiList.map(wifi => ({
+      ssid: wifi.ssid,
+      signal: wifi.signalLevel,
+      macAddress: wifi.bssid || wifi.mac
+    }));
+
+    console.log('Full WiFi List:', transformed); // check length here
+    return transformed;
+  } catch (err) {
+    console.error('WiFi Fetch Error:', err);
+    return [];
+  }
+});
 
 // Enhanced Sentry configuration
 Sentry.init({

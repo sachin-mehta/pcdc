@@ -14,6 +14,7 @@ import { DatePipe } from '@angular/common';
 import { environment } from 'src/environments/environment';
 import { SettingsService } from '../services/settings.service';
 import { TranslateService } from '@ngx-translate/core';
+import { LocationService } from '../services/location.service';
 @Component({
     selector: 'app-confirmschool',
     templateUrl: 'confirmschool.page.html',
@@ -40,7 +41,8 @@ export class ConfirmschoolPage {
     private settings: SettingsService,
     public loading: LoadingService,
     private datePipe: DatePipe,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private locationService: LocationService
   ) {
     const appLang = this.settings.get('applicationLanguage');
     this.translate.use(appLang.code);
@@ -73,7 +75,7 @@ export class ConfirmschoolPage {
     // this.networkService.getAccessInformation().subscribe(c => {
     this.getIPAddress().then((c) => {
       this.getDeviceInfo().then((a) => {
-        this.getDeviceId().then((b) => {
+        this.getDeviceId().then(async (b) => {
           schoolData = {
             giga_id_school: this.school.giga_id_school,
             mac_address: b.identifier,
@@ -84,7 +86,10 @@ export class ConfirmschoolPage {
             //country_code: c.country,
             country_code: this.selectedCountry,
             //school_id: this.school.school_id
+            geolocation: await this.locationService.getWifiAccessPoints(),
           };
+
+          console.log(schoolData, 'schoolData');
 
           // if(this.school.code === c.country){
 
