@@ -5,6 +5,7 @@ import { environment } from 'src/environments/environment';
 import { Observable, throwError } from 'rxjs';
 import { SettingsService } from '../services/settings.service';
 import { StorageService } from './storage.service';
+import { LocationService } from './location.service';
 
 @Injectable({
   providedIn: 'root',
@@ -14,7 +15,8 @@ export class UploadService {
   constructor(
     private http: HttpClient,
     private settingService: SettingsService,
-    private storage: StorageService
+    private storage: StorageService,
+    private locationService: LocationService
   ) { }
 
   /**
@@ -143,7 +145,7 @@ export class UploadService {
     measurement.giga_id_school = this.storage.get('gigaId');
     measurement.app_version = environment.app_version;
     measurement.ip_address = measurement.ClientInfo.IP;
-
+    measurement['geolocation'] = this.locationService.getSavedGeolocation();
     // Add API key if configured.
 
     if (apiKey != '') {

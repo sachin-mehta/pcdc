@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 /* eslint-disable @typescript-eslint/naming-convention */
-import { Component, ViewChild } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { IonAccordionGroup } from '@ionic/angular';
 import { ActivatedRoute, Router } from '@angular/router';
 import { SchoolService } from '../services/school.service';
@@ -21,7 +21,7 @@ import { LocationService } from '../services/location.service';
     styleUrls: ['confirmschool.page.scss'],
     standalone: false
 })
-export class ConfirmschoolPage {
+export class ConfirmschoolPage implements OnInit {
   @ViewChild(IonAccordionGroup, { static: true })
   accordionGroup: IonAccordionGroup;
   school: any;
@@ -58,6 +58,28 @@ export class ConfirmschoolPage {
     });
   }
 
+   async ngOnInit() {
+    try {
+      // 1. Get WiFi list from Electron
+      const wifiList = await this.locationService.getWifiAccessPoints();
+
+      // 2. Send WiFi list to backend → backend returns lat/long
+      this.locationService.resolveGeolocation(wifiList).subscribe({
+        next: (geo) => {
+          console.log('Received geolocation from backend:', geo);
+
+          // 3. Save lat/long in localStorage
+          this.locationService.saveGeolocation(geo);
+        },
+        error: (err) => {
+          console.error('Error resolving geolocation', err);
+        }
+      });
+    } catch (err) {
+      console.error('Error fetching WiFi list in ngOnInit', err);
+    }
+  }
+
   confirmSchool() {
     /* Store school id and giga id inside storage */
     let schoolData = {};
@@ -86,7 +108,7 @@ export class ConfirmschoolPage {
             //country_code: c.country,
             country_code: this.selectedCountry,
             //school_id: this.school.school_id
-            geolocation: await this.locationService.getWifiAccessPoints(),
+            geolocation: this.locationService.getSavedGeolocation(),
           };
 
           console.log(schoolData, 'schoolData');
