@@ -95,10 +95,15 @@ export class AppComponent {
       this.settingsService.currentSettings.scheduleInterval
     );
     this.availableSettings = this.settingsService.availableSettings;
-    if (this.settingsService.currentSettings.scheduledTesting) {
-      this.refreshSchedule();
+    if (!this.isNative) {
+      if (this.settingsService.currentSettings.scheduledTesting) {
+        this.refreshSchedule();
+      }
+      this.sharedService.on(
+        'semaphore:refresh',
+        this.refreshSchedule.bind(this)
+      );
     }
-    this.sharedService.on('semaphore:refresh', this.refreshSchedule.bind(this));
 
     this.sharedService.on(
       'history:measurement:change',

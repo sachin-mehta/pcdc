@@ -110,6 +110,7 @@ export class HomePage {
         'Queue from native: home',
         JSON.parse(JSON.stringify(result.historicalData))
       );
+      console.log('Queue from native: home', result.historicalData);
       let historicalData = result.historicalData;
       if (
         historicalData !== null &&
@@ -117,6 +118,26 @@ export class HomePage {
         historicalData.measurements.length
       ) {
         this.historyService.set(historicalData);
+        const allHistoryData = this.historyService.getAll();
+        console.log(
+          'Queue from native: home all',
+          allHistoryData.measurements.length
+        );
+        if (historicalData.measurements.length > 0) {
+          const merged = [
+            ...allHistoryData.measurements,
+            ...historicalData.measurements,
+          ].reduce((acc, item) => {
+            if (!acc.some((element) => element.uuid === item.uuid)) {
+              acc.push(item);
+            }
+            return acc;
+          }, []);
+          console.log('Queue from native: home merged', merged.length);
+          this.historyService.setAll(merged);
+        } else {
+          this.historyService.setAll(historicalData);
+        }
         this.historyService.setAll(historicalData);
       }
     } catch (err) {

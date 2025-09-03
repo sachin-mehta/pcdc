@@ -92,7 +92,7 @@ object AlarmHelper {
       if (afterMillis in start until end) {
         return if (lastSlotHour == startHour && today == lastExecutionDay) {
           Log.d("GIGA AlarmHelper", "Already Executed for Slot")
-          isExecutedInCurrentSlot = true;
+          isExecutedInCurrentSlot = true
           // Already executed in this slot, go to next
           continue
         } else {
