@@ -11,7 +11,6 @@ const config: ExtendedCapacitorConfig = {
   appId: 'io.ionic.starter',
   appName: 'unicef-pdca',
   webDir: 'www',
-  bundledWebRuntime: false,
   electron: {
     trayIconAndMenuEnabled: true,
     electronIsDev: true
