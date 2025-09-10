@@ -7,7 +7,7 @@ export class IndexedDBService {
   private dbName = 'connectivity_ping_db';
   private storeName = 'pingResults';
 
-  constructor() {}
+  constructor() { }
 
   private openDatabase(): Promise<IDBDatabase> {
     return new Promise((resolve, reject) => {
@@ -66,39 +66,84 @@ export class IndexedDBService {
     const retentionPeriod = 30 * 24 * 60 * 60 * 1000; // 30 days in milliseconds
 
     return new Promise((resolve, reject) => {
-        const request = store.getAll(); // Get all records from IndexedDB
-        
-        request.onsuccess = () => {
-            const records = request.result;
-            const deletePromises: Promise<void>[] = [];
+      const request = store.getAll(); // Get all records from IndexedDB
 
-            records.forEach((record) => {
-                if (record.isSynced || now - record.createdAt >= retentionPeriod) {
-                    const deleteRequest = store.delete(record.timestamp); // Delete based on primary key
-                    
-                    // Wrap each delete operation in a promise
-                    const deletePromise = new Promise<void>((res, rej) => {
-                        deleteRequest.onsuccess = () => res();
-                        deleteRequest.onerror = () => rej(deleteRequest.error);
-                    });
+      request.onsuccess = () => {
+        const records = request.result;
+        const deletePromises: Promise<void>[] = [];
 
-                    deletePromises.push(deletePromise);
-                }
+        records.forEach((record) => {
+          if (record.isSynced || now - record.createdAt >= retentionPeriod) {
+            const deleteRequest = store.delete(record.timestamp); // Delete based on primary key
+
+            // Wrap each delete operation in a promise
+            const deletePromise = new Promise<void>((res, rej) => {
+              deleteRequest.onsuccess = () => res();
+              deleteRequest.onerror = () => rej(deleteRequest.error);
             });
 
-            // Wait for all delete operations to complete before resolving
-            Promise.all(deletePromises)
-                .then(() => resolve())
-                .catch(reject);
-        };
+            deletePromises.push(deletePromise);
+          }
+        });
 
-        request.onerror = () => reject(request.error);
+        // Wait for all delete operations to complete before resolving
+        Promise.all(deletePromises)
+          .then(() => resolve())
+          .catch(reject);
+      };
+
+      request.onerror = () => reject(request.error);
     });
-}
+  }
 
 
   async getUnsyncedRecords(): Promise<any[]> {
     const records = await this.getPingResults();
     return records.filter((record) => !record.isSynced);
   }
+
+  async saveMeasurement(record: any): Promise<void> {
+    const db = await this.openDatabase();
+    const tx = db.transaction('measurements', 'readwrite');
+    const store = tx.objectStore('measurements');
+    store.add({ ...record, status: 'pending', createdAt: Date.now() });
+
+    return new Promise((resolve, reject) => {
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  }
+
+  async getPendingMeasurements(): Promise<any[]> {
+    const db = await this.openDatabase();
+    const tx = db.transaction('measurements', 'readonly');
+    const store = tx.objectStore('measurements');
+    const index = store.index('status');
+    const request = index.getAll('pending');
+
+    return new Promise((resolve, reject) => {
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error);
+    });
+  }
+
+  async markMeasurementSynced(id: number): Promise<void> {
+    const db = await this.openDatabase();
+    const tx = db.transaction('measurements', 'readwrite');
+    const store = tx.objectStore('measurements');
+    const getRequest = store.get(id);
+
+    return new Promise((resolve, reject) => {
+      getRequest.onsuccess = () => {
+        const record = getRequest.result;
+        if (record) {
+          record.status = 'synced';
+          store.put(record);
+        }
+      };
+      tx.oncomplete = () => resolve();
+      tx.onerror = () => reject(tx.error);
+    });
+  }
+
 }
