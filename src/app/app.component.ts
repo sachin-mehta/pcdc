@@ -11,7 +11,7 @@ import { PingResult, PingService } from './services/ping.service';
 import { IndexedDBService } from './services/indexed-db.service';
 import { SyncService } from './services/sync.service';
 import { Capacitor } from '@capacitor/core';
-
+import { FirebaseCrashlytics } from '@capacitor-firebase/crashlytics';
 // const shell = require('electron').shell;
 @Component({
   selector: 'app-root',
@@ -116,6 +116,33 @@ export class AppComponent {
       setInterval(() => {
         this.scheduleService.initiate();
       }, 60000);
+    } else {
+      this.initCrashlytics();
+    }
+  }
+
+  async initCrashlytics() {
+    // Enable crashlytics collection
+    console.log(
+      'GIGA Enable Chrashlytics for Native Android App',
+      this.isNative
+    );
+    await FirebaseCrashlytics.setEnabled({ enabled: true });
+
+    // Test log
+    await FirebaseCrashlytics.log({ message: 'App started!' });
+
+    // Force test crash (for testing only!)
+
+    // this.testCrash();
+  }
+
+  async testCrash() {
+    try {
+      // This will crash the app intentionally
+      await FirebaseCrashlytics.crash({ message: 'Force crash test' });
+    } catch (err) {
+      console.error('Crash test failed', err);
     }
   }
 

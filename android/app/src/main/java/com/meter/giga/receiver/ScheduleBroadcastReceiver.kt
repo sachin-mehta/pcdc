@@ -13,6 +13,7 @@ import com.meter.giga.utils.Constants.NEXT_SLOT
 import com.meter.giga.utils.Constants.SCHEDULE_TYPE
 import com.meter.giga.utils.Constants.SCHEDULE_TYPE_DAILY
 import com.meter.giga.utils.Constants.SCHEDULE_TYPE_START
+import io.capawesome.capacitorjs.plugins.firebase.crashlytics.FirebaseCrashlytics
 import java.util.Calendar
 import kotlin.jvm.java
 import kotlin.random.Random

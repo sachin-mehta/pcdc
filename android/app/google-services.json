@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "14420833743",
+    "project_id": "giga-meter-dev-da075",
+    "storage_bucket": "giga-meter-dev-da075.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:14420833743:android:515ffde761dd6dba31ceba",
+        "android_client_info": {
+          "package_name": "com.meter.giga.debug"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBtatokkqUg4PlAk-yNDny-Um4uNb4PdOU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

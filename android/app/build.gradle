@@ -1,5 +1,8 @@
 apply plugin: 'com.android.application'
 apply plugin: 'org.jetbrains.kotlin.android'
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.google.firebase.crashlytics'
+
 android {
   namespace "com.meter.giga"
   compileSdk rootProject.ext.compileSdkVersion
@@ -32,7 +35,7 @@ android {
       buildConfigField "String", "CLIENT_INFO_TOKEN", "\"${CLIENT_INFO_API_TOKEN}\""
       debuggable true
       minifyEnabled false
-      applicationIdSuffix
+      applicationIdSuffix ".debug"
       versionNameSuffix
     }
     release {
