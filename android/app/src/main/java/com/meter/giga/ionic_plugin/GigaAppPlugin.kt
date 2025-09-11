@@ -194,8 +194,6 @@ class GigaAppPlugin : Plugin() {
     CoroutineScope(Dispatchers.IO).launch {
       val secureDataStore = SecureDataStore(context)
       secureDataStore.setMlabUploadKey(mlabUploadKey ?: "")
-      val savedKey = secureDataStore.getMlabUploadKey()
-      println("GIGA Last Executed Time: $savedKey")
     }
     scheduleAlarm(context, alarmPrefs)
     call.resolve()
