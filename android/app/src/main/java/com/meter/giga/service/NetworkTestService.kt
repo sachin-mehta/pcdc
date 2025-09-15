@@ -31,6 +31,8 @@ import com.meter.giga.utils.Constants.SCHEDULE_TYPE
 import com.meter.giga.utils.Constants.SCHEDULE_TYPE_DAILY
 import com.meter.giga.utils.GigaUtil
 import com.meter.giga.utils.ResultState
+import io.sentry.Sentry
+import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -81,22 +83,29 @@ class NetworkTestService : LifecycleService() {
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
     super.onStartCommand(intent, flags, startId)
     startForeground(NOTIFICATION_ID, createNotification("Starting speed test..."))
-    val prefs = AlarmSharedPref(this)
-    secureDataStore = SecureDataStore(this)
-    val scheduleType = intent?.getStringExtra(SCHEDULE_TYPE) ?: SCHEDULE_TYPE_DAILY
-    Log.d("GIGA NetworkTestService SCHEDULE_TYPE", scheduleType)
-    val appVersion = GigaUtil.getAppVersionName(this)
-    val isRunningOnChromebook = GigaUtil.isRunningOnChromebook(this)
-    val client = NDTTestImpl(
-      createHttpClient(),
-      scheduleType,
-      appVersion,
-      isRunningOnChromebook,
-      prefs,
-      secureDataStore
-    )
-    GigaAppPlugin.sendSpeedTestStarted()
-    client.startTest(NDTTest.TestType.DOWNLOAD_AND_UPLOAD)
+    try {
+      // Example logging
+      Sentry.captureMessage("Foreground Service started", SentryLevel.INFO)
+      val prefs = AlarmSharedPref(this)
+      secureDataStore = SecureDataStore(this)
+      val scheduleType = intent?.getStringExtra(SCHEDULE_TYPE) ?: SCHEDULE_TYPE_DAILY
+      Log.d("GIGA NetworkTestService SCHEDULE_TYPE", scheduleType)
+      val appVersion = GigaUtil.getAppVersionName(this)
+      val isRunningOnChromebook = GigaUtil.isRunningOnChromebook(this)
+      val client = NDTTestImpl(
+        createHttpClient(),
+        scheduleType,
+        appVersion,
+        isRunningOnChromebook,
+        prefs,
+        secureDataStore
+      )
+      GigaAppPlugin.sendSpeedTestStarted()
+      client.startTest(NDTTest.TestType.DOWNLOAD_AND_UPLOAD)
+      throw RuntimeException("Test crash inside ForegroundService")
+    } catch (e: Exception) {
+      Sentry.captureException(e)
+    }
     return START_STICKY
   }
 
@@ -287,19 +296,23 @@ class NetworkTestService : LifecycleService() {
       testType: TestType
     ) {
       super.onFinished(clientResponse, error, testType)
-      val speed = clientResponse?.let { DataConverter.convertToMbps(it) }
-      println(error)
-      error?.printStackTrace()
-      Log.d("GIGA NetworkTestService", "ALL DONE: $speed ")
-      allDoneInvoked = allDoneInvoked + 1
-      Log.d("GIGA NetworkTestService", "ALL DONE: $allDoneInvoked ")
-      if (allDoneInvoked == 2) {
-        publishSpeedTestData(
-          scheduleType,
-          appVersion,
-          isRunningOnChromebook,
-        )
-        allDoneInvoked = 0
+      try {
+        val speed = clientResponse?.let { DataConverter.convertToMbps(it) }
+        println(error)
+        error?.printStackTrace()
+        Log.d("GIGA NetworkTestService", "ALL DONE: $speed ")
+        allDoneInvoked = allDoneInvoked + 1
+        Log.d("GIGA NetworkTestService", "ALL DONE: $allDoneInvoked ")
+        if (allDoneInvoked == 2) {
+          publishSpeedTestData(
+            scheduleType,
+            appVersion,
+            isRunningOnChromebook,
+          )
+          allDoneInvoked = 0
+        }
+      } catch (e: Exception) {
+        Sentry.captureException(e)
       }
     }
 
@@ -333,7 +346,6 @@ class NetworkTestService : LifecycleService() {
           val serverInfoState = serviceScope.async {
             runCatching { getServerInfoUseCase.invoke(null) }.getOrNull()
           }
-
           val clientInfo = clientInfoState.await()
           val serverInfo = serverInfoState.await()
           var speedTestResultRequestEntity: SpeedTestResultRequestEntity? = null
@@ -474,6 +486,7 @@ class NetworkTestService : LifecycleService() {
                     "Updated Speed Test Data $updateSpeedTestData"
                   )
                   prefs.oldSpeedTestData = updateSpeedTestData
+                  Sentry.captureMessage("Failed to sync speed test data", SentryLevel.INFO)
                 }
 
                 ResultState.Loading -> {
@@ -502,17 +515,25 @@ class NetworkTestService : LifecycleService() {
                     speedTestResultRequestEntity,
                     measurementsItem
                   )
+                  Sentry.captureMessage("Synced speed test data successfully", SentryLevel.INFO)
                 }
               }
             } else {
+              Sentry.captureMessage("Failed to create speedtest request payload", SentryLevel.INFO)
               updateNotification("Speed Test Failed")
               GigaAppPlugin.sendSpeedTestCompletedWithError()
             }
           } else {
+            if (clientInfo == null) {
+              Sentry.captureMessage("Failed to fetch Client Info", SentryLevel.INFO)
+            } else {
+              Sentry.captureMessage("Failed to fetch Server Info", SentryLevel.INFO)
+            }
             updateNotification("Speed Test Failed")
             Log.e("NetworkTestService", "Failed to fetch one or both APIs")
           }
         } catch (e: Exception) {
+          Sentry.captureException(e)
           updateNotification("Speed Test Failed")
           Log.e("GIGA NetworkTestService", "Error: ${e.message}")
           GigaAppPlugin.sendSpeedTestCompletedWithError()

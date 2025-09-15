@@ -72,6 +72,7 @@ dependencies {
   implementation "androidx.core:core-splashscreen:$coreSplashScreenVersion"
   implementation "androidx.security:security-crypto:1.1.0"
   implementation "androidx.datastore:datastore-preferences:1.1.7"
+  implementation 'io.sentry:sentry-android:8.20.0'
   implementation project(':capacitor-android')
   implementation project(':ndt7lib')
   testImplementation "junit:junit:$junitVersion"
