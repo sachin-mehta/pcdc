@@ -7,6 +7,10 @@ export class IndexedDBService {
   private dbName = 'connectivity_ping_db';
   private storeName = 'pingResults';
 
+  private measurementDbName = 'connectivity_measurements_db';
+  private measurementStoreName = 'measurements';
+
+
   constructor() { }
 
   private openDatabase(): Promise<IDBDatabase> {
@@ -102,10 +106,28 @@ export class IndexedDBService {
     return records.filter((record) => !record.isSynced);
   }
 
+  private openMeasurementDatabase(): Promise<IDBDatabase> {
+    return new Promise((resolve, reject) => {
+      const request = indexedDB.open(this.measurementDbName, 1);
+      request.onupgradeneeded = () => {
+        const db = request.result;
+        if (!db.objectStoreNames.contains(this.measurementStoreName)) {
+          const store = db.createObjectStore(this.measurementStoreName, {
+            keyPath: 'id',
+            autoIncrement: true,
+          });
+          store.createIndex('status', 'status', { unique: false });
+        }
+      };
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = (e) => reject(e);
+    });
+  }
+
   async saveMeasurement(record: any): Promise<void> {
-    const db = await this.openDatabase();
-    const tx = db.transaction('measurements', 'readwrite');
-    const store = tx.objectStore('measurements');
+    const db = await this.openMeasurementDatabase();
+    const tx = db.transaction(this.measurementStoreName, 'readwrite');
+    const store = tx.objectStore(this.measurementStoreName);
     store.add({ ...record, status: 'pending', createdAt: Date.now() });
 
     return new Promise((resolve, reject) => {
@@ -115,9 +137,9 @@ export class IndexedDBService {
   }
 
   async getPendingMeasurements(): Promise<any[]> {
-    const db = await this.openDatabase();
-    const tx = db.transaction('measurements', 'readonly');
-    const store = tx.objectStore('measurements');
+    const db = await this.openMeasurementDatabase();
+    const tx = db.transaction(this.measurementStoreName, 'readonly');
+    const store = tx.objectStore(this.measurementStoreName);
     const index = store.index('status');
     const request = index.getAll('pending');
 
@@ -128,9 +150,9 @@ export class IndexedDBService {
   }
 
   async markMeasurementSynced(id: number): Promise<void> {
-    const db = await this.openDatabase();
-    const tx = db.transaction('measurements', 'readwrite');
-    const store = tx.objectStore('measurements');
+    const db = await this.openMeasurementDatabase();
+    const tx = db.transaction(this.measurementStoreName, 'readwrite');
+    const store = tx.objectStore(this.measurementStoreName);
     const getRequest = store.get(id);
 
     return new Promise((resolve, reject) => {
@@ -145,5 +167,42 @@ export class IndexedDBService {
       tx.onerror = () => reject(tx.error);
     });
   }
+
+  async cleanupOldMeasurements(): Promise<void> {
+  const db = await this.openMeasurementDatabase();
+  const tx = db.transaction('measurements', 'readwrite');
+  const store = tx.objectStore('measurements');
+  const now = Date.now();
+  const retentionPeriod = 30 * 24 * 60 * 60 * 1000; // 30 days
+
+  return new Promise((resolve, reject) => {
+    const request = store.getAll();
+
+    request.onsuccess = () => {
+      const records = request.result;
+      const deletePromises: Promise<void>[] = [];
+
+      records.forEach((record) => {
+        if (record.status === 'synced' || now - record.createdAt >= retentionPeriod) {
+          const deleteRequest = store.delete(record.id);
+
+          const deletePromise = new Promise<void>((res, rej) => {
+            deleteRequest.onsuccess = () => res();
+            deleteRequest.onerror = () => rej(deleteRequest.error);
+          });
+
+          deletePromises.push(deletePromise);
+        }
+      });
+
+      Promise.all(deletePromises)
+        .then(() => resolve())
+        .catch(reject);
+    };
+
+    request.onerror = () => reject(request.error);
+  });
+}
+
 
 }
