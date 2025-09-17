@@ -12,6 +12,9 @@ import com.meter.giga.network.RetrofitInstanceBuilder
 import com.meter.giga.utils.ResultState
 import com.meter.giga.utils.toEntity
 import com.meter.giga.utils.toModel
+import io.sentry.Sentry
+import io.sentry.SentryLevel
+import retrofit2.Response
 
 /**
  * SpeedTestRepositoryImpl provides abstract implementation of
@@ -103,11 +106,19 @@ class SpeedTestRepositoryImpl : SpeedTestRepository {
     speedTestData: SpeedTestResultRequestEntity,
     uploadKey: String
   ): ResultState<Unit?> {
-    val response =
-      RetrofitInstanceBuilder.speedTestApi.postSpeedTestData(
-        body = speedTestData.toModel(),
-        authorization = "Bearer $uploadKey"
-      )
+    var retryAttemptCount = 0;
+    return syncSpeedTestData(speedTestData, uploadKey, retryAttemptCount)
+  }
+
+  private suspend fun syncSpeedTestData(
+    speedTestData: SpeedTestResultRequestEntity,
+    uploadKey: String,
+    retryAttemptCount: Int
+  ): ResultState<Unit> {
+    val response = RetrofitInstanceBuilder.speedTestApi.postSpeedTestData(
+      body = speedTestData.toModel(),
+      authorization = "Bearer $uploadKey"
+    )
     if (response.isSuccessful) {
       Log.d("GIGA SpeedTestRepositoryImpl Success", "$response")
       if (response.body() != null) {
@@ -118,7 +129,15 @@ class SpeedTestRepositoryImpl : SpeedTestRepository {
         return ResultState.Failure(ErrorHandlerImpl().getError(response.errorBody()))
       }
     } else {
-      Log.d("GIGA SpeedTestRepositoryImpl Failure", "$response")
+      if (retryAttemptCount < 4) {
+        val attemptNo = retryAttemptCount + 1;
+        Sentry.captureMessage("Sync data re attempt count : $attemptNo", SentryLevel.INFO)
+        syncSpeedTestData(speedTestData, uploadKey, attemptNo)
+        Log.d("GIGA SpeedTestRepositoryImpl Failed with attempt No: ", "$retryAttemptCount")
+      } else {
+        Log.d("GIGA SpeedTestRepositoryImpl Failed after no of attempts", "$retryAttemptCount")
+        Sentry.captureMessage("Sync data failed after  : $retryAttemptCount", SentryLevel.INFO)
+      }
     }
     return ResultState.Failure(
       ErrorEntity.Unknown("Post speed test data api failed")
