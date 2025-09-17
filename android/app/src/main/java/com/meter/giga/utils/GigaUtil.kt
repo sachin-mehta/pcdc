@@ -17,6 +17,8 @@ import com.meter.giga.domain.entity.request.SpeedTestResultRequestEntity
 import com.meter.giga.domain.entity.response.ClientInfoResponseEntity
 import com.meter.giga.domain.entity.response.ServerInfoResponseEntity
 import com.meter.giga.utils.Constants.M_D_YYYY_H_MM_SS_A
+import io.sentry.Sentry
+import io.sentry.SentryLevel
 import net.measurementlab.ndt7.android.models.AppInfo
 import net.measurementlab.ndt7.android.models.BBRInfo
 import net.measurementlab.ndt7.android.models.ClientResponse
@@ -136,151 +138,74 @@ object GigaUtil {
     ipAddress: String,
     lastDownloadResponse: ClientResponse?,
     lastUploadResponse: ClientResponse?,
-  ): SpeedTestResultRequestEntity {
-    val currentTime = getCurrentFormattedTime()
-    var meanUploadClientMbps: Double? = null
-    lastUploadResponse?.appInfo?.let {
-      meanUploadClientMbps = if (it.elapsedTime == 0L) {
-        0.0
-      } else {
-        (it.numBytes / (it.elapsedTime / 1000)) * 0.008
+  ): SpeedTestResultRequestEntity? {
+    try {
+      val currentTime = getCurrentFormattedTime()
+      var meanUploadClientMbps: Double? = null
+      lastUploadResponse?.appInfo?.let {
+        meanUploadClientMbps = if (it.elapsedTime == 0L) {
+          0.0
+        } else {
+          (it.numBytes / (it.elapsedTime / 1000)) * 0.008
+        }
       }
-    }
-    var meanDownloadClientMbps: Double? = null
-    lastDownloadResponse?.appInfo?.let {
-      meanDownloadClientMbps = if (it.elapsedTime == 0L) {
-        0.0
-      } else {
-        (it.numBytes / (it.elapsedTime / 1000)) * 0.008
+      var meanDownloadClientMbps: Double? = null
+      lastDownloadResponse?.appInfo?.let {
+        meanDownloadClientMbps = if (it.elapsedTime == 0L) {
+          0.0
+        } else {
+          (it.numBytes / (it.elapsedTime / 1000)) * 0.008
+        }
       }
-    }
-    return SpeedTestResultRequestEntity(
-      annotation = "",
-      appVersion = appVersion,
-      browserID = browserId,
-      clientInfo = clientInfoRequestEntity,
-      countryCode = countryCode,
-      deviceType = deviceType,
-      download = (meanDownloadClientMbps ?: 0.0) * 1000,
-      upload = (meanUploadClientMbps ?: 0.0) * 1000,
-      gigaIdSchool = gigaSchoolId,
-      ipAddress = if (ipAddress == "") clientInfoRequestEntity.ip else ipAddress,
-      latency = (if (uploadMeasurement?.tcpInfo?.minRtt != null) uploadMeasurement.tcpInfo!!.minRtt!! / 1000 else 0.0).toInt()
-        .toString(),
-      notes = scheduleType,
-      results = ResultsRequestEntity(
-        ndtResultC2S = SpeedTestMeasurementRequestEntity(
-          lastClientMeasurement = LastClientMeasurementRequestEntity(
-            elapsedTime = lastUploadResponse?.appInfo?.elapsedTime?.toDouble(),
-            meanClientMbps = meanUploadClientMbps,
-            numBytes = lastUploadResponse?.appInfo?.numBytes?.toInt()
+      return SpeedTestResultRequestEntity(
+        annotation = "",
+        appVersion = appVersion,
+        browserID = browserId,
+        clientInfo = clientInfoRequestEntity,
+        countryCode = countryCode,
+        deviceType = deviceType,
+        download = (meanDownloadClientMbps ?: 0.0) * 1000,
+        upload = (meanUploadClientMbps ?: 0.0) * 1000,
+        gigaIdSchool = gigaSchoolId,
+        ipAddress = if (ipAddress == "") clientInfoRequestEntity.ip else ipAddress,
+        latency = (if (uploadMeasurement?.tcpInfo?.minRtt != null) uploadMeasurement.tcpInfo!!.minRtt!! / 1000 else 0.0).toInt()
+          .toString(),
+        notes = scheduleType,
+        results = ResultsRequestEntity(
+          ndtResultC2S = SpeedTestMeasurementRequestEntity(
+            lastClientMeasurement = LastClientMeasurementRequestEntity(
+              elapsedTime = lastUploadResponse?.appInfo?.elapsedTime?.toDouble(),
+              meanClientMbps = meanUploadClientMbps,
+              numBytes = lastUploadResponse?.appInfo?.numBytes?.toInt()
+            ),
+            lastServerMeasurement = uploadMeasurement?.toEntity()
           ),
-          lastServerMeasurement = uploadMeasurement?.toEntity()
+          ndtResultS2C = SpeedTestMeasurementRequestEntity(
+            lastClientMeasurement = LastClientMeasurementRequestEntity(
+              elapsedTime = lastDownloadResponse?.appInfo?.elapsedTime?.toDouble(),
+              meanClientMbps = meanDownloadClientMbps,
+              numBytes = lastDownloadResponse?.appInfo?.numBytes?.toInt()
+            ),
+            lastServerMeasurement = downloadMeasurement?.toEntity()
+          )
         ),
-        ndtResultS2C = SpeedTestMeasurementRequestEntity(
-          lastClientMeasurement = LastClientMeasurementRequestEntity(
-            elapsedTime = lastDownloadResponse?.appInfo?.elapsedTime?.toDouble(),
-            meanClientMbps = meanDownloadClientMbps,
-            numBytes = lastDownloadResponse?.appInfo?.numBytes?.toInt()
-          ),
-          lastServerMeasurement = downloadMeasurement?.toEntity()
-        )
-      ),
-      schoolId = schoolId,
-      serverInfo = serverInfoRequestEntity,
-      timestampLocal = currentTime,
-      timestamp = convertToIso(currentTime),
-      uUID = uploadMeasurement?.connectionInfo?.uuid,
-      source = "DailyCheckApp",
+        schoolId = schoolId,
+        serverInfo = serverInfoRequestEntity,
+        timestampLocal = currentTime,
+        timestamp = convertToIso(currentTime),
+        uUID = uploadMeasurement?.connectionInfo?.uuid,
+        source = "DailyCheckApp",
 //      createdAt = null,
 //      dataDownloaded = null,
 //      dataUploaded = null,
 //      dataUsage = null,
 //      id = null
-    )
-  }
-
-  fun getDefaultClientInfo(testType: String): ClientResponse? {
-    return ClientResponse(
-      appInfo = AppInfo(
-        elapsedTime = 0,
-        numBytes = 0.0
-      ),
-      origin = "",
-      test = testType
-    )
-  }
-
-  fun getDefaultMeasurements(): Measurement? {
-    return Measurement(
-      connectionInfo = ConnectionInfo(
-        client = null,
-        server = null,
-        uuid = null
-      ),
-      bbrInfo = BBRInfo(
-        bw = null,
-        minRtt = null,
-        pacingGain = null,
-        cwndGain = null,
-        elapsedTime = null
-      ),
-      tcpInfo = TCPInfo(
-        state = null,
-        caState = null,
-        retransmits = null,
-        probes = null,
-        backoff = null,
-        options = null,
-        wScale = null,
-        appLimited = null,
-        rto = null,
-        ato = null,
-        sndMss = null,
-        rcvMss = null,
-        unacked = null,
-        sacked = null,
-        lost = null,
-        retrans = null,
-        fackets = null,
-        lastDataSent = null,
-        lastAckSent = null,
-        lastDataRecv = null,
-        lastAckRecv = null,
-        pmtu = null,
-        rcvSsThresh = null,
-        rtt = null,
-        rttVar = null,
-        sndSsThresh = null,
-        sndCwnd = null,
-        advMss = null,
-        reordering = null,
-        rcvRtt = null,
-        rcvSpace = null,
-        totalRetrans = null,
-        pacingRate = null,
-        maxPacingRate = null,
-        bytesAcked = null,
-        bytesReceived = null,
-        segsOut = null,
-        segsIn = null,
-        notSentBytes = null,
-        minRtt = null,
-        dataSegsIn = null,
-        dataSegsOut = null,
-        deliveryRate = null,
-        busyTime = null,
-        rWndLimited = null,
-        sndBufLimited = null,
-        delivered = null,
-        deliveredCE = null,
-        bytesSent = null,
-        bytesRetrans = null,
-        dSackDups = null,
-        reordSeen = null,
-        elapsedTime = null
       )
-    )
+    } catch (e: Exception) {
+      Sentry.captureMessage("Failed to create speedtest request payload", SentryLevel.INFO)
+      Sentry.captureException(e)
+      return null;
+    }
   }
 
   fun addJsonItem(existingArrayStr: String, jsonString: String): String {
@@ -308,16 +233,25 @@ object GigaUtil {
     c2sLastServerManagement: Measurement?,
     s2cLastServerManagement: Measurement?,
   ): DataUsage {
-    val bytesReceived = (s2cLastServerManagement?.tcpInfo?.bytesReceived
-      ?: 0) + (c2sLastServerManagement?.tcpInfo?.bytesReceived ?: 0)
-    val bytesSent = (s2cLastServerManagement?.tcpInfo?.bytesAcked
-      ?: 0) + (c2sLastServerManagement?.tcpInfo?.bytesAcked ?: 0)
-    val totalBytes = bytesSent + bytesReceived
-    return DataUsage(
-      download = bytesReceived,
-      upload = bytesSent,
-      total = totalBytes,
-    )
+    try {
+      val bytesReceived = (s2cLastServerManagement?.tcpInfo?.bytesReceived
+        ?: 0) + (c2sLastServerManagement?.tcpInfo?.bytesReceived ?: 0)
+      val bytesSent = (s2cLastServerManagement?.tcpInfo?.bytesAcked
+        ?: 0) + (c2sLastServerManagement?.tcpInfo?.bytesAcked ?: 0)
+      val totalBytes = bytesSent + bytesReceived
+      return DataUsage(
+        download = bytesReceived,
+        upload = bytesSent,
+        total = totalBytes,
+      )
+    } catch (e: Exception) {
+      Sentry.captureException(e)
+      return DataUsage(
+        download = 0,
+        upload = 0,
+        total = 0,
+      );
+    }
   }
 
   fun getMeasurementItem(

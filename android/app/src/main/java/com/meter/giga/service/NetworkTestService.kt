@@ -456,7 +456,7 @@ class NetworkTestService : LifecycleService() {
                 s2cLastServerManagement = lastDownloadMeasurement,
                 serverInfoResponse = serverInfoResponse,
                 scheduleType = scheduleType,
-                results = speedTestResultRequestEntity.results,
+                results = speedTestResultRequestEntity?.results,
                 c2sRate = c2sRate,
                 s2cRate = s2cRate,
                 historyDataIndex
@@ -468,58 +468,59 @@ class NetworkTestService : LifecycleService() {
               )
               val postSpeedTestUseCase = PostSpeedTestUseCase()
               val uploadKey = secureDataStore.getMlabUploadKey()
-              val postSpeedTestResultState =
-                postSpeedTestUseCase.invoke(speedTestResultRequestEntity, uploadKey)
-              when (postSpeedTestResultState) {
-                is ResultState.Failure -> {
-                  Log.d(
-                    "GIGA NetworkTestService",
-                    "Speed Test Not Published Successfully Due to ${postSpeedTestResultState.error}"
-                  )
-                  measurementsItem.uploaded = false
-                  val updateSpeedTestData = GigaUtil.addJsonItem(
-                    existingSpeedTestData,
-                    Gson().toJson(measurementsItem)
-                  )
-                  Log.d(
-                    "GIGA NetworkTestService",
-                    "Updated Speed Test Data $updateSpeedTestData"
-                  )
-                  prefs.oldSpeedTestData = updateSpeedTestData
-                  Sentry.captureMessage("Failed to sync speed test data", SentryLevel.INFO)
-                }
+              if (speedTestResultRequestEntity != null) {
+                val postSpeedTestResultState =
+                  postSpeedTestUseCase.invoke(speedTestResultRequestEntity, uploadKey)
+                when (postSpeedTestResultState) {
+                  is ResultState.Failure -> {
+                    Log.d(
+                      "GIGA NetworkTestService",
+                      "Speed Test Not Published Successfully Due to ${postSpeedTestResultState.error}"
+                    )
+                    measurementsItem.uploaded = false
+                    val updateSpeedTestData = GigaUtil.addJsonItem(
+                      existingSpeedTestData,
+                      Gson().toJson(measurementsItem)
+                    )
+                    Log.d(
+                      "GIGA NetworkTestService",
+                      "Updated Speed Test Data $updateSpeedTestData"
+                    )
+                    prefs.oldSpeedTestData = updateSpeedTestData
+                    Sentry.captureMessage("Failed to sync speed test data", SentryLevel.INFO)
+                  }
 
-                ResultState.Loading -> {
-                  Log.d(
-                    "GIGA NetworkTestService",
-                    "Uploading Speed Test Data"
-                  )
-                }
+                  ResultState.Loading -> {
+                    Log.d(
+                      "GIGA NetworkTestService",
+                      "Uploading Speed Test Data"
+                    )
+                  }
 
-                is ResultState.Success<*> -> {
-                  Log.d(
-                    "GIGA NetworkTestService",
-                    "Speed Test Data Published Successfully"
-                  )
-                  measurementsItem.uploaded = true
-                  val updateSpeedTestData = GigaUtil.addJsonItem(
-                    existingSpeedTestData,
-                    Gson().toJson(measurementsItem)
-                  )
-                  Log.d(
-                    "GIGA NetworkTestService",
-                    "Updated Speed Test Data $updateSpeedTestData"
-                  )
-                  prefs.oldSpeedTestData = updateSpeedTestData
-                  GigaAppPlugin.sendSpeedTestCompleted(
-                    speedTestResultRequestEntity,
-                    measurementsItem
-                  )
-                  Sentry.captureMessage("Synced speed test data successfully", SentryLevel.INFO)
+                  is ResultState.Success<*> -> {
+                    Log.d(
+                      "GIGA NetworkTestService",
+                      "Speed Test Data Published Successfully"
+                    )
+                    measurementsItem.uploaded = true
+                    val updateSpeedTestData = GigaUtil.addJsonItem(
+                      existingSpeedTestData,
+                      Gson().toJson(measurementsItem)
+                    )
+                    Log.d(
+                      "GIGA NetworkTestService",
+                      "Updated Speed Test Data $updateSpeedTestData"
+                    )
+                    prefs.oldSpeedTestData = updateSpeedTestData
+                    GigaAppPlugin.sendSpeedTestCompleted(
+                      speedTestResultRequestEntity,
+                      measurementsItem
+                    )
+                    Sentry.captureMessage("Synced speed test data successfully", SentryLevel.INFO)
+                  }
                 }
               }
             } else {
-              Sentry.captureMessage("Failed to create speedtest request payload", SentryLevel.INFO)
               updateNotification("Speed Test Failed")
               GigaAppPlugin.sendSpeedTestCompletedWithError()
             }
