@@ -14,6 +14,7 @@ import com.meter.giga.utils.toEntity
 import com.meter.giga.utils.toModel
 import io.sentry.Sentry
 import io.sentry.SentryLevel
+import kotlinx.coroutines.delay
 import retrofit2.Response
 
 /**
@@ -129,6 +130,7 @@ class SpeedTestRepositoryImpl : SpeedTestRepository {
         return ResultState.Failure(ErrorHandlerImpl().getError(response.errorBody()))
       }
     } else {
+      delay(500)
       if (retryAttemptCount < 4) {
         val attemptNo = retryAttemptCount + 1;
         Sentry.captureMessage("Sync data re attempt count : $attemptNo", SentryLevel.INFO)

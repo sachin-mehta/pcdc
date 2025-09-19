@@ -385,6 +385,7 @@ class NetworkTestService : LifecycleService() {
                   "GIGA NetworkTestService",
                   "Get Client Info API Failed: ${clientInfo.error}"
                 )
+                Sentry.captureMessage("Client Info Fetch Failed", SentryLevel.INFO)
               }
 
               ResultState.Loading -> {
@@ -415,6 +416,7 @@ class NetworkTestService : LifecycleService() {
                   "GIGA NetworkTestService",
                   "Get Client Info API Failed: ${serverInfo.error}"
                 )
+                Sentry.captureMessage("Server Info Fetch Failed", SentryLevel.INFO)
               }
 
               ResultState.Loading -> {
