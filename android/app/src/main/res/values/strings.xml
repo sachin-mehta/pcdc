@@ -5,4 +5,6 @@
   <string name="package_name">com.meter.giga</string>
   <string name="custom_url_scheme">com.meter.giga</string>
   <string name="notification_header">GIGA Speed Test</string>
+  <!-- Replace with your real DSN -->
+  <string name="sentry_dsn">https://e52e97fc558344bc80a218fc22a9a6a9@excubo.unicef.io/47</string>
 </resources>
