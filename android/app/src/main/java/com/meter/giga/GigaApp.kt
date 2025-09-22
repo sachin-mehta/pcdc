@@ -17,7 +17,8 @@ class GigaApp : Application() {
       options.dsn = getString(R.string.sentry_dsn)
       options.isDebug = BuildConfig.DEBUG
       options.environment = "development" // if (BuildConfig.DEBUG) "development" else "production"
-      options.setTracesSampleRate(1.0) // capture 100% for demo
+      options.connectionTimeoutMillis = 10000 // 10 seconds
+      options.readTimeoutMillis = 10000
     }
   }
 }
