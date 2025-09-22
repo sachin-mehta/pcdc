@@ -1,0 +1,12 @@
+trigger: none
+
+stages:
+- stage: build
+  displayName: Build
+  jobs:
+  - job: build_android_app
+    displayName: Build Android Application
+    pool: $(VmImage)
+    steps:
+    - script: build_android_app
+  
