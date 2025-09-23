@@ -138,6 +138,12 @@ class GigaAppPlugin : Plugin() {
     call.resolve()
   }
 
+  /**
+   * This function is getting used to return the historical data persisted in the
+   * shared preferences while performing speed test in background.
+   * @param call: PluginCall instance to pass the data on Capacitor
+   * UI layer
+   */
   @PluginMethod
   fun getHistoricalSpeedTestData(call: PluginCall) {
     try {

@@ -111,6 +111,15 @@ class SpeedTestRepositoryImpl : SpeedTestRepository {
     return syncSpeedTestData(speedTestData, uploadKey, retryAttemptCount)
   }
 
+  /**
+   * This function is used to invoke the Sync api call while syncing first time
+   * or while retry in failure scenario. We have added little as well between 2 api call while retries
+   * @param speedTestData: Instance of SpeedTestResultRequestEntity
+   * @param uploadKey: Upload key to authenticate the post request
+   * @param retryAttemptCount: Number of retry
+   * @return instance of ResultState. It can be Success or Failure
+   *
+   */
   private suspend fun syncSpeedTestData(
     speedTestData: SpeedTestResultRequestEntity,
     uploadKey: String,
