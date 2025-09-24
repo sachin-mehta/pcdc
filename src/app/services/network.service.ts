@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
-import { map, catchError } from 'rxjs/operators';
-import { throwError, firstValueFrom } from 'rxjs';
+import {  firstValueFrom } from 'rxjs';
 import { Network } from '@awesome-cordova-plugins/network/ngx';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
@@ -52,6 +51,7 @@ type IpInfoData = {
 export class NetworkService {
   accessServiceUrl = environment.restAPI + 'ip-metadata';
   ipInfoLiteUrl = 'https://api.ipinfo.io/lite/me?token=' + environment.ipInfoToken;
+
   headers: any;
   options: any;
   currentAccessInformation: any;
@@ -77,7 +77,9 @@ export class NetworkService {
     while (retryCount < maxRetries) {
       try {
         console.log('accessServiceUrl', this.ipInfoLiteUrl);
-        response = (await this.http.get(this.ipInfoLiteUrl, options).toPromise<any>()) as IpInfoLiteData;
+        response = await firstValueFrom(
+          this.http.get<IpInfoLiteData>(this.ipInfoLiteUrl, options)
+        );
         console.log('response', response);
         return response;
       } catch (error) {
