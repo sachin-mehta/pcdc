@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
+import { map } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -16,14 +17,18 @@ export class LocationService {
     }));
   }
 
-  /** Send wifi list to backend, backend returns lat/long */
+
   resolveGeolocation(wifiAccessPoints: any) {
-    return this.http.post<{ latitude: number; longitude: number }>(
-      `${environment.restAPI}geolocation/geolocate
- `,
-      { wifiAccessPoints }
-    );
-  }
+  return this.http.post(
+    `${environment.restAPI}geolocation/geolocate`,
+    { wifiAccessPoints }
+  ).pipe(
+    map(response => ({
+      ...response,
+      timestamp: Date.now() // add timestamp before returning
+    }))
+  );
+}
 
   /** Save geolocation in localStorage */
   saveGeolocation(geo: { latitude: number; longitude: number }) {

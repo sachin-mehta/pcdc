@@ -4,6 +4,8 @@ import { HistoryService } from 'src/app/services/history.service';
 import { NetworkService } from 'src/app/services/network.service';
 import { StorageService } from 'src/app/services/storage.service';
 import { Router, NavigationEnd } from '@angular/router';
+import { LocationService } from 'src/app/services/location.service';
+import { SettingsService } from 'src/app/services/settings.service';
 
 @Component({
   selector: 'app-test-detail',
@@ -36,10 +38,13 @@ export class TestDetailComponent implements OnInit {
   measurementnetworkServer: any;
   measurementISP: any;
   selectedCountry: any;
+  locationDetail: any;
   constructor(private storage: StorageService,
     private historyService: HistoryService,
     private countryService: CountryService,
-    private router: Router
+    private router: Router,
+    private locationService: LocationService,
+    private settingsService: SettingsService
 
   ) {
     this.router.events.subscribe((event) => {
@@ -60,6 +65,8 @@ export class TestDetailComponent implements OnInit {
           console.log('ERROR: ' + err);
         })
     }
+    this.locationDetail = this.locationService.getSavedGeolocation();
+    console.log(this.locationDetail)
     this.loadData();
   }
 
@@ -83,4 +90,7 @@ export class TestDetailComponent implements OnInit {
     }
   }
 
+   openExternalUrl() {
+    this.settingsService.getShell().shell.openExternal('https://www.google.com/maps?q=' + this.locationDetail?.location?.lat + ',' + this.locationDetail?.location?.lng);
+  }
 }

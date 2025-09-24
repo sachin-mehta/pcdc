@@ -65,7 +65,7 @@ export class ConfirmschoolPage implements OnInit {
 
       // 2. Send WiFi list to backend → backend returns lat/long
       this.locationService.resolveGeolocation(wifiList).subscribe({
-        next: (geo) => {
+        next: (geo: any) => {
           console.log('Received geolocation from backend:', geo);
 
           // 3. Save lat/long in localStorage
