@@ -49,8 +49,7 @@ type IpInfoData = {
 })
 export class NetworkService {
   accessServiceUrl = environment.restAPI + 'ip-metadata';
-  ipInfoLiteUrl = 'https://api.ipinfo.io/lite/me?token=9906baf67eda8b'; //ONLY FOR LOCAL DEV TESTING
-  // accessServiceUrl = 'https://ipinfo.io?token=060bdd9da6a22f'; //ONLY FOR LOCAL DEV TESTING
+  ipInfoLiteUrl = 'https://api.ipinfo.io/lite/me?token=' + environment.ipInfoToken;
   headers: any;
   options: any;
   currentAccessInformation: any;
