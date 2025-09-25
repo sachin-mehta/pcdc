@@ -1,18 +1,31 @@
-import { isDevMode } from '@angular/core';
 import { environment as env } from './_environment.prod';
 
-const token = env.token;
+const environmentConfig = {
+  prod:{
+    restApi: env.restAPI,
+    token: env.token,
+  },
+  dev:{
+    restApi: env.restAPIDev,
+    token: env.tokenDev,
+  },
+  stg:{
+    restApi: env.restAPIStg,
+    token: env.tokenStg,
+  }
+};
 export const environment = {
-  production: env.mode,
   isElectron: window && window.process && window.process.type,
+  production: env.mode === 'prod' ? true : false,
   mode: env.mode,
   // restAPI: 'https://uni-connect-services.azurewebsites.net/api/v1/',
-  restAPI: env.mode === 'dev' ? env.restAPIDev : env.restAPI,
-  token: env.mode === 'dev' ? env.tokenDev : token,
-  app_version: '2.0.1',
+  restAPI: environmentConfig[env.mode].restApi,
+  token: environmentConfig[env.mode].token,
+  app_version: '2.0.2',
   appName: 'Giga Meter',
   appNameSuffix: '',
   showAboutMenu: true,
+  ipInfoToken: env.ipInfoToken,
   languages: [
     {
       name: 'En',

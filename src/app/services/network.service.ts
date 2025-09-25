@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { map, catchError } from 'rxjs/operators';
-import { throwError, firstValueFrom } from 'rxjs';
+import {  firstValueFrom } from 'rxjs';
 import { Network } from '@awesome-cordova-plugins/network/ngx';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { environment } from 'src/environments/environment';
 
 type Ip4Data = {
   organization: string;
@@ -22,6 +22,17 @@ type Ip4Data = {
   timezone: string;
 };
 
+type IpInfoLiteData = {
+  ip: string;
+  asn: string;
+  as_name: string;
+  as_domain: string;
+  country_code: string;
+  country: string;
+  continent_code: string;
+  continent: string;
+};
+
 type IpInfoData = {
   ip: string;
   hostname: string;
@@ -38,8 +49,9 @@ type IpInfoData = {
   providedIn: 'root',
 })
 export class NetworkService {
-  accessServiceUrl = 'https://ipinfo.io?token=9906baf67eda8b';
-  // accessServiceUrl = 'https://ipinfo.io?token=060bdd9da6a22f'; //ONLY FOR LOCAL DEV TESTING
+  accessServiceUrl = environment.restAPI + 'ip-metadata';
+  ipInfoLiteUrl = 'https://api.ipinfo.io/lite/me?token=' + environment.ipInfoToken;
+
   headers: any;
   options: any;
   currentAccessInformation: any;
@@ -54,17 +66,47 @@ export class NetworkService {
     this.headers = headersItem;
   }
 
+  // this function has a retrie logic of 3 times with exponential wait
+  async getIpFromIpLite(): Promise<IpInfoLiteData> {
+    console.log('getIpFromIpLite');
+    const options = { headers: this.headers };
+    let response = null;
+    let retryCount = 0;
+    const maxRetries = 3;
+
+    while (retryCount < maxRetries) {
+      try {
+        console.log('accessServiceUrl', this.ipInfoLiteUrl);
+        response = await firstValueFrom(
+          this.http.get<IpInfoLiteData>(this.ipInfoLiteUrl, options)
+        );
+        console.log('response', response);
+        return response;
+      } catch (error) {
+        console.error('Error:', error);
+        retryCount++;
+        if (retryCount < maxRetries) {
+          const waitTime = Math.pow(2, retryCount) * 1000; // Exponential backoff
+          await new Promise((resolve) => setTimeout(resolve, waitTime));
+        }
+      }
+    }
+    throw new Error('Failed to retrieve IP information after multiple attempts.');
+  }
+
+
   /**
    * Retrieves network information.
    * @returns {Promise<any>} A promise that resolves to the network information.
    */
   async getNetInfo() {
+    const ipInfoLite = await this.getIpFromIpLite();
     console.log('getNetInfo');
     const options = { headers: this.headers };
     let response = null;
     try {
       const httpResponse = await firstValueFrom(
-        this.http.get<IpInfoData>(this.accessServiceUrl, options)
+        this.http.get<IpInfoData>(`${this.accessServiceUrl}/${ipInfoLite.ip}`, options)
       );
       response = this.standardData(httpResponse);
     } catch (error) {
@@ -79,7 +121,7 @@ export class NetworkService {
   private mapData(source: Ip4Data): IpInfoData {
     return this.standardData({
       ip: source.ip,
-      
+
       hostname: source.ip,
       city: source.city ?? '',
       region: source.region ?? '',
