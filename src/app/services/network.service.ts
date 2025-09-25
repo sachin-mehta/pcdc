@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import {  firstValueFrom } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 import { Network } from '@awesome-cordova-plugins/network/ngx';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
@@ -50,7 +50,8 @@ type IpInfoData = {
 })
 export class NetworkService {
   accessServiceUrl = environment.restAPI + 'ip-metadata';
-  ipInfoLiteUrl = 'https://api.ipinfo.io/lite/me?token=' + environment.ipInfoToken;
+  ipInfoLiteUrl =
+    'https://api.ipinfo.io/lite/me?token=' + environment.ipInfoToken;
 
   headers: any;
   options: any;
@@ -91,9 +92,10 @@ export class NetworkService {
         }
       }
     }
-    throw new Error('Failed to retrieve IP information after multiple attempts.');
+    throw new Error(
+      'Failed to retrieve IP information after multiple attempts.'
+    );
   }
-
 
   /**
    * Retrieves network information.
@@ -106,13 +108,17 @@ export class NetworkService {
     try {
       const ipInfoLite = await this.getIpFromIpLite();
       const httpResponse = await firstValueFrom(
-        this.http.get<IpInfoData>(`${this.accessServiceUrl}/${ipInfoLite.ip}`, options)
+        this.http.get<IpInfoData>(
+          `${this.accessServiceUrl}/${ipInfoLite.ip}`,
+          options
+        )
       );
       response = this.standardData(httpResponse);
     } catch (error) {
       console.error('Error:', error);
       const ipGeoResponse = await fetch('https://ipv4.geojs.io/v1/ip/geo.json');
       const ipGeoData = await ipGeoResponse.json();
+
       return this.mapData(ipGeoData);
     }
     return response;
@@ -120,16 +126,15 @@ export class NetworkService {
 
   private mapData(source: Ip4Data): IpInfoData {
     return this.standardData({
-      ip: source.ip,
-
-      hostname: source.ip,
-      city: source.city ?? '',
-      region: source.region ?? '',
-      country: source.country_code,
-      loc: `${source.latitude},${source.longitude}`,
-      org: source.organization ?? source.organization_name,
+      ip: source?.ip ?? '',
+      hostname: source?.ip ?? '',
+      city: source?.city ?? '',
+      region: source?.region ?? '',
+      country: source?.country_code ?? '',
+      loc: `${source?.latitude},${source?.longitude}` ?? '',
+      org: source?.organization ?? source?.organization_name ?? '',
       postal: '',
-      timezone: source.timezone,
+      timezone: source?.timezone ?? '',
     });
   }
   private standardData(source: IpInfoData): IpInfoData {
