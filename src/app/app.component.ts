@@ -71,7 +71,7 @@ export class AppComponent {
     this.translate.use(appLang.code);
     this.app_version = environment.app_version;
     this.device_id = this.storage.get('schoolUserId') || 'unknown-device';
-    this.device_id_short = this.device_id.substring(0, 8) + '...';
+    this.device_id_short = this.device_id.substring(0, 16) + '...';
     if (this.storage.get('schoolId')) {
       this.school = JSON.parse(this.storage.get('schoolInfo'));
     }
