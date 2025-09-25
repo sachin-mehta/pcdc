@@ -117,7 +117,7 @@ export class NetworkService {
     } catch (error) {
       console.error('Error:', error);
       const ipGeoResponse = await fetch('https://ipv4.geojs.io/v1/ip/geo.json');
-      const ipGeoData = await ipGeoResponse.json();
+      const ipGeoData = await ipGeoResponse?.json().catch(() => null);
 
       return this.mapData(ipGeoData);
     }
@@ -131,7 +131,7 @@ export class NetworkService {
       city: source?.city ?? '',
       region: source?.region ?? '',
       country: source?.country_code ?? '',
-      loc: `${source?.latitude},${source?.longitude}` ?? '',
+      loc: `${source?.latitude},${source?.longitude}`,
       org: source?.organization ?? source?.organization_name ?? '',
       postal: '',
       timezone: source?.timezone ?? '',
