@@ -1,9 +1,4 @@
 {
-<<<<<<< HEAD
-  "home": {
-    "title1": "Welcome to {{appName}} <span class='daily-chk-blue'>{{appNameSuffix}}</span>",
-    "title2": "Help your school get better connectivity. Share your school's internet status with {{appName}} every day.",
-=======
     "home": {
         "title1": "Welcome to {{appName}} <span class='daily-chk-blue'>{{appNameSuffix}}</span>",
         "title2": "Help your school get better connectivity. Share your school's internet status with {{appName}} every day.",
@@ -169,7 +164,6 @@
     "tryAgain": "Try again",
     "yes": "Yes",
     "no": "No",
->>>>>>> release/2.0.2
     "next": "Next",
     "learn-more": "LEARN MORE ABOUT {{appName}}",
     "checkboxText": "By registering and using GigaMeter, I agree to the collection, processing and publication of my measurement and other supporting data by Giga under the",
