@@ -1,5 +1,6 @@
 <app-pcdc-header></app-pcdc-header>
 
+<<<<<<< HEAD
 <!-- Registration Banners for First-Time Visit -->
 <div class="notification-container" *ngIf="showRegistrationBanner">
   <!-- Registration Completed Notification -->
@@ -35,11 +36,20 @@
 
 <ion-content class="scrollable_content">
   <ion-card class="card_margin">
+=======
+<ion-content class="scrollable_content">
+  <ion-card class="card_margin">
+
+>>>>>>> release/2.0.2
     <div class="container centerPos">
       <ion-item class="custom-item" lines="none" color="light">
         <ion-label>
           <p class="subtitle">{{selectedCountry}} - {{schoolId}}</p>
+<<<<<<< HEAD
           <h2 class="title" title="{{school?.name}}">{{school?.name}}</h2>
+=======
+          <h2 class="title" title={{school?.name}}>{{school?.name}}</h2>
+>>>>>>> release/2.0.2
         </ion-label>
       </ion-item>
       <!---------   Start test Section ------------------>
@@ -50,6 +60,7 @@
           <button class="test-btn" (click)="startNDT()" [translate]="'startTest.startTest'"></button>
         </div>
       </div> -->
+<<<<<<< HEAD
       <app-circular-progress-bar
         [progressValue]="progress"
         [secondLabel]="(currentState !=undefined && currentState != 'Starting' && onlineStatus) && downloadStarted ? 'DOWNLOAD' : (currentState !=undefined && currentState != 'Starting' && onlineStatus && uploadStarted === true) ? 'UPLOAD' : currentState == 'Completed' ? 'TEST AGAIN': ''"
@@ -61,6 +72,15 @@
         [currentRateUpload]="currentRateUpload"
         [completed]="currentState =='Completed'"
       ></app-circular-progress-bar>
+=======
+      <app-circular-progress-bar [progressValue]="progress"
+        [secondLabel]="(currentState !=undefined && currentState != 'Starting' && onlineStatus) && downloadStarted ? 'DOWNLOAD' : (currentState !=undefined && currentState != 'Starting' && onlineStatus && uploadStarted === true) ? 'UPLOAD' : currentState == 'Completed' ? 'TEST AGAIN': ''"
+        [icon]="''" [error]="(connectionStatus=='error' && currentState == undefined) || (!onlineStatus)"
+        (startTest)="startNDT()"
+        [firstLabel]="(currentState == undefined && currentRate != 'error' && onlineStatus) ? ('startTest.startTest' | translate) : ''"
+        [currentRateDownload]="currentRateDownload" [currentRateUpload]="currentRateUpload" [completed]="currentState =='Completed'"></app-circular-progress-bar>
+
+>>>>>>> release/2.0.2
 
       <div class="location">{{mlabInformation.label}}</div>
       <!-- </div> -->
@@ -76,9 +96,13 @@
     </div> -->
       <!----------   Start test progress Section END --------------->
       <!---------   Test Result Section ----------------->
+<<<<<<< HEAD
       <div
         *ngIf="currentState !=undefined && currentState != 'Starting' && onlineStatus"
       >
+=======
+      <div *ngIf="currentState !=undefined && currentState != 'Starting' && onlineStatus">
+>>>>>>> release/2.0.2
         <!-- <div class="uploadDownldSec">
         <div class="uplanddowld" *ngIf="currentState !=undefined">
           <div class="downloadsec">
@@ -114,6 +138,10 @@
         </div> -->
         <!-- <div class="location">{{mlabInformation.label}}</div> -->
         <!-- </div> -->
+<<<<<<< HEAD
+=======
+
+>>>>>>> release/2.0.2
       </div>
       <!-- ------------------------------------------- -->
       <!--   Test Failed Section------------------------->
@@ -129,6 +157,7 @@
           </div>
         </div>
       </div> -->
+<<<<<<< HEAD
       <div
         class="custom-toast"
         *ngIf="((connectionStatus=='error' && currentState == undefined) || (!onlineStatus)) && !isErrorClosed"
@@ -144,6 +173,15 @@
             class="failed_test"
             [translate]="'startTest.testFailed'"
           ></ion-label>
+=======
+      <div class="custom-toast"
+        *ngIf="((connectionStatus=='error' && currentState == undefined) || (!onlineStatus)) && !isErrorClosed">
+        <!-- <span class="icon">⚠️</span> -->
+        <ion-img src="../../assets/images/test_failed_Icon.svg" class="testFailed"></ion-img>
+
+        <div class="message">
+          <ion-label class="failed_test" [translate]="'startTest.testFailed'"></ion-label>
+>>>>>>> release/2.0.2
           <div class="msg" [translate]="'startTest.testFailedDesc'"></div>
         </div>
         <button class="close-btn" (click)="closeError()">&times;</button>
@@ -169,11 +207,16 @@
       <!-- ------------------------------------------- -->
       <ion-list lines="none" class="horizontal-list">
         <!-- <ion-item lines="none" class="left-item"> -->
+<<<<<<< HEAD
         <!-- <ion-label>
+=======
+          <!-- <ion-label>
+>>>>>>> release/2.0.2
             <h3  [translate]="'startTest.network'"></h3>
             <p title="--">--</p>
           </ion-label> -->
         <!-- </ion-item> -->
+<<<<<<< HEAD
 
         <ion-item lines="none" class="center-item">
           <ion-label class="position">
@@ -208,10 +251,41 @@
             <ion-card-title>
               <span class="footer_text">
                 <img src="assets/images/Download.svg" />
+=======
+      
+        <ion-item lines="none" class="center-item">
+          <ion-label class="position">
+            <h3  [translate]="'startTest.isp'"></h3>
+            <p title={{measurementISP}}>{{measurementISP?.length ? measurementISP : '---'}}</p>
+          </ion-label>
+        </ion-item>
+      
+        <ion-item lines="none" class="right-item">
+          <ion-label class="position">
+            <h3  [translate]="'startTest.server'"></h3>
+            <p title={{measurementnetworkServer}}>{{measurementnetworkServer?.length ? measurementnetworkServer : '---' }}</p>
+          </ion-label>
+        </ion-item>
+      </ion-list>
+      
+    </div>
+
+
+  </ion-card>
+  <ion-card class="footer_card_margin">
+    <ion-label class="latest_measurement" [translate]="'startTest.measurement'"></ion-label>
+    <div class="footer-grid">
+      <div class="footer-row">
+        <ion-card class="footer-card" >
+          <ion-card-header class="footer_card_header">
+            <ion-card-title>
+              <span class="footer_text"> <img src="assets/images/Download.svg" />
+>>>>>>> release/2.0.2
                 <span [translate]="'startTest.downloadLowerCase'"></span>
               </span>
               <span class="time">{{ currentDate | date:'shortTime' }}</span>
             </ion-card-title>
+<<<<<<< HEAD
             <ion-card-subtitle
               [ngClass]="{'error_status': (connectionStatus=='error' && currentState == undefined) ||
             (!onlineStatus)}"
@@ -223,11 +297,21 @@
                 (!onlineStatus)) ? '' : 'Mbps'}}</span
               >
             </ion-card-subtitle>
+=======
+            <ion-card-subtitle [ngClass]="{'error_status': (connectionStatus=='error' && currentState == undefined) ||
+            (!onlineStatus)}">{{currentRateDownload && !((connectionStatus=='error' && currentState == undefined) ||
+              (!onlineStatus)) ? currentRateDownload : '---'}}
+              <span class="footer_card_font_size">{{((connectionStatus=='error' && currentState == undefined) ||
+                (!onlineStatus)) ? '' : 'Mbps'}}</span>
+            </ion-card-subtitle>
+
+>>>>>>> release/2.0.2
           </ion-card-header>
         </ion-card>
 
         <ion-card class="footer-card" color="medium">
           <ion-card-header class="footer_card_header">
+<<<<<<< HEAD
             <ion-card-title
               ><span class="footer_text">
                 <img src="assets/images/Upload.svg" />
@@ -245,6 +329,20 @@
                 >{{((connectionStatus=='error' && currentState == undefined) ||
                 (!onlineStatus)) ? '' : 'Mbps'}}</span
               >
+=======
+
+            <ion-card-title><span class="footer_text">
+                <img src="assets/images/Upload.svg" />
+                <span [translate]="'startTest.uploadLowerCase'">
+                    </span> </span> <span class="time">{{ currentDate | date:'shortTime' }}</span>
+            </ion-card-title>
+            <ion-card-subtitle [ngClass]="{'error_status': (connectionStatus=='error' && currentState == undefined) ||
+            (!onlineStatus)}">{{currentRateUpload && !((connectionStatus=='error' && currentState == undefined) ||
+              (!onlineStatus)) ? currentRateUpload : '---'}}
+              <span class="footer_card_font_size">{{((connectionStatus=='error' && currentState == undefined) ||
+                (!onlineStatus)) ? '' : 'Mbps'}}</span>
+
+>>>>>>> release/2.0.2
             </ion-card-subtitle>
           </ion-card-header>
         </ion-card>
@@ -253,6 +351,7 @@
       <div class="footer-row">
         <ion-card class="footer-card" color="medium">
           <ion-card-header class="footer_card_header">
+<<<<<<< HEAD
             <ion-card-title>
               <span class="footer_text">
                 <img src="assets/images/Arrows--horizontal.svg" />
@@ -270,11 +369,29 @@
                 >{{((connectionStatus=='error' && currentState == undefined) ||
                 (!onlineStatus)) ? '---' : 'ms'}}</span
               >
+=======
+            <ion-card-title> <span class="footer_text">
+                <img src="assets/images/Arrows--horizontal.svg" />
+                <span [translate]="'startTest.latencyDetail'"></span>
+              </span> <span class="time">{{ currentDate | date:'shortTime' }}</span>
+
+            </ion-card-title>
+            <ion-card-subtitle [ngClass]="{'error_status': (connectionStatus=='error' && currentState == undefined) ||
+            (!onlineStatus)}">{{currentRateDownload && !((connectionStatus=='error' && currentState == undefined) ||
+              (!onlineStatus)) ? latency ? latency : '---' : '---'}}
+              <span class="footer_card_font_size">{{((connectionStatus=='error' && currentState == undefined) ||
+                (!onlineStatus)) ? '---' : 'ms'}}</span>
+
+>>>>>>> release/2.0.2
             </ion-card-subtitle>
           </ion-card-header>
         </ion-card>
 
+<<<<<<< HEAD
         <ion-card class="footer-card" style="background: #f5f5f5">
+=======
+        <ion-card class="footer-card" style="background: #F5F5F5;">
+>>>>>>> release/2.0.2
           <!-- <ion-card-header class="footer_card_header">
             <ion-card-title>
               <span class="footer_text">
@@ -326,5 +443,11 @@
 <!-- <ion-footer class="ion-no-border">
   <ion-toolbar> -->
 
+<<<<<<< HEAD
 <!-- </ion-toolbar>
 </ion-footer> -->
+=======
+
+<!-- </ion-toolbar>
+</ion-footer> -->
+>>>>>>> release/2.0.2

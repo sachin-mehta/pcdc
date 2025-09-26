@@ -102,7 +102,6 @@ export class NetworkService {
    * @returns {Promise<any>} A promise that resolves to the network information.
    */
   async getNetInfo() {
-    const ipInfoLite = await this.getIpFromIpLite();
     console.log('getNetInfo');
     const options = { headers: this.headers };
     let response = null;

@@ -464,7 +464,6 @@ export class StarttestPage implements OnInit, OnDestroy {
       this.measurementnetworkServer = '';
       this.measurementISP = '';
       this.progress = 0;
-
       // Clear any ongoing timers
       if (this.downloadTimer) {
         clearInterval(this.downloadTimer);
@@ -474,7 +473,6 @@ export class StarttestPage implements OnInit, OnDestroy {
         clearInterval(this.uploadTimer);
         this.uploadTimer = null;
       }
-
       this.currentState = 'Starting';
       this.uploadStatus = undefined;
       this.latency = undefined;
@@ -492,13 +490,11 @@ export class StarttestPage implements OnInit, OnDestroy {
     const interval = 200; // update every 200ms
     const steps = duration / interval;
     const stepSize = (target - this.progress) / steps;
-
     // Clear existing timer
     if (this.downloadTimer) {
       clearInterval(this.downloadTimer);
       this.downloadTimer = null;
     }
-
     // Reset progress if needed
     if (this.progress > target) {
       this.progress = 0;
@@ -510,13 +506,11 @@ export class StarttestPage implements OnInit, OnDestroy {
       if (this.downloadStarted && this.progress < target) {
         this.progress += stepSize;
         elapsedSteps++;
-
         if (this.progress >= target || elapsedSteps >= steps) {
           this.progress = target;
           clearInterval(this.downloadTimer);
           this.downloadTimer = null;
         }
-
         this.ref.detectChanges(); // trigger UI update
       } else {
         clearInterval(this.downloadTimer);
@@ -524,7 +518,6 @@ export class StarttestPage implements OnInit, OnDestroy {
       }
     }, interval);
   }
-
   // Animate progress from 50 to 100
   startUploadProgress() {
     const target = 100;
