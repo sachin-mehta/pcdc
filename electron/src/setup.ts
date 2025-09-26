@@ -19,19 +19,23 @@ import {
   session,
   shell,
   globalShortcut,
+  screen,
 } from 'electron';
 import electronIsDev from 'electron-is-dev';
 import electronServe from 'electron-serve';
 import windowStateKeeper from 'electron-window-state';
 import { join } from 'path';
 import * as Sentry from '@sentry/node';
-import { Console } from 'console';
+import { Capacitor } from '@capacitor/core';
+
 var AutoLaunch = require('auto-launch');
 var isQuiting = false;
 
 // Enhanced Sentry configuration
 Sentry.init({
-  dsn: 'https://e52e97fc558344bc80a218fc22a9a6a9@excubo.unicef.io/47',
+  dsn: Capacitor.isNativePlatform()
+    ? 'https://425388d87bae44d7be09a88dd5548d7e@excubo.unicef.io/77'
+    : 'https://e52e97fc558344bc80a218fc22a9a6a9@excubo.unicef.io/47',
   environment: 'production',
   beforeSend: (event) => {
     // Add app version to help with debugging
@@ -182,9 +186,13 @@ export class ElectronCapacitorApp {
         process?.platform === 'win32' ? 'appIcon.ico' : 'appIcon.png'
       )
     );
+    // Get primary display size
+    const { width: screenWidth, height: screenHeight } =
+      screen.getPrimaryDisplay().workAreaSize;
+
     this.mainWindowState = windowStateKeeper({
-      defaultWidth: 376,
-      defaultHeight: 550,
+      defaultWidth: Capacitor.isNativePlatform() ? screenWidth : 376,
+      defaultHeight: Capacitor.isNativePlatform() ? screenHeight : 550,
     });
     // Setup preload script path and construct our main window.
     const preloadPath = join(app?.getAppPath(), 'build', 'src', 'preload.js');
@@ -256,7 +264,10 @@ export class ElectronCapacitorApp {
       }
     );
 
-    this.MainWindow?.setSize(390, 700);
+    this.MainWindow?.setSize(
+      Capacitor.isNativePlatform() ? screenWidth : 390,
+      Capacitor.isNativePlatform() ? screenHeight : 700
+    );
     this.mainWindowState?.manage(this.MainWindow);
 
     if (this.CapacitorFileConfig?.backgroundColor) {
@@ -375,7 +386,10 @@ export class ElectronCapacitorApp {
       setTimeout(() => {
         if ((this.CapacitorFileConfig.electron as any)?.electronIsDev) {
           this.MainWindow.webContents.openDevTools();
-          this.MainWindow.setSize(390, 700);
+          this.MainWindow?.setSize(
+            Capacitor.isNativePlatform() ? screenWidth : 390,
+            Capacitor.isNativePlatform() ? screenHeight : 700
+          );
         }
         CapElectronEventEmitter.emit(
           'CAPELECTRON_DeeplinkListenerInitialized',

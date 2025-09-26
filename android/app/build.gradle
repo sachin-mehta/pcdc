@@ -10,8 +10,8 @@ android {
     applicationId "com.meter.giga"
     minSdkVersion rootProject.ext.minSdkVersion
     targetSdkVersion rootProject.ext.targetSdkVersion
-    versionCode 7
-    versionName "1.1.7"
+    versionCode 8
+    versionName "1.1.8"
     testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     aaptOptions {
       // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -46,6 +46,26 @@ android {
       applicationIdSuffix ".debug" // Need to remove it once we got the crashlytics json config
       proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
       signingConfig signingConfigs.release
+    }
+  }
+
+
+  flavorDimensions "environment"
+
+  productFlavors {
+    dev {
+      dimension "environment"
+      buildConfigField "String", "BASE_URL", "\"${BASE_URL_DEVELOPMENT}\""
+
+    }
+    staging {
+      dimension "environment"
+      buildConfigField "String", "BASE_URL", "\"${BASE_URL_STAGING}\""
+
+    }
+    prod {
+      dimension "environment"
+      buildConfigField "String", "BASE_URL", "\"${BASE_URL_PRODUCTION}\""
     }
   }
   buildFeatures {

@@ -49,7 +49,9 @@ export class ConfirmschoolPage {
     const appLang = this.settings.get('applicationLanguage');
     this.translate.use(appLang.code);
     this.isNative = Capacitor.isNativePlatform();
-    this.gigaAppPlugin = registerPlugin<any>('GigaAppPlugin');
+    if (Capacitor.isNativePlatform()) {
+      this.gigaAppPlugin = registerPlugin<any>('GigaAppPlugin');
+    }
     this.sub = this.activatedroute.params.subscribe((params) => {
       this.schoolId = params.schoolId;
       this.selectedCountry = params.selectedCountry;
@@ -121,16 +123,19 @@ export class ConfirmschoolPage {
                 );
               }
               this.loading.dismiss();
-              this.router.navigate(['/save-email']);
-              this.router.navigate(
-                [
-                  'save-email',
-                  this.school.school_id,
-                  this.selectedCountry,
-                  this.detectedCountry,
-                ],
-                { state: this.school }
-              );
+              this.router.navigate(['/schoolsuccess']);
+              // As confirmed by @Vipul, commented the navigation flow
+              // to add email,and navigate directly to success screen
+              // this.router.navigate(['/save-email']);
+              // this.router.navigate(
+              //   [
+              //     'save-email',
+              //     this.school.school_id,
+              //     this.selectedCountry,
+              //     this.detectedCountry,
+              //   ],
+              //   { state: this.school }
+              // );
 
               this.settings.setSetting('scheduledTesting', true);
             }),

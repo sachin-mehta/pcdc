@@ -24,7 +24,21 @@ class GigaApp : Application() {
     SentryAndroid.init(this) { options ->
       options.dsn = getString(R.string.sentry_dsn)
       options.isDebug = BuildConfig.DEBUG
-      options.environment = "development" // if (BuildConfig.DEBUG) "development" else "production"
+      when (BuildConfig.FLAVOR) {
+        "dev" -> {
+          options.environment =
+            "development"
+        }
+
+        "staging" -> {
+          options.environment = "staging"
+        }
+
+        "prod" -> {
+          options.environment =
+            "production"
+        }
+      }
       options.connectionTimeoutMillis = 10000 // 10 seconds
       options.readTimeoutMillis = 10000
     }

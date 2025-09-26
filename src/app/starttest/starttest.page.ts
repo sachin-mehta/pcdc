@@ -134,7 +134,9 @@ export class StarttestPage implements OnInit, OnDestroy {
       console.log(this.school, 'heheh');
     }
     this.isNative = Capacitor.isNativePlatform();
-    this.gigaAppPlugin = registerPlugin<any>('GigaAppPlugin');
+    if (Capacitor.isNativePlatform()) {
+      this.gigaAppPlugin = registerPlugin<any>('GigaAppPlugin');
+    }
     this.onlineStatus = navigator.onLine;
     this.route.params.subscribe((params) => {
       if (this.onlineStatus) {
@@ -149,122 +151,124 @@ export class StarttestPage implements OnInit, OnDestroy {
         translate.setDefaultLang(applicationLanguage.code);
       }
     }
-
-    this.gigaAppPlugin.addListener('speedTestUpdate', (data: any) => {
-      console.log(
-        'GIGA NetworkTestService Data:',
-        JSON.stringify(data, null, 2)
-      );
-      try {
-        if (data.testStatus === 'onstart') {
-          this.currentState = 'Starting';
-          this.currentRate = undefined;
-          this.currentRateUpload = undefined;
-          this.currentRateDownload = undefined;
-          this.ref.markForCheck();
-          console.log('GIGA', 'Executed onstart');
-        } else if (data.testStatus === 'upload') {
-          console.log('Running Test (Upload)');
-          this.downloadStarted = false;
-          this.uploadStarted = true;
-          if (this.downloadTimer) {
-            clearInterval(this.downloadTimer);
-          }
-          this.currentState = 'Running Test (Upload)';
-          this.currentRateDownload = data.downloadSpeed?.toFixed(2);
-          this.currentRate = data.uploadSpeed?.toFixed(2);
-          this.currentRateUpload = data.uploadSpeed?.toFixed(2);
-          if (!this.uploadProgressStarted) {
-            this.progress = 50;
-            this.uploadProgressStarted = true;
-            this.startUploadProgress();
-          }
-          this.ref.markForCheck();
-          console.log('GIGA', 'Executed upload ');
-        } else if (data.testStatus === 'download') {
-          this.downloadStarted = true;
-          this.uploadStarted = false;
-          this.currentState = 'Running Test (Download)';
-          this.currentRate = data.downloadSpeed?.toFixed(2);
-          this.currentRateDownload = data.downloadSpeed?.toFixed(2);
-          this.currentRateUpload = data.uploadSpeed?.toFixed(2);
-          if (this.downloadStarted) {
-            this.startDownloadProgress();
-          }
-          this.ref.markForCheck();
-          console.log('GIGA', 'Executed download');
-        } else if (data.testStatus === 'complete') {
-          this.uploadStarted = false;
-          if (this.uploadTimer) {
-            clearInterval(this.uploadTimer);
-          }
-          this.progress = 100;
-          this.currentState = 'Completed';
-          this.currentDate = new Date();
-          this.currentRate =
-            data.speedTestData.results[
-              'NDTResult.S2C'
-            ].LastClientMeasurement.MeanClientMbps?.toFixed(2);
-          this.currentRateUpload =
-            data.speedTestData.results[
-              'NDTResult.C2S'
-            ].LastClientMeasurement.MeanClientMbps?.toFixed(2);
-          this.currentRateDownload =
-            data.speedTestData.results[
-              'NDTResult.S2C'
-            ].LastClientMeasurement.MeanClientMbps?.toFixed(2);
-          this.progressGaugeState.current = this.progressGaugeState.maximum;
-          if (
-            data.speedTestData.results['NDTResult.S2C'].LastServerMeasurement
-              .BBRInfo.MinRTT == null ||
-            data.speedTestData.results['NDTResult.C2S'].LastServerMeasurement
-              .BBRInfo.MinRTT == null
-          ) {
-            this.latency = '0';
+    if (Capacitor.isNativePlatform()) {
+      this.gigaAppPlugin.addListener('speedTestUpdate', (data: any) => {
+        console.log(
+          'GIGA NetworkTestService Data:',
+          JSON.stringify(data, null, 2)
+        );
+        try {
+          if (data.testStatus === 'onstart') {
+            this.currentState = 'Starting';
+            this.currentRate = undefined;
+            this.currentRateUpload = undefined;
+            this.currentRateDownload = undefined;
+            this.ref.markForCheck();
+            console.log('GIGA', 'Executed onstart');
+          } else if (data.testStatus === 'upload') {
+            console.log('Running Test (Upload)');
+            this.downloadStarted = false;
+            this.uploadStarted = true;
+            if (this.downloadTimer) {
+              clearInterval(this.downloadTimer);
+            }
+            this.currentState = 'Running Test (Upload)';
+            this.currentRateDownload = data.downloadSpeed?.toFixed(2);
+            this.currentRate = data.uploadSpeed?.toFixed(2);
+            this.currentRateUpload = data.uploadSpeed?.toFixed(2);
+            if (!this.uploadProgressStarted) {
+              this.progress = 50;
+              this.uploadProgressStarted = true;
+              this.startUploadProgress();
+            }
+            this.ref.markForCheck();
+            console.log('GIGA', 'Executed upload ');
+          } else if (data.testStatus === 'download') {
+            this.downloadStarted = true;
+            this.uploadStarted = false;
+            this.currentState = 'Running Test (Download)';
+            this.currentRate = data.downloadSpeed?.toFixed(2);
+            this.currentRateDownload = data.downloadSpeed?.toFixed(2);
+            this.currentRateUpload = data.uploadSpeed?.toFixed(2);
+            if (this.downloadStarted) {
+              this.startDownloadProgress();
+            }
+            this.ref.markForCheck();
+            console.log('GIGA', 'Executed download');
+          } else if (data.testStatus === 'complete') {
+            this.uploadStarted = false;
+            if (this.uploadTimer) {
+              clearInterval(this.uploadTimer);
+            }
+            this.progress = 100;
+            this.currentState = 'Completed';
+            this.currentDate = new Date();
+            this.currentRate =
+              data.speedTestData.results[
+                'NDTResult.S2C'
+              ].LastClientMeasurement.MeanClientMbps?.toFixed(2);
+            this.currentRateUpload =
+              data.speedTestData.results[
+                'NDTResult.C2S'
+              ].LastClientMeasurement.MeanClientMbps?.toFixed(2);
+            this.currentRateDownload =
+              data.speedTestData.results[
+                'NDTResult.S2C'
+              ].LastClientMeasurement.MeanClientMbps?.toFixed(2);
+            this.progressGaugeState.current = this.progressGaugeState.maximum;
+            if (
+              data.speedTestData.results['NDTResult.S2C'].LastServerMeasurement
+                .BBRInfo.MinRTT == null ||
+              data.speedTestData.results['NDTResult.C2S'].LastServerMeasurement
+                .BBRInfo.MinRTT == null
+            ) {
+              this.latency = '0';
+            } else {
+              this.latency = (
+                (data.speedTestData.results['NDTResult.S2C']
+                  .LastServerMeasurement.BBRInfo.MinRTT +
+                  data.speedTestData.results['NDTResult.C2S']
+                    .LastServerMeasurement.BBRInfo.MinRTT) /
+                2 /
+                1000
+              ).toFixed(0);
+            }
+            if (
+              data.speedTestData.ClientInfo !== null &&
+              data.speedTestData.ClientInfo !== undefined
+            ) {
+              this.measurementnetworkServer =
+                data.speedTestData.ClientInfo.City;
+              this.measurementISP = data.speedTestData.ClientInfo.ISP;
+            }
+            console.log(
+              'GIGA',
+              'Executed complete :' + JSON.stringify(data.measurementsItem)
+            );
+            if (data.measurementsItem) {
+              this.historyService.add(data.measurementsItem);
+            }
+            this.ref.markForCheck();
+            this.refreshHistory();
+            console.log('GIGA', 'Executed complete');
+          } else if (data.testStatus === 'onerror') {
+            this.gaugeError();
+            this.currentState = undefined;
+            this.currentRate = undefined;
+            this.ref.markForCheck();
+            console.log('GIGA', 'Executed onerror');
           } else {
-            this.latency = (
-              (data.speedTestData.results['NDTResult.S2C'].LastServerMeasurement
-                .BBRInfo.MinRTT +
-                data.speedTestData.results['NDTResult.C2S']
-                  .LastServerMeasurement.BBRInfo.MinRTT) /
-              2 /
-              1000
-            ).toFixed(0);
+            console.log('GIGA', 'Executed Else');
           }
-          if (
-            data.speedTestData.ClientInfo !== null &&
-            data.speedTestData.ClientInfo !== undefined
-          ) {
-            this.measurementnetworkServer = data.speedTestData.ClientInfo.City;
-            this.measurementISP = data.speedTestData.ClientInfo.ISP;
-          }
-          console.log(
-            'GIGA',
-            'Executed complete :' + JSON.stringify(data.measurementsItem)
-          );
-          if (data.measurementsItem) {
-            this.historyService.add(data.measurementsItem);
-          }
-          this.ref.markForCheck();
-          this.refreshHistory();
-          console.log('GIGA', 'Executed complete');
-        } else if (data.testStatus === 'onerror') {
+        } catch (e) {
           this.gaugeError();
           this.currentState = undefined;
           this.currentRate = undefined;
           this.ref.markForCheck();
-          console.log('GIGA', 'Executed onerror');
-        } else {
-          console.log('GIGA', 'Executed Else');
+          console.log('GIGA', 'Exception to bind the data' + e);
         }
-      } catch (e) {
-        this.gaugeError();
-        this.currentState = undefined;
-        this.currentRate = undefined;
-        this.ref.markForCheck();
-        console.log('GIGA', 'Exception to bind the data' + e);
-      }
-    });
+      });
+    }
 
     window.addEventListener(
       'online',

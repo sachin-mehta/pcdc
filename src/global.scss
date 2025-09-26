@@ -26,6 +26,7 @@
 @import "~@ionic/angular/css/flex-utils.css";
 @import "./theme/variables.scss";
 
+
 ion-header {
   background-color: #ffffff !important;
   height: 48px;
@@ -190,10 +191,18 @@ ion-content {
 }
 .ion-page {
   border-radius: 10px !important;
-  max-width: 700px;
   margin: 0 0;
   background-color: #fe2762;
   color: $light-text2;
+}
+//Apply for Android App
+body.is-native .ion-page {
+  max-width: 100%;
+  max-height: 100%;
+}
+// Apply for elctron app
+body.is-web .ion-page {
+  max-width: 700px;
   max-height: 840px;
 }
 .container {

@@ -29,7 +29,7 @@ object Constants {
   const val KEY_HISTORY_DATA_INDEX = "KEY_HISTORY_DATA_INDEX"
   const val CLIENT_INFO_FALLBACK_END_URL = "https://ipv4.geojs.io/v1/"
   const val CLIENT_INFO_END_URL = "https://ipinfo.io/"
-  const val SPEED_TEST_END_URL = "https://uni-ooi-giga-meter-backend-dev.azurewebsites.net/api/v1/"
+
   const val SERVER_INFO_END_URL = "https://mlab-ns.appspot.com/"
   const val SCHEDULE_TYPE_DAILY = "daily"
   const val SCHEDULE_TYPE_START = "start"

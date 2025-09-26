@@ -157,6 +157,7 @@ ion-label {
 }
 
 .middle-layout {
+  flex-direction: column;
   text-align: left;
   background-color: #ffffff;
   display: flex;
@@ -165,7 +166,6 @@ ion-label {
   gap: 8px;
   padding: 0 0;
   color: #E2E2E2;
-  flex-flow: wrap;
   position: absolute;
   left: 0;
 }
@@ -194,7 +194,6 @@ ion-label {
 
 
 .middle-layout .learnmore {
-  flex: 1;
   /* Allow text to take available space */
   font-size: 12px;
   padding: 0;

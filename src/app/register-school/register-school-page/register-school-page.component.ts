@@ -5,13 +5,13 @@ import { SettingsService } from 'src/app/services/settings.service';
 import { TranslateService } from '@ngx-translate/core';
 import { environment } from 'src/environments/environment';
 import { IonAccordionGroup, IonSlides } from '@ionic/angular';
-
+import { Capacitor } from '@capacitor/core';
+import { Browser } from '@capacitor/browser';
 @Component({
   selector: 'app-register-school-page',
   templateUrl: './register-school-page.component.html',
   styleUrls: ['./register-school-page.component.scss'],
-  standalone: false
-
+  standalone: false,
 })
 export class RegisterSchoolPageComponent implements OnInit {
   @ViewChild(IonAccordionGroup, { static: true })
@@ -24,33 +24,32 @@ export class RegisterSchoolPageComponent implements OnInit {
     speed: 400,
     pagination: {
       el: '.swiper-pagination', // target class for bullets
-      clickable: true
+      clickable: true,
     },
     watchSlidesProgress: true,
     observeSlideChildren: true,
     observer: true,
     observeParents: true,
-
   };
   isFirst = true;
 
   isLast = false;
   appName = environment.appName;
-  privacyUrl1 = "https://opendatacommons.org/licenses/odbl/1-0/";
-  privacyUrl2 = "https://www.measurementlab.net/privacy/";
-  targetUrl = "_blank"
+  privacyUrl1 = 'https://opendatacommons.org/licenses/odbl/1-0/';
+  privacyUrl2 = 'https://www.measurementlab.net/privacy/';
+  targetUrl = '_blank';
   isPrivacyChecked = false;
-  constructor(public loading: LoadingService,
+  constructor(
+    public loading: LoadingService,
     private readonly router: Router,
     private settingsService: SettingsService,
     private translate: TranslateService
-
   ) {
     const appLang = this.settingsService.get('applicationLanguage');
     this.translate.use(appLang.code);
   }
 
-  ngOnInit() { }
+  ngOnInit() {}
 
   swipeNext() {
     this.slides.slideNext();
@@ -76,11 +75,21 @@ export class RegisterSchoolPageComponent implements OnInit {
       `<div class="loadContent"><ion-img src="assets/loader/new_loader.gif" class="loaderGif"></ion-img><p class="green_loader" >${translatedText}</p></div>`;
     this.loading.present(loadingMsg, 3000, 'pdcaLoaderClass', 'null');
     this.router.navigate(['/searchcountry']);
-
   }
 
   openExternalUrl(href) {
-    this.settingsService.getShell().shell.openExternal(href);
+    if (Capacitor.isNativePlatform()) {
+      this.openNativeAppBrowser(href);
+    } else {
+      this.settingsService.getShell().shell.openExternal(href);
+    }
+  }
+
+  async openNativeAppBrowser(href) {
+    await Browser.open({
+      url: href,
+      windowName: '_system', // ensures it uses external browser where possible
+    });
   }
   async checkCurrentSlide() {
     const index = await this.slides.getActiveIndex();
@@ -88,14 +97,14 @@ export class RegisterSchoolPageComponent implements OnInit {
 
     this.isFirst = index === 0;
     this.isLast = index === total - 1;
-    console.log(this.isFirst, this.isLast, index)
+    console.log(this.isFirst, this.isLast, index);
   }
 
   updatePaginationIndexClass(index: number) {
     const paginationEl = document.querySelector('.swiper-pagination');
     if (paginationEl) {
       // Remove previous index-* classes
-      paginationEl.classList.forEach(cls => {
+      paginationEl.classList.forEach((cls) => {
         if (cls.startsWith('index-')) {
           paginationEl.classList.remove(cls);
         }
@@ -106,7 +115,7 @@ export class RegisterSchoolPageComponent implements OnInit {
     }
   }
   handleBackClick() {
-    this.slides.getActiveIndex().then(index => {
+    this.slides.getActiveIndex().then((index) => {
       if (index === 0) {
         // First slide → go to home
         this.router.navigate(['/home']);
@@ -116,6 +125,4 @@ export class RegisterSchoolPageComponent implements OnInit {
       }
     });
   }
-
-
 }

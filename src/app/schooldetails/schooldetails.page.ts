@@ -5,11 +5,13 @@ import { SchoolService } from '../services/school.service';
 import { LoadingService } from '../services/loading.service';
 import { SettingsService } from '../services/settings.service';
 import { TranslateService } from '@ngx-translate/core';
+import { Capacitor } from '@capacitor/core';
+import { Browser } from '@capacitor/browser';
 @Component({
   selector: 'app-schooldetails',
   templateUrl: 'schooldetails.page.html',
   styleUrls: ['schooldetails.page.scss'],
-  standalone: false
+  standalone: false,
 })
 export class SchooldetailsPage {
   @ViewChild(IonAccordionGroup, { static: true })
@@ -41,7 +43,7 @@ export class SchooldetailsPage {
       this.schoolId = params.schoolId;
       this.selectedCountry = params.selectedCountry;
       this.detectedCountry = params.detectedCountry;
-      this.selectedCountryName = params.selectedCountryName
+      this.selectedCountryName = params.selectedCountryName;
       this.selectedSchool = {};
       this.searchSchoolBySchooIdAndCountryCode();
       //this.searchSchoolById(this.schoolId);
@@ -54,28 +56,28 @@ export class SchooldetailsPage {
    * @param id
    */
   searchSchoolById(id) {
-
-    this.translate.get('schoolDetails.searchSchool').subscribe((translatedText) => {
-      const loadingMsg = `
+    this.translate
+      .get('schoolDetails.searchSchool')
+      .subscribe((translatedText) => {
+        const loadingMsg = `
       <div class="loadContent">
         <ion-img src="assets/loader/new_loader.gif" class="loaderGif"></ion-img>
         <p class="green_loader">${translatedText}</p>
       </div>`;
 
-      this.loading.present(loadingMsg, 15000, 'pdcaLoaderClass', 'null');
-      this.schoolService.getById(id).subscribe(
-        (response) => {
-          this.schools = response;
-        },
-        (err) => {
-          this.loading.dismiss();
-        },
-        () => {
-          this.loading.dismiss();
-        }
-      );
-    })
-
+        this.loading.present(loadingMsg, 15000, 'pdcaLoaderClass', 'null');
+        this.schoolService.getById(id).subscribe(
+          (response) => {
+            this.schools = response;
+          },
+          (err) => {
+            this.loading.dismiss();
+          },
+          () => {
+            this.loading.dismiss();
+          }
+        );
+      });
   }
 
   /**
@@ -83,59 +85,58 @@ export class SchooldetailsPage {
    */
   searchSchoolBySchooIdAndCountryCode() {
     if (this.schoolId && this.selectedCountry) {
-      this.translate.get('schoolDetails.searchSchool').subscribe((translatedText) => {
-        const loadingMsg = `
+      this.translate
+        .get('schoolDetails.searchSchool')
+        .subscribe((translatedText) => {
+          const loadingMsg = `
           <div class="loadContent">
             <ion-img src="assets/loader/new_loader.gif" class="loaderGif"></ion-img>
             <p class="green_loader">${translatedText}</p>
           </div>`;
 
-        this.loading.present(loadingMsg, 15000, 'pdcaLoaderClass', 'null');
-        this.schoolService
-          .getBySchoolIdAndCountryCode(this.schoolId, this.selectedCountry)
-          .subscribe(
-            (response) => {
-              this.schools = response;
-              console.log(this.schools);
-            },
-            (err) => {
-              console.log('ERROR: ' + err);
-              this.loading.dismiss();
-              this.router.navigate([
-                'schoolnotfound',
-                this.schoolId,
-                this.selectedCountry,
-                this.detectedCountry,
-                this.selectedCountryName
-
-              ]);
-              /* Redirect to no result found page */
-            },
-            () => {
-              this.loading.dismiss();
-              if (this.schools.length > 0) {
-                this.router.navigate([
-                  'schooldetails',
-                  this.schoolId,
-                  this.selectedCountry,
-                  this.detectedCountry,
-                  this.selectedCountryName
-                ]);
-              } else {
-                /* Redirect to no result found page */
+          this.loading.present(loadingMsg, 15000, 'pdcaLoaderClass', 'null');
+          this.schoolService
+            .getBySchoolIdAndCountryCode(this.schoolId, this.selectedCountry)
+            .subscribe(
+              (response) => {
+                this.schools = response;
+                console.log(this.schools);
+              },
+              (err) => {
+                console.log('ERROR: ' + err);
+                this.loading.dismiss();
                 this.router.navigate([
                   'schoolnotfound',
                   this.schoolId,
                   this.selectedCountry,
                   this.detectedCountry,
-                  this.selectedCountryName
-
+                  this.selectedCountryName,
                 ]);
+                /* Redirect to no result found page */
+              },
+              () => {
+                this.loading.dismiss();
+                if (this.schools.length > 0) {
+                  this.router.navigate([
+                    'schooldetails',
+                    this.schoolId,
+                    this.selectedCountry,
+                    this.detectedCountry,
+                    this.selectedCountryName,
+                  ]);
+                } else {
+                  /* Redirect to no result found page */
+                  this.router.navigate([
+                    'schoolnotfound',
+                    this.schoolId,
+                    this.selectedCountry,
+                    this.detectedCountry,
+                    this.selectedCountryName,
+                  ]);
+                }
               }
-            }
-          );
-      })
-
+            );
+        });
     }
   }
 
@@ -147,7 +148,7 @@ export class SchooldetailsPage {
         this.selectedSchool.school_id,
         this.selectedCountry,
         this.detectedCountry,
-        this.selectedCountryName
+        this.selectedCountryName,
       ],
       { state: this.selectedSchool }
     );
@@ -155,13 +156,12 @@ export class SchooldetailsPage {
 
   backToSearchDetail(schoolObj) {
     this.selectedSchool = schoolObj;
-    this.router.navigate(
-      [
-        'searchschool',
-        this.selectedCountry,
-        this.detectedCountry,
-        this.selectedCountryName
-      ]);
+    this.router.navigate([
+      'searchschool',
+      this.selectedCountry,
+      this.detectedCountry,
+      this.selectedCountryName,
+    ]);
   }
 
   schoolSelection(schoolObj) {
@@ -178,7 +178,18 @@ export class SchooldetailsPage {
   }
 
   openExternalUrl(href) {
-    this.settingsService.getShell().shell.openExternal(href);
+    if (Capacitor.isNativePlatform()) {
+      this.openNativeAppBrowser(href);
+    } else {
+      this.settingsService.getShell().shell.openExternal(href);
+    }
+  }
+
+  async openNativeAppBrowser(href) {
+    await Browser.open({
+      url: href,
+      windowName: '_system', // ensures it uses external browser where possible
+    });
   }
 
   ngOnDestroy() {

@@ -4,7 +4,8 @@ import com.meter.giga.network.api.ApiService
 import com.meter.giga.utils.Constants.CLIENT_INFO_END_URL
 import com.meter.giga.utils.Constants.CLIENT_INFO_FALLBACK_END_URL
 import com.meter.giga.utils.Constants.SERVER_INFO_END_URL
-import com.meter.giga.utils.Constants.SPEED_TEST_END_URL
+import com.meter.giga.BuildConfig
+import com.meter.giga.BuildConfig.BASE_URL
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
@@ -45,7 +46,7 @@ object RetrofitInstanceBuilder {
    */
   val speedTestApi: ApiService by lazy {
     Retrofit.Builder()
-      .baseUrl(SPEED_TEST_END_URL)
+      .baseUrl(BASE_URL)
       .addConverterFactory(GsonConverterFactory.create())
       .build()
       .create(ApiService::class.java)

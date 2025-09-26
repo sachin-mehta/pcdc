@@ -11,6 +11,7 @@ import { PingResult, PingService } from './services/ping.service';
 import { IndexedDBService } from './services/indexed-db.service';
 import { SyncService } from './services/sync.service';
 import { Capacitor } from '@capacitor/core';
+import { Browser } from '@capacitor/browser';
 import { FirebaseCrashlytics } from '@capacitor-firebase/crashlytics';
 // const shell = require('electron').shell;
 @Component({
@@ -119,8 +120,18 @@ export class AppComponent {
     } else {
       this.initCrashlytics();
     }
+    this.setPlatformClass();
   }
 
+  private setPlatformClass() {
+    if (this.isNative) {
+      // Running as a native (Capacitor/Cordova) app
+      document.body.classList.add('is-native');
+    } else {
+      // Running as a web/windows app (browser/windows)
+      document.body.classList.add('is-web');
+    }
+  }
   async initCrashlytics() {
     // Enable crashlytics collection
     console.log(
@@ -292,7 +303,18 @@ export class AppComponent {
   }
 
   openExternalUrl(href) {
-    this.settingsService.getShell().shell.openExternal(href);
+    if (Capacitor.isNativePlatform()) {
+      this.openNativeAppBrowser(href);
+    } else {
+      this.settingsService.getShell().shell.openExternal(href);
+    }
+  }
+
+  async openNativeAppBrowser(href) {
+    await Browser.open({
+      url: href,
+      windowName: '_system', // ensures it uses external browser where possible
+    });
   }
 
   closeHelpenu() {

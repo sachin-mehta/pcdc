@@ -9,6 +9,7 @@ import { StorageService } from '../services/storage.service';
 import { checkRightGigaId, removeUnregisterSchool } from './home.utils';
 import { environment } from '../../environments/environment';
 import { Capacitor } from '@capacitor/core';
+import { Browser } from '@capacitor/browser';
 import { GigaAppPlugin } from '../android/giga-app-android-plugin';
 import { HistoryService } from '../services/history.service';
 
@@ -146,6 +147,17 @@ export class HomePage {
   }
 
   openExternalUrl(href) {
-    this.settingsService.getShell().shell.openExternal(href);
+    if (Capacitor.isNativePlatform()) {
+      this.openNativeAppBrowser(href);
+    } else {
+      this.settingsService.getShell().shell.openExternal(href);
+    }
+  }
+
+  async openNativeAppBrowser(href) {
+    await Browser.open({
+      url: href,
+      windowName: '_system', // ensures it uses external browser where possible
+    });
   }
 }
