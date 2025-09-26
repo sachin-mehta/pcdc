@@ -6,6 +6,7 @@ import { SearchschoolPage } from './searchschool.page';
 import { SharedModule } from '../shared/shared.module';
 import { SearchschoolPageRoutingModule } from './searchschool-routing.module';
 import { PcdcHeaderComponent } from '../pcdc-header/pcdc-header.component';
+import { EnterKeyClickDirective } from '../shared/directives/enter-key-click.directive';
 
 @NgModule({
   imports: [
@@ -15,6 +16,6 @@ import { PcdcHeaderComponent } from '../pcdc-header/pcdc-header.component';
     SearchschoolPageRoutingModule,
     SharedModule,
   ],
-  declarations: [SearchschoolPage, PcdcHeaderComponent],
+  declarations: [SearchschoolPage, PcdcHeaderComponent, EnterKeyClickDirective],
 })
 export class SearchschoolPageModule {}

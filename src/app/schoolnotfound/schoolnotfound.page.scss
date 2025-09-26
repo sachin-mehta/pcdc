@@ -43,10 +43,10 @@
      margin: 25px auto;
     }
     .unabletolocate-txt{
-      color: #51E12B;
+      color: red;
       text-align: center;
-      padding-top: 10px;
-      font-size: 13px;
+      font-size: 16px;
+      font-weight: 400;
     }
     .noschool-txt{
       color: $light-text2;
@@ -63,5 +63,20 @@
     font-size: 12px;
   }
 .bottom-layout{
-  padding: 0px 30px;
+  margin-bottom: 105px;
+}
+.try_again{
+  display: flex;
+  text-align: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 400;
+  padding: 10px;
+
+}
+.wrap_content {
+  margin: 0 50px;
+}
+.container {
+  margin: 24px 0 0 0;
 }

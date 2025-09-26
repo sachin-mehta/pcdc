@@ -26,7 +26,6 @@ import windowStateKeeper from 'electron-window-state';
 import { join } from 'path';
 import * as Sentry from '@sentry/node';
 import { Console } from 'console';
-import { Severity } from '@sentry/node';
 var AutoLaunch = require('auto-launch');
 var isQuiting = false;
 
@@ -34,7 +33,7 @@ var isQuiting = false;
 Sentry.init({
   dsn: 'https://e52e97fc558344bc80a218fc22a9a6a9@excubo.unicef.io/47',
   environment: 'production',
-  beforeSend: (event)=> {
+  beforeSend: (event) => {
     // Add app version to help with debugging
     event.extra = {
       ...event.extra,
@@ -196,11 +195,13 @@ export class ElectronCapacitorApp {
       y: this.mainWindowState?.y,
       width: this.mainWindowState?.width,
       height: this.mainWindowState?.height,
-      titleBarStyle: 'hidden',
+      // titleBarStyle: 'hidden',
       maximizable: false,
       minimizable: false,
-      resizable: true,
-      transparent: true,
+      resizable: false,
+      frame: true,
+      useContentSize: true, //Make content area exactly 390x700
+      transparent: false,
       webPreferences: {
         nodeIntegration: true,
         contextIsolation: true,
@@ -211,20 +212,23 @@ export class ElectronCapacitorApp {
     });
 
     // Add error tracking for renderer process
-    this.MainWindow?.webContents?.on('render-process-gone', (event, details) => {
-      const crashData = {
-        reason: details?.reason,
-        exitCode: details?.exitCode,
-        processType: 'renderer',
-      };
-      Sentry.captureException(new Error('Renderer Process Gone'), {
-        extra: crashData,
-      });
-    });
+    this.MainWindow?.webContents?.on(
+      'render-process-gone',
+      (event, details) => {
+        const crashData = {
+          reason: details?.reason,
+          exitCode: details?.exitCode,
+          processType: 'renderer',
+        };
+        Sentry.captureException(new Error('Renderer Process Gone'), {
+          extra: crashData,
+        });
+      }
+    );
 
     this.MainWindow?.on('unresponsive', () => {
       Sentry.captureMessage('Window became unresponsive', {
-        level: 'error',
+        level: Sentry.Severity.Error,
         extra: {
           windowId: this.MainWindow?.id,
         },
@@ -246,7 +250,7 @@ export class ElectronCapacitorApp {
       }
     );
 
-    this.MainWindow?.setSize(376, 550);
+    this.MainWindow?.setSize(390, 700);
     this.mainWindowState?.manage(this.MainWindow);
 
     if (this.CapacitorFileConfig?.backgroundColor) {
@@ -294,7 +298,9 @@ export class ElectronCapacitorApp {
     }
 
     // Setup the main manu bar at the top of our window.
-    if (this.CapacitorFileConfig?.electron?.appMenuBarMenuTemplateEnabled) {
+    if (
+      (this.CapacitorFileConfig.electron as any)?.appMenuBarMenuTemplateEnabled
+    ) {
       Menu.setApplicationMenu(
         Menu.buildFromTemplate(this.AppMenuBarMenuTemplate)
       );
@@ -327,7 +333,9 @@ export class ElectronCapacitorApp {
       }
     });
     this.MainWindow?.webContents?.on('will-navigate', (event, _newURL) => {
-      if (!this.MainWindow?.webContents?.getURL()?.includes(this.customScheme)) {
+      if (
+        !this.MainWindow?.webContents?.getURL()?.includes(this.customScheme)
+      ) {
         event.preventDefault();
       }
     });
@@ -359,9 +367,9 @@ export class ElectronCapacitorApp {
         }
       });
       setTimeout(() => {
-        if (this.CapacitorFileConfig?.electron?.electronIsDev) {
-          this.MainWindow?.webContents?.openDevTools();
-          this.MainWindow?.setSize(800, 600);
+        if ((this.CapacitorFileConfig.electron as any)?.electronIsDev) {
+          this.MainWindow.webContents.openDevTools();
+          this.MainWindow.setSize(390, 700);
         }
         CapElectronEventEmitter.emit(
           'CAPELECTRON_DeeplinkListenerInitialized',

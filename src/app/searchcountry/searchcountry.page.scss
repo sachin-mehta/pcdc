@@ -1,94 +1,212 @@
 @import '../../theme/variables.scss';
-.search-label{
-  padding: 20px 5px;  
-  color: $light-text2;
+
+.search-label {
+  padding: 0 5px 12px;
+  color: $text-color;
+  font-size: 16px;
+  font-weight: 400;
 }
-.search-label-error{
-  padding: 20px 5px;  
-  color: #b00f0f;
+
+.automatic_label {
+  padding: 6px 5px;
+  color: $text-color;
+  font-size: 12px;
+  font-weight: 400;
 }
-.ionList{
+
+.search-label-error {
+  padding: 4px 5px 16px;
+  color: #F94B4B;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.ionList {
   padding: 10px 30px;
 }
-.wrap{
-  margin-top:18px;
+
+.wrap {
+  margin-top: 18px;
   padding: 10px 30px;
 }
-.search {
-  width: 100%;
-  position: relative;
-  display: flex;
-  ion-icon{
-    color: #e2e2e2;
-  }
-}
+
 select {
   pointer-events: auto;
-}
-.searchTerm {
-  width: 100%;
-  border: 3px solid $color-blue;
-  border-right: none;
-  padding: 5px;
-  border-radius: 5px 0 0 5px;
-  outline: none;
-  color: #9DBFAF;
-}
-.searchTerm:focus{
-  color: #00B4CC;
-  --offset-top: 0px;
-  --offset-bottom: 0px;
-  --keyboard-offset: 0px;
-  
 }
 
 ion-select:hover {
   color: #fff;
 
 }
-.item.sc-ion-label-md-h, .item .sc-ion-label-md-h{
+
+.item.sc-ion-label-md-h,
+.item .sc-ion-label-md-h {
   color: #fff !important;
 }
 
-
-
-
 .searchCountry {
-  -webkit-app-region: no-drag ;
+  -webkit-app-region: no-drag;
   width: 100%;
-  border: 3px solid $color-blue;
- 
-  padding: 5px;
-  border-radius: 5px ;
+  border-bottom: 1px solid #6F6F6F; // change color and size as needed
+  border-top: none;
+  border-left: none;
+  border-right: none;
   outline: none;
   color: #fff;
+
 }
-.searchCountry:hover{
+
+::ng-deep {
+  .searchbar-input.sc-ion-searchbar-md {
+    box-shadow: none !important;
+    font-size: 14px;
+    font-weight: 400;
+
+  }
+
+  .sc-ion-searchbar-md-h {
+    padding: 0;
+  }
+
+  .searchbar-search-icon.sc-ion-searchbar-md {
+    left: 0;
+    display: none;
+  }
+  .searchbar-search-icon.sc-ion-searchbar-md.md.hydrated {
+    display: none;
+  }
+
+  .searchbar-clear-icon.sc-ion-searchbar-md {
+    width: 16px;
+    height: 16px;
+  }
+
+  .searchbar-input.sc-ion-searchbar-md {
+    padding-left: 0px;
+    padding-right: 30px;
+  }
+
+  .list-md {
+    z-index: 9999;
+    position: relative;
+    margin: 0 2px;
+    border-radius: 0px;
+  }
+}
+
+::ng-deep ion-item {
+  pointer-events: auto !important;
+  user-select: auto !important;
+  font-size: 20px !important;
+  font-weight: 400 !important;
+  font-family: "Open Sans";
+}
+
+.searchCountry:hover {
   color: #fff;
   --offset-top: 0px;
   --offset-bottom: 0px;
   --keyboard-offset: 0px;
-  
+
 }
 
-.bottom-layout{
-  position: absolute; 
-  padding: 0px 20px;
+.bottom-layout {
+  position: absolute;
+  padding: 0px 0;
   width: 100%;
   text-align: center;
 }
 
+.dropdown_list {
+  text-transform: none;
+  font-size: 14px !important;
+  font-weight: 400 !important;
 
+  &:hover {
+    background: none;
+  }
+}
 
-.searchButton {
-width: 40px;
-height: 40px;
-border: 1px solid;
-border-color: $color-blue;
-background: $color-blue;
-text-align: center;
-color: #fff;
-border-radius: 0 5px 5px 0;
-cursor: pointer;
-font-size: 20px;
+.scrollable {
+  max-height: 250px;
+  overflow: auto;
+  box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.50);
+  border: 1px solid #ccc;
+}
+
+.error {
+  font-size: 12px;
+  font-weight: 700;
+  color: #F94B4B;
+  line-height: 16px;
+  padding-top: 5px;
+  padding-bottom: 5px;
+}
+
+.margin_on_condition{
+  margin-left: 12px;
+}
+.img_wifi {
+  margin-left: 5px;
+}
+.change-country {
+  padding-top: 5px;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 16px;
+}
+.warning_color {
+  // border-color: #F1C21B;
+  border: 2px solid #F1C21B; // change color and size as needed
+
+}
+.error_color {
+  // border-color: #b00f0f;;
+  border: 2px solid #F94B4B;
+}
+
+.error_icon {
+  height: 16px;
+  width: 16px;
+  margin-top: 5px;
+}
+
+.error_message {
+  display: flex;
+}
+
+.red-dot {
+  background-color: #F94B4B;
+  border-radius: 50%;
+  display: inline-block;
+  margin-left: 4px;
+  margin-top: 9px;
+  height: 4px;
+  width: 5px;
+
+}
+
+.half-border-bottom::after {
+  content: "";
+  display: block;
+  width: 100%;
+  border-bottom: 1px solid #ccc;
+  margin-top: 10px; /* space between content and border */
+}
+::ng-deep {
+  ion-list {
+
+    // Target WebKit browsers (Chrome, Edge, Safari)
+  &::-webkit-scrollbar {
+      width: 8px;
+    }
+    &::-webkit-scrollbar-thumb {  
+      border-radius: 4px;
+      border: 2px solid transparent;
+    }  
+    scrollbar-color: #a3acbb transparent;
+    scrollbar-width: thin;
+  }
+  
+   
 }

@@ -2,11 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { environment as env } from '../../environments/environment';
 import { SettingsService } from '../services/settings.service';
+import { MenuController } from '@ionic/angular';
 
 @Component({
-  selector: 'app-pcdc-header',
-  templateUrl: './pcdc-header.component.html',
-  styleUrls: ['./pcdc-header.component.scss'],
+    selector: 'app-pcdc-header',
+    templateUrl: './pcdc-header.component.html',
+    styleUrls: ['./pcdc-header.component.scss'],
+    standalone: false
 })
 export class PcdcHeaderComponent implements OnInit {
   languages = env?.languages ?? [];
@@ -17,7 +19,8 @@ export class PcdcHeaderComponent implements OnInit {
   appNameSuffix = env?.appNameSuffix ?? '';
   constructor(
     private translate: TranslateService,
-    private settingsService: SettingsService
+    private settingsService: SettingsService,
+    private menuCtrl: MenuController
   ) {
     // Retrieve the selected language from local storage if it exists
     this.selectedLanguage =
@@ -25,26 +28,33 @@ export class PcdcHeaderComponent implements OnInit {
       translate.defaultLang;
     this.selectedLanguageName = this.languages.find(
       (l) => l?.code === this.selectedLanguage
-    )?.name ?? '';
+    )?.label ?? '';
     translate.use(this.selectedLanguage);
     this.test = env?.mode === 'dev';
   }
   ngOnInit() { }
   onLanguageChange() {
+    this.menuCtrl.enable(true, 'third'); // Ensure the menu is enabled
+    this.menuCtrl.open('third');     
     // Update local storage when the language changes
-    this.settingsService.setSetting(
-      'applicationLanguage',
-      this.languages.find((l) => l?.code === this.selectedLanguage)
-    );
-    this.selectedLanguageName = this.languages.find(
-      (l) => l?.code === this.selectedLanguage
-    )?.name ?? '';
-    window.location.reload();
+    // this.settingsService.setSetting(
+    //   'applicationLanguage',
+    //   this.languages.find((l) => l?.code === this.selectedLanguage)
+    // );
+    // this.selectedLanguageName = this.languages.find(
+    //   (l) => l?.code === this.selectedLanguage
+    // )?.name ?? '';
+    // window.location.reload();
   }
   closeApp() {
     this.settingsService
       .getIpcRenderer()
-      ?.ipcRenderer
-      ?.send('closeFromUi', 'minimize');
+      .send('closeFromUi', 'minimize');
+  }
+
+  openMenu(menuId: string) {
+    this.menuCtrl.enable(true, menuId);
+
+    this.menuCtrl.open(menuId);
   }
 }

@@ -6,9 +6,10 @@ import { TranslateService } from '@ngx-translate/core';
 import { SettingsService } from '../services/settings.service';
 
 @Component({
-  selector: 'app-invalidlocation',
-  templateUrl: 'invalidlocation.page.html',
-  styleUrls: ['invalidlocation.page.scss'],
+    selector: 'app-invalidlocation',
+    templateUrl: 'invalidlocation.page.html',
+    styleUrls: ['invalidlocation.page.scss'],
+    standalone: false
 })
 export class InvalidLocationPage {
   @ViewChild(IonAccordionGroup, { static: true })

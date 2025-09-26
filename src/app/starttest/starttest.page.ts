@@ -4,6 +4,7 @@ import {
   ViewChild,
   ChangeDetectorRef,
   ElementRef,
+  OnDestroy,
 } from '@angular/core';
 import { IonAccordionGroup, ModalController } from '@ionic/angular';
 import { ActivatedRoute, Router } from '@angular/router';
@@ -19,16 +20,22 @@ import { SharedService } from '../services/shared-service.service';
 import { HistoryService } from '../services/history.service';
 import { TranslateService } from '@ngx-translate/core';
 import { StorageService } from '../services/storage.service';
+import { Subscription } from 'rxjs';
+import { CountryService } from '../services/country.service';
+import { mlabInformation, accessInformation } from '../models/models';
+import { FirstTestSuccessModalComponent } from '../components/first-test-success-modal/first-test-success-modal.component';
 
 @Component({
   selector: 'app-starttest',
   templateUrl: 'starttest.page.html',
   styleUrls: ['starttest.page.scss'],
+  standalone: false,
 })
-export class StarttestPage implements OnInit {
+export class StarttestPage implements OnInit, OnDestroy {
   @ViewChild(IonAccordionGroup, { static: true })
   accordionGroup: IonAccordionGroup;
   @ViewChild('errorMsg') el: ElementRef;
+  progress: number = 0; // Progress in percentage (0-100)
   currentState = undefined;
   currentRate = undefined;
   currentRateUpload = undefined;
@@ -40,6 +47,7 @@ export class StarttestPage implements OnInit {
   isErrorClosed = false;
   connectionInformation: any;
   lastMeasurementId: number;
+  selectedCountry: string;
   mlabInformation = {
     city: '',
     url: '',
@@ -50,6 +58,8 @@ export class StarttestPage implements OnInit {
     label: '',
     metro: '',
   };
+  measurementISP: any;
+  measurementnetworkServer: any;
   accessInformation = {
     ip: '',
     city: '',
@@ -67,6 +77,9 @@ export class StarttestPage implements OnInit {
     asn: '',
   };
   isLoaded = false;
+  downloadStarted = false;
+  uploadStarted = false;
+
   progressGaugeState = {
     type: 'full',
     minimum: 0,
@@ -82,6 +95,22 @@ export class StarttestPage implements OnInit {
   public currentDate: any;
   public connectionStatus: any;
   private sub: any;
+  private downloadSub!: Subscription;
+  private uploadSub!: Subscription;
+  private downloadStartedSub!: Subscription;
+  private uploadStartedSub!: Subscription;
+
+  downloadTimer: any;
+  uploadTimer: any;
+  uploadProgressStarted = false; // To ensure we start upload animation only once
+  school: any;
+
+  // Registration banner properties
+  isFirstVisit: boolean = false;
+  showRegistrationBanner: boolean = false;
+  registrationStatus: 'completed' | 'testing' | 'done' = 'completed';
+  firstTestTriggered: boolean = false;
+
   constructor(
     private route: ActivatedRoute,
     public loading: LoadingService,
@@ -98,8 +127,13 @@ export class StarttestPage implements OnInit {
     private historyService: HistoryService,
     public translate: TranslateService,
     private ref: ChangeDetectorRef,
-    private storage: StorageService
+    private storage: StorageService,
+    private countryService: CountryService
   ) {
+    if (this.storage.get('schoolId')) {
+      this.school = JSON.parse(this.storage.get('schoolInfo'));
+      console.log(this.school, 'heheh');
+    }
     this.onlineStatus = navigator.onLine;
     this.route.params.subscribe((params) => {
       if (this.onlineStatus) {
@@ -121,6 +155,7 @@ export class StarttestPage implements OnInit {
         // Re-sync data with server.
         try {
           console.log('Online');
+          this.progress = 0;
           this.onlineStatus = true;
           this.currentState = undefined;
           this.currentRate = undefined;
@@ -157,6 +192,78 @@ export class StarttestPage implements OnInit {
     }
   }
   ngOnInit() {
+    this.schoolId = this.storage.get('schoolId');
+
+    // CRITICAL: Set up all event listeners FIRST before any auto-trigger logic
+    this.setupEventListeners();
+    this.setupServiceSubscriptions();
+
+    // Initialize country information
+    this.initializeCountryData();
+
+    // Load historical data
+    this.refreshHistory();
+    this.loadLatestMeasurement();
+
+    // IMPORTANT: Check for first-time visit LAST to ensure all event listeners are ready
+    this.checkFirstTimeVisit();
+  }
+
+  /**
+   * Set up all SharedService event listeners
+   */
+  private setupEventListeners() {
+    console.log('Setting up SharedService event listeners');
+
+    // Critical: measurement:status listener must be registered before any auto-trigger
+    this.sharedService.on('measurement:status', this.driveGauge.bind(this));
+    this.sharedService.on(
+      'history:measurement:change',
+      this.refreshHistory.bind(this)
+    );
+    this.sharedService.on('history:reset', this.refreshHistory.bind(this));
+  }
+
+  /**
+   * Set up all service subscriptions
+   */
+  private setupServiceSubscriptions() {
+    console.log('Setting up service subscriptions');
+
+    this.downloadSub =
+      this.measurementClientService.downloadComplete$.subscribe((data) => {
+        this.downloadStarted = false;
+        if (this.downloadTimer) {
+          clearInterval(this.downloadTimer);
+        }
+        this.progress = 50;
+        this.ref.markForCheck();
+      });
+
+    this.downloadStartedSub =
+      this.measurementClientService.downloadStarted$.subscribe((data) => {
+        this.downloadStarted = true;
+        this.uploadStarted = false;
+      });
+
+    this.uploadStartedSub =
+      this.measurementClientService.uploadStarted$.subscribe((data) => {
+        this.uploadStarted = true;
+        this.downloadStarted = false;
+      });
+
+    this.uploadSub = this.measurementClientService.uploadComplete$.subscribe(
+      (data) => {
+        this.uploadStarted = false;
+        if (this.uploadTimer) {
+          clearInterval(this.uploadTimer);
+        }
+        this.progress = 100;
+        this.ref.markForCheck();
+      }
+    );
+
+    // Set up window event listeners
     window.addEventListener(
       'online',
       () => {
@@ -172,13 +279,23 @@ export class StarttestPage implements OnInit {
       },
       false
     );
-    this.sharedService.on('measurement:status', this.driveGauge.bind(this));
-    this.sharedService.on(
-      'history:measurement:change',
-      this.refreshHistory.bind(this)
-    );
-    this.sharedService.on('history:reset', this.refreshHistory.bind(this));
-    this.refreshHistory();
+  }
+
+  /**
+   * Initialize country-related data
+   */
+  private initializeCountryData() {
+    if (this.school?.country) {
+      this.countryService.getPcdcCountryByCode(this.school.country).subscribe(
+        (response) => {
+          this.selectedCountry = response[0].name;
+        },
+        (err) => {
+          console.log('ERROR: ' + err);
+          this.loading.dismiss();
+        }
+      );
+    }
   }
 
   measureReady() {
@@ -191,23 +308,135 @@ export class StarttestPage implements OnInit {
   }
 
   tryConnectivity() {
-    let loadingMsg =
-      '<div class="loadContent"><ion-img src="assets/loader/loader.gif" class="loaderGif"></ion-img><p class="white">Fetching Internet Provider Info...</p></div>';
-    this.loading.present(loadingMsg, 15000, 'pdcaLoaderClass', 'null');
-    this.networkService.getNetInfo().then((res) => {
-      this.connectionStatus = 'success';
-      if (this.loading.isStillLoading()) {
-        this.loading.dismiss();
-      }
-      if (res) {
-        this.accessInformation = res;
-      }
+    const translatedText = this.translate.instant('searchCountry.loading');
+
+    this.translate.get('searchCountry.loading').subscribe((translatedText) => {
+      const loadingMsg = `
+      <div class="loadContent">
+        <ion-img src="assets/loader/new_loader.gif" class="loaderGif"></ion-img>
+        <p class="green_loader">${translatedText}</p>
+      </div>`;
+
+      this.loading.present(loadingMsg, 15000, 'pdcaLoaderClass', 'null');
+      this.networkService.getNetInfo().then((res) => {
+        this.connectionStatus = 'success';
+        if (this.loading.isStillLoading()) {
+          this.loading.dismiss();
+        }
+        if (res) {
+          this.accessInformation = res;
+          console.log(this.accessInformation);
+        }
+      });
     });
   }
 
   refreshHistory() {
     let data = this.historyService.get();
     this.lastMeasurementId = data.measurements.length - 1;
+
+    // Load latest measurement data for dashboard display
+    this.loadLatestMeasurement();
+  }
+
+  /**
+   * Load the latest measurement data to display in the Latest measurements section
+   */
+  loadLatestMeasurement() {
+    try {
+      let historicalData = this.historyService.get();
+
+      // If we have measurement data, load the latest one
+      if (
+        historicalData &&
+        historicalData.measurements &&
+        historicalData.measurements.length > 0
+      ) {
+        const latestMeasurement =
+          historicalData.measurements[historicalData.measurements.length - 1];
+
+        // Populate the dashboard's latest measurement display with historical data
+        if (
+          latestMeasurement.results &&
+          latestMeasurement.results['NDTResult.S2C'] &&
+          latestMeasurement.results['NDTResult.C2S']
+        ) {
+          // Set download and upload rates
+          const downloadMbps =
+            latestMeasurement.results['NDTResult.S2C'].LastClientMeasurement
+              ?.MeanClientMbps;
+          const uploadMbps =
+            latestMeasurement.results['NDTResult.C2S'].LastClientMeasurement
+              ?.MeanClientMbps;
+
+          this.currentRateDownload = downloadMbps
+            ? downloadMbps.toFixed(2)
+            : undefined;
+          this.currentRateUpload = uploadMbps
+            ? uploadMbps.toFixed(2)
+            : undefined;
+
+          // Calculate latency
+          const s2cMinRTT =
+            latestMeasurement.results['NDTResult.S2C'].LastServerMeasurement
+              ?.BBRInfo?.MinRTT;
+          const c2sMinRTT =
+            latestMeasurement.results['NDTResult.C2S'].LastServerMeasurement
+              ?.BBRInfo?.MinRTT;
+
+          if (s2cMinRTT && c2sMinRTT) {
+            this.latency = ((s2cMinRTT + c2sMinRTT) / 2 / 1000).toFixed(0);
+          }
+
+          // Set the date from the stored timestamp
+          if (latestMeasurement.timestamp) {
+            this.currentDate = new Date(latestMeasurement.timestamp);
+          }
+
+          // Update server and ISP information
+          if (latestMeasurement.mlabInformation?.city) {
+            this.measurementnetworkServer =
+              latestMeasurement.mlabInformation.city;
+          }
+          if (latestMeasurement.accessInformation?.org) {
+            this.measurementISP = latestMeasurement.accessInformation.org;
+          }
+
+          // Trigger change detection to update the UI
+          this.ref.markForCheck();
+
+          console.log('Loaded latest measurement data for dashboard display', {
+            download: this.currentRateDownload,
+            upload: this.currentRateUpload,
+            latency: this.latency,
+            date: this.currentDate,
+            server: this.measurementnetworkServer,
+            isp: this.measurementISP,
+          });
+        }
+      } else {
+        // No historical data, reset display values
+        this.clearLatestMeasurementDisplay();
+        console.log(
+          'No historical measurement data found, cleared dashboard display'
+        );
+      }
+    } catch (error) {
+      console.error('Error loading latest measurement data:', error);
+      this.clearLatestMeasurementDisplay();
+    }
+  }
+
+  /**
+   * Clear the latest measurement display values
+   */
+  private clearLatestMeasurementDisplay() {
+    this.currentRateDownload = undefined;
+    this.currentRateUpload = undefined;
+    this.latency = undefined;
+    this.currentDate = undefined;
+    this.measurementnetworkServer = undefined;
+    this.measurementISP = undefined;
   }
 
   openFirst() {
@@ -229,46 +458,175 @@ export class StarttestPage implements OnInit {
 
   startNDT() {
     try {
+      this.uploadProgressStarted = false;
+      this.downloadStarted = false;
+      this.uploadStarted = false;
+      this.measurementnetworkServer = '';
+      this.measurementISP = '';
+      this.progress = 0;
+
+      // Clear any ongoing timers
+      if (this.downloadTimer) {
+        clearInterval(this.downloadTimer);
+        this.downloadTimer = null;
+      }
+      if (this.uploadTimer) {
+        clearInterval(this.uploadTimer);
+        this.uploadTimer = null;
+      }
+
       this.currentState = 'Starting';
       this.uploadStatus = undefined;
+      this.latency = undefined;
       this.connectionStatus = '';
+      this.uploadProgressStarted = false;
       this.measurementClientService.runTest();
     } catch (e) {
       console.log(e);
     }
   }
 
+  startDownloadProgress() {
+    const target = 50;
+    const duration = 10000; // total animation duration in ms (10 seconds)
+    const interval = 200; // update every 200ms
+    const steps = duration / interval;
+    const stepSize = (target - this.progress) / steps;
+
+    // Clear existing timer
+    if (this.downloadTimer) {
+      clearInterval(this.downloadTimer);
+      this.downloadTimer = null;
+    }
+
+    // Reset progress if needed
+    if (this.progress > target) {
+      this.progress = 0;
+    }
+
+    let elapsedSteps = 0;
+
+    this.downloadTimer = setInterval(() => {
+      if (this.downloadStarted && this.progress < target) {
+        this.progress += stepSize;
+        elapsedSteps++;
+
+        if (this.progress >= target || elapsedSteps >= steps) {
+          this.progress = target;
+          clearInterval(this.downloadTimer);
+          this.downloadTimer = null;
+        }
+
+        this.ref.detectChanges(); // trigger UI update
+      } else {
+        clearInterval(this.downloadTimer);
+        this.downloadTimer = null;
+      }
+    }, interval);
+  }
+
+  // Animate progress from 50 to 100
+  startUploadProgress() {
+    const target = 100;
+    const interval = 200; // update every 50ms
+    this.uploadTimer = setInterval(() => {
+      if (this.progress < target) {
+        this.progress += 1;
+        if (this.progress >= target) {
+          this.progress = target;
+          clearInterval(this.uploadTimer);
+        }
+        this.ref.markForCheck();
+      } else {
+        clearInterval(this.uploadTimer);
+      }
+    }, interval);
+  }
+
   driveGauge(event, data) {
     if (event === 'measurement:status') {
-      console.log({ data });
+      console.log('driveGauge called with measurement:status event', { data });
+      console.log(
+        'isFirstVisit:',
+        this.isFirstVisit,
+        'registrationStatus:',
+        this.registrationStatus
+      );
+      if (data.testStatus === 'error') {
+        this.connectionStatus = 'error';
+        this.currentRate = 'error';
+      }
       if (data.testStatus === 'onstart') {
         this.currentState = 'Starting';
         this.currentRate = undefined;
         this.currentRateUpload = undefined;
         this.currentRateDownload = undefined;
+        this.progress = 0;
       } else if (data.testStatus === 'interval_c2s') {
         console.log('Running Test (Upload)');
         this.currentState = 'Running Test (Upload)';
         this.currentRate = (
-          (data.passedResults.Data.TCPInfo.BytesReceived / data.passedResults.Data.TCPInfo.ElapsedTime) *
+          (data.passedResults.Data.TCPInfo.BytesReceived /
+            data.passedResults.Data.TCPInfo.ElapsedTime) *
           8
         ).toFixed(2);
         this.currentRateUpload = this.currentRate;
+        if (!this.uploadProgressStarted) {
+          this.uploadProgressStarted = true;
+          this.startUploadProgress();
+        }
       } else if (data.testStatus === 'interval_s2c') {
         this.currentState = 'Running Test (Download)';
         this.currentRate = data.passedResults.Data.MeanClientMbps?.toFixed(2);
-        this.currentRateDownload = data.passedResults.Data.MeanClientMbps?.toFixed(2);
+        this.currentRateDownload =
+          data.passedResults.Data.MeanClientMbps?.toFixed(2);
+        if (this.downloadStarted) {
+          this.startDownloadProgress();
+        }
       } else if (data.testStatus === 'complete') {
         this.currentState = 'Completed';
         this.currentDate = new Date();
-        this.currentRate = data.passedResults['NDTResult.S2C'].LastClientMeasurement.MeanClientMbps?.toFixed(2);
-        this.currentRateUpload = data.passedResults['NDTResult.C2S'].LastClientMeasurement.MeanClientMbps?.toFixed(2);
-        this.currentRateDownload = data.passedResults['NDTResult.S2C'].LastClientMeasurement.MeanClientMbps?.toFixed(2);
+        this.currentRate =
+          data.passedResults[
+            'NDTResult.S2C'
+          ].LastClientMeasurement.MeanClientMbps?.toFixed(2);
+        this.currentRateUpload =
+          data.passedResults[
+            'NDTResult.C2S'
+          ].LastClientMeasurement.MeanClientMbps?.toFixed(2);
+        this.currentRateDownload =
+          data.passedResults[
+            'NDTResult.S2C'
+          ].LastClientMeasurement.MeanClientMbps?.toFixed(2);
         this.progressGaugeState.current = this.progressGaugeState.maximum;
-        this.latency = ((data.passedResults['NDTResult.S2C'].LastServerMeasurement.BBRInfo.MinRTT +
-          data.passedResults['NDTResult.C2S'].LastServerMeasurement.BBRInfo.MinRTT) / 2 / 1000).toFixed(0);
+        this.latency = (
+          (data.passedResults['NDTResult.S2C'].LastServerMeasurement.BBRInfo
+            .MinRTT +
+            data.passedResults['NDTResult.C2S'].LastServerMeasurement.BBRInfo
+              .MinRTT) /
+          2 /
+          1000
+        ).toFixed(0);
+        let historicalData = this.historyService.get();
+        if (
+          historicalData !== null &&
+          historicalData !== undefined &&
+          historicalData.measurements.length
+        ) {
+          this.measurementnetworkServer =
+            historicalData.measurements[
+              historicalData.measurements.length - 1
+            ].mlabInformation.city;
+          this.measurementISP =
+            historicalData.measurements[
+              historicalData.measurements.length - 1
+            ].accessInformation.org;
+        }
         this.ref.markForCheck();
         this.refreshHistory();
+
+        // Handle first test completion for new registrations
+        this.handleFirstTestCompletion();
       } else if (data.testStatus === 'onerror') {
         this.gaugeError();
         this.currentState = undefined;
@@ -293,7 +651,7 @@ export class StarttestPage implements OnInit {
       buttons: [
         {
           text: 'Okay',
-          handler: () => { },
+          handler: () => {},
         },
       ],
     });
@@ -313,7 +671,7 @@ export class StarttestPage implements OnInit {
       buttons: [
         {
           text: 'Okay',
-          handler: () => { },
+          handler: () => {},
         },
       ],
     });
@@ -322,5 +680,120 @@ export class StarttestPage implements OnInit {
 
   gaugeError() {
     this.progressGaugeState.current = this.progressGaugeState.maximum;
+  }
+
+  /**
+   * Check if this is the first visit after registration
+   */
+  checkFirstTimeVisit() {
+    this.isFirstVisit = this.storage.getFirstTimeVisit();
+
+    if (this.isFirstVisit && this.storage.isRecentRegistration()) {
+      // if (1) {
+      this.showRegistrationBanner = true;
+      this.registrationStatus = 'completed';
+
+      // Auto-trigger first test after a short delay
+      setTimeout(() => {
+        this.autoTriggerFirstTest();
+      }, 2000); // 2 second delay to show the banner first
+    } else if (this.isFirstVisit) {
+      // Clear stale first visit flag if registration is old
+      this.storage.clearFirstTimeVisit();
+      this.isFirstVisit = false;
+    }
+  }
+
+  /**
+   * Auto-trigger the first test for new registrations
+   */
+  autoTriggerFirstTest() {
+    if (
+      !this.firstTestTriggered &&
+      this.onlineStatus &&
+      this.currentState === undefined
+    ) {
+      this.firstTestTriggered = true;
+      this.registrationStatus = 'testing';
+
+      console.log(
+        'Auto-triggering first test for new registration - event listeners are ready'
+      );
+
+      // Additional safety: ensure driveGauge listener is registered
+      if (
+        this.sharedService.listeners &&
+        this.sharedService.listeners['measurement:status']
+      ) {
+        console.log('Confirmed: measurement:status listener is registered');
+      } else {
+        console.warn(
+          'Warning: measurement:status listener may not be registered yet'
+        );
+      }
+
+      this.startNDT();
+    } else {
+      console.log('Auto-trigger conditions not met:', {
+        firstTestTriggered: this.firstTestTriggered,
+        onlineStatus: this.onlineStatus,
+        currentState: this.currentState,
+      });
+    }
+  }
+
+  /**
+   * Dismiss the registration banner
+   */
+  dismissBanner() {
+    this.showRegistrationBanner = false;
+    if (this.isFirstVisit) {
+      this.storage.clearFirstTimeVisit();
+      this.isFirstVisit = false;
+    }
+  }
+
+  /**
+   * Handle test completion for first-time users
+   */
+  async handleFirstTestCompletion() {
+    if (this.isFirstVisit && this.registrationStatus === 'testing') {
+      this.registrationStatus = 'done';
+
+      // Show success modal after a short delay
+      setTimeout(async () => {
+        await this.showFirstTestSuccessModal();
+      }, 1000);
+    }
+  }
+
+  /**
+   * Show the first test success modal
+   */
+  async showFirstTestSuccessModal() {
+    const modal = await this.modalController.create({
+      component: FirstTestSuccessModalComponent,
+      cssClass: 'first-test-success-modal',
+      backdropDismiss: true,
+      componentProps: {
+        schoolInfo: this.school,
+        selectedCountry: this.selectedCountry,
+        schoolId: this.schoolId,
+      },
+    });
+
+    modal.onDidDismiss().then(() => {
+      // Clear first visit flag and dismiss banner after modal is closed
+      this.dismissBanner();
+    });
+
+    return await modal.present();
+  }
+
+  ngOnDestroy() {
+    this.downloadSub.unsubscribe();
+    this.uploadSub.unsubscribe();
+    this.downloadStartedSub.unsubscribe();
+    this.uploadStartedSub.unsubscribe();
   }
 }

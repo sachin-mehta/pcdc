@@ -6,6 +6,7 @@ import { SearchcountryPage } from './searchcountry.page';
 import { SharedModule } from '../shared/shared.module';
 import { SearchcountryPageRoutingModule } from './searchcountry-routing.module';
 import { PcdcHeaderComponent } from '../pcdc-header/pcdc-header.component';
+import { EnterKeyClickDirective } from '../shared/directives/enter-key-click.directive';
 
 @NgModule({
   imports: [
@@ -17,6 +18,6 @@ import { PcdcHeaderComponent } from '../pcdc-header/pcdc-header.component';
     SearchcountryPageRoutingModule,
     SharedModule,
   ],
-  declarations: [SearchcountryPage, PcdcHeaderComponent],
+  declarations: [SearchcountryPage, PcdcHeaderComponent, EnterKeyClickDirective],
 })
 export class SearchcountryPageModule {}

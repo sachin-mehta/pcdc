@@ -1,11 +1,11 @@
 <app-pcdc-header></app-pcdc-header>
 <ion-content>
   <div class="container">
-    <ion-slides pager="true" [options]="slideOpts" (ionSlideReachEnd)="reachedEnd()" class="schoolsuccess" #mySlider>
+    <ion-slides  [options]="slideOpts"  (ionSlideReachEnd)="reachedEnd()" (ionSlideWillChange)="checkCurrentSlide()" class="schoolsuccess" #mySlider>
       <ion-slide>
         <div class="top-layout">
           <div class="successInfo">
-            <ion-img src="assets/images/Congratulations_Icon.png" class="icon1"></ion-img>
+            <ion-img src="assets/images/Congratulations_Icon.svg" class="icon1"></ion-img>
             <div class="success-txt" [translate]="'schoolSuccess.congratulations'"></div>
             <div class="success-desc-txt" [innerHtml]="'schoolSuccess.school-registered' | translate:{ appName }"></div>
           </div>
@@ -14,7 +14,7 @@
       <ion-slide>
         <div class="top-layout">
           <div class="successInfo">
-            <ion-img src="assets/images/Daily_Check_is_Set_Icon.png" class="icon2"></ion-img>
+            <ion-img src="assets/images/Daily_Check_is_Set_Icon.svg" class="icon2"></ion-img>
             <div class="success-txt" [innerHtml]="'schoolSuccess.success-txt' | translate"></div>
             <div class="success-desc-txt" [innerHtml]="'schoolSuccess.internet-checks' | translate"></div>
           </div>
@@ -23,18 +23,22 @@
       <ion-slide>
         <div class="top-layout">
           <div class="successInfo">
-            <ion-img src="assets/images/App_Run Background_Icon.png" class="icon3"></ion-img>
+            <ion-img src="assets/images/app_run.svg" class="icon3"></ion-img>
             <div class="success-txt" [innerHtml]="'schoolSuccess.app-run' | translate"></div>
             <div class="success-desc-txt" [innerHtml]="'schoolSuccess.app-run-desc' | translate"></div>
+            <div class="success-desc-txt" [innerHtml]="'schoolSuccess.you-can-close' | translate"></div>
+
           </div>
         </div>
       </ion-slide>
     </ion-slides>
+    <div class="swiper-pagination"></div>
+
     <div class="bottom-layout">
-      <ion-button color="primary" (click)="swipeNext()" class="dailycheck_btn" *ngIf="!isLast"
-        [translate]="'next'"></ion-button>
-      <ion-button color="primary" (click)="moveToStartTest()" class="dailycheck_btn" *ngIf="isLast"
-        [translate]="'next'"></ion-button>
+      <ion-button color="primary" appEnterKeyClick (click)="swipeNext()" class="dailycheck_btn btn_margin" *ngIf="!isLast"
+         [translate]="'next'"></ion-button>
+      <ion-button color="primary" appEnterKeyClick (click)="moveToStartTest()" class="dailycheck_btn btn_margin" *ngIf="isLast"
+      [translate]="'schoolSuccess.go-dashboard'"></ion-button>
     </div>
   </div>
 </ion-content>

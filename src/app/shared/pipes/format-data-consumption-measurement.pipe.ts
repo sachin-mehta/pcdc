@@ -1,7 +1,8 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-  name: 'formatDataConsumptionMeasurement'
+    name: 'formatDataConsumptionMeasurement',
+    standalone: false
 })
 export class FormatDataConsumptionMeasurementPipe implements PipeTransform {
 

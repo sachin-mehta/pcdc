@@ -18,6 +18,7 @@ import { TranslateService } from '@ngx-translate/core';
   selector: 'app-confirmschool',
   templateUrl: 'confirmschool.page.html',
   styleUrls: ['confirmschool.page.scss'],
+  standalone: false,
 })
 export class ConfirmschoolPage {
   @ViewChild(IonAccordionGroup, { static: true })
@@ -25,6 +26,8 @@ export class ConfirmschoolPage {
   school: any;
   schoolId: any;
   selectedCountry: any;
+  selectedCountryName: any;
+  showNotification = true;
   detectedCountry: any;
   sub: any;
   appName = environment.appName;
@@ -45,6 +48,8 @@ export class ConfirmschoolPage {
       this.schoolId = params.schoolId;
       this.selectedCountry = params.selectedCountry;
       this.detectedCountry = params.detectedCountry;
+      this.selectedCountryName = params.selectedCountryName;
+
       if (this.router.getCurrentNavigation()) {
         this.school = this.router.getCurrentNavigation().extras.state as School;
       }
@@ -59,9 +64,9 @@ export class ConfirmschoolPage {
       new Date(),
       'yyyy-MM-ddah:mm:ssZZZZZ'
     );
+    const translatedText = this.translate.instant('searchCountry.loading');
 
-    const loadingMsg =
-      '<div class="loadContent"><ion-img src="assets/loader/loader.gif" class="loaderGif"></ion-img><p class="white">Loading...</p></div>';
+    const loadingMsg = `<div class="loadContent"><ion-img src="assets/loader/new_loader.gif" class="loaderGif"></ion-img><p class="green_loader">${translatedText}</p></div>`;
     this.loading.present(loadingMsg, 4000, 'pdcaLoaderClass', 'null');
 
     // this.networkService.getAccessInformation().subscribe(c => {
@@ -70,7 +75,7 @@ export class ConfirmschoolPage {
         this.getDeviceId().then((b) => {
           schoolData = {
             giga_id_school: this.school.giga_id_school,
-            mac_address: b.uuid,
+            mac_address: b.identifier,
             os: a.operatingSystem,
             app_version: environment.app_version,
             created: today,
@@ -86,7 +91,7 @@ export class ConfirmschoolPage {
             .registerSchoolDevice(schoolData)
             .subscribe((response) => {
               this.storage.set('deviceType', a.operatingSystem);
-              this.storage.set('macAddress', b.uuid);
+              this.storage.set('macAddress', b.identifier);
               this.storage.set('schoolUserId', response);
               this.storage.set('schoolId', this.schoolId);
               this.storage.set('gigaId', this.school.giga_id_school);
@@ -96,8 +101,15 @@ export class ConfirmschoolPage {
               this.storage.set('country_code', this.selectedCountry);
               this.storage.set('school_id', this.school.school_id);
               this.storage.set('schoolInfo', JSON.stringify(this.school));
+
+              // Set first-time visit flags for new registration flow
+              this.storage.setFirstTimeVisit(true);
+              this.storage.setRegistrationCompleted(Date.now());
+
               this.loading.dismiss();
-              this.router.navigate(['/schoolsuccess']);
+              // Redirect directly to dashboard instead of success page
+              this.router.navigate(['/starttest']);
+
               this.settings.setSetting('scheduledTesting', true);
             }),
             (err) => {
@@ -107,6 +119,7 @@ export class ConfirmschoolPage {
                 this.schoolId,
                 this.selectedCountry,
                 this.detectedCountry,
+                this.selectedCountryName,
               ]);
               /* Redirect to no result found page */
             };
@@ -153,6 +166,19 @@ export class ConfirmschoolPage {
     });
   }
 
+  backToSaved(schoolObj) {
+    this.router.navigate(
+      [
+        'schooldetails',
+        schoolObj?.school_id || this.schoolId,
+        this.selectedCountry,
+        this.detectedCountry,
+        this.selectedCountryName,
+      ],
+      { state: schoolObj }
+    );
+  }
+
   async getDeviceInfo() {
     const info = await Device.getInfo();
     return info;
@@ -173,5 +199,18 @@ export class ConfirmschoolPage {
   async getDeviceId() {
     const deviceId = await Device.getId();
     return deviceId;
+  }
+
+  closeNotification() {
+    this.showNotification = false;
+  }
+
+  backToSearchDetail() {
+    this.router.navigate([
+      'searchschool',
+      this.selectedCountry,
+      this.detectedCountry,
+      this.selectedCountryName,
+    ]);
   }
 }

@@ -1,21 +1,21 @@
-import { isDevMode } from '@angular/core';
 import { environment as env } from './_environment.prod';
 
 const environmentConfig = {
-  prod:{
+  prod: {
     restApi: env.restAPI,
     token: env.token,
   },
-  dev:{
+  dev: {
     restApi: env.restAPIDev,
     token: env.tokenDev,
   },
-  stg:{
+  stg: {
     restApi: env.restAPIStg,
     token: env.tokenStg,
-  }
+  },
 };
 export const environment = {
+  isElectron: window && window.process && window.process.type,
   production: env.mode === 'prod' ? true : false,
   mode: env.mode,
   // restAPI: 'https://uni-connect-services.azurewebsites.net/api/v1/',

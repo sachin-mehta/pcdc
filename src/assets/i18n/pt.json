@@ -1,5 +1,6 @@
 {
     "home": {
+        "welcome": "Bem-vindo ao",
         "title1": "Boas-vindas ao {{appName}} <span class='daily-chk-blue'>{{appNameSuffix}}</span>",
         "title2": "Ajude sua escola a obter uma melhor conectividade. Compartilhe diariamente o estado da internet de sua escola com o {{appName}}.",
         "next": "Próximo",
@@ -8,12 +9,21 @@
         "licenseLink": "Licença de Banco de Dados Aberta (ODbL)",
         "andText": "e pelo M-Lab sob a",
         "privacyPolicy": "Política de Privacidade",
-        "privacy": "<a href='https://www.unicef.org/legal#privacy-policy' target={{targetUrl}}>Para mais detalhes sobre como a Giga gerencia seus dados, visite a Política de Privacidade da UNICEF.</a>"
+        "privacy": "<a href='https://www.unicef.org/legal#privacy-policy' target={{targetUrl}}>Para mais detalhes sobre como a Giga gerencia seus dados, visite a Política de Privacidade da UNICEF.</a>",
+        "start": "Começar",
+        "learnMore": "Saiba mais sobre o Giga Meter"
     },
     "confirmSchool": {
-        "title": "CONFIRME AS INFORMAÇÕES DA ESCOLA PARA REGISTRAR SUA ESCOLA NO {{appName}}",
-        "confirm1": "*Certifique-se de que o país correto está selecionado.",
+        "title": "As informações abaixo estão corretas?",
+        "confirm1": "Confirme as informações da escola para registrar sua escola",
         "confirm2": "AS INFORMAÇÕES ACIMA ESTÃO CORRETAS?"
+    },
+    "saveEmail" : {
+        "optional": "(Opcional)",
+        "instruction": "Por favor, utilize uma conta de e-mail vinculada à sua instituição de ensino",
+        "emailRequired": "O e-mail é obrigatório.",
+        "validEmail": "Insira um endereço de e-mail válido.",
+        "emailFormat": "Insira um e-mail válido com domínio e ponto (por exemplo, info@school.com)."
     },
     "invalidLocation": {
         "resultLocation": "- A sua localização é {{country}}.<br />- As escolas selecionadas são do {{selectedCountry}}. <br />",
@@ -21,35 +31,60 @@
     },
     "schoolDetails": {
         "search": "Procurando por sua escola...",
-        "selectAndConfirm": "SELECIONE SUA ESCOLA ABAIXO",
-        "noSchoolList": "A MINHA ESCOLA NÃO ESTÁ NA LISTA"
+        "selectAndConfirm": "Selecione a escola jurídica",
+        "noSchoolList": "A MINHA ESCOLA NÃO ESTÁ NA LISTA",
+        "saveEmail":"Por favor, adicione o endereço de e-mail da sua escola",
+        "enterEmail": "Texto de entrada",
+        "totalSchools": "{{schoolCount}} resultados correspondentes a {{schoolId}}",
+        "checkGiga": "Verifique os mapas Giga",
+        "searchSchool": "Pesquisando IDs de escolas",
+        "select": "Selecione",
+        "confirmText": "Verifique sua seleção de escola. Depois de tocar em <b>&quot;Sim&quot;</b>, mudar de escola exigirá reinstalar o aplicativo.",
+        "skip": "Pular",
+        "add": "Adicionar"
+
     },
     "schoolNotFound": {
-        "unableToLocate": "NÃO FOI POSSÍVEL LOCALIZAR SUA ESCOLA",
+        "unableToLocate": "Não conseguimos encontrar sua escola: {{schoolId}}",
         "notFound": "Infelizmente, não foi possível localizar a sua escola",
+        "tryAgainPlaceholder": "Certifique-se de que digitou o ID correto ou tente novamente com um ID diferente",
         "notRegister": "Infelizmente, sua escola não está registrada no {{appName}}\nPor favor, entre em contato com o administrador da sua escola para registrar sua escola novamente no\nPCDC."
     },
     "schoolSuccess": {
         "congratulations": "PARABÉNS!",
         "school-registered": "Sua escola foi registada no <br />{{appName}}",
         "success-txt": "O SEU CONTROLO DIÁRIO DE INTERNET <br />ESTÁ CONFIGURADO",
-        "internet-checks": "Este aplicativo verificará a sua <br />situação de internet duas vezes ao dia",
+        "internet-checks": "Este aplicativo verificará seu status de internet 4 vezes por dia.",
         "app-run": "ESTE APLICATIVO FUNCIONARÁ <br />EM SEGUNDO PLANO",
-        "app-run-desc": "Pode fechar o aplicativo. <br />Os dados da sua escola serão coletados <br />quando o dispositivo estiver ligado."
+        "app-run-desc": "Seus dados escolares serão coletados quando o dispositivo estiver ligado.",
+        "you-can-close": "Você pode fechar o App.",
+        "get-started": "Começar",
+        "go-dashboard": "Ir para o seu painel"
+
+    },
+    "registerSchool": {
+        "register-step-1": "Você está prestes a registrar sua escola",
+        "register-part-2": "Certifique-se de que os computadores estão conectados via cabo",
+        "register-step-2": "Certifique-se de que o aplicativo está instalado em 2 dispositivos usados regularmente",
+        "register-step-3": "Certifique-se de estar conectado apenas à internet da escola",
+        "start-registeration": "Iniciar registro"
     },
     "searchCountry": {
-        "check": "Verificando país...",
+        "loading": "Carregando",
+        "confirm": "Confirmar",
+        "check": "Detectando seu país",
         "detected-auto": "O seu país foi detetado automaticamente",
         "country": "País",
-        "country-not-accurate": "Parece que o país que selecionou pode não ser exato.",
+        "country-not-accurate": "Parece que o país que você selecionou pode não corresponder à sua localização. Tem certeza de que deseja continuar?",
         "please-double-check": "Verifique novamente a sua seleção.",
-        "not-available": "Desculpe, o Aplicativo de Verificação Diária do {{appName}} não está disponível em {{selectedCountry}}"
+        "not-available": "o aplicativo {{appName}} {{appNameSuffix}} não está disponível neste país. Por favor escolha outro país.",
+        "change-country": "Se a seleção acima não estiver correta, selecione seu país na caixa de seleção."
     },
     "searchSchool": {
         "search": "Procurando por sua escola...",
-        "placeholder-school-id": "Digite o ID da sua escola",
-        "provide-school-id": "Para começar, digite e procure o ID da sua escola",
-        "user-has-not-id": "NÃO SEI O MEU NÚMERO DE IDENTIFICAO (ID) DA ESCOLA <span class=\"chevron right\"></span>"
+        "placeholder-school-id": "por exemplo. 00000000",
+        "provide-school-id": "Por favor, digite e insira seu ID escolar",
+        "user-has-not-id": "Depois que você digitar seu ID escolar, buscaremos IDs que correspondam à sua entrada."
     },
     "faq": {
         "FAQ": "PERGUNTAS FREQUENTES",
@@ -68,7 +103,8 @@
         "multiple-installs": "Posso instalar este aplicativo <br />em mais de um computador?",
         "multiple-installs-desc": "Sim, pode. De facto, encorajamo-lo. Se várias máquinas comunicarem dados à plataforma, a medição será mais fiável.",
         "dissatisfied-speed": "O que posso fazer se estiver insatisfeito/a<br />com a velocidade ou confiabilidade da minha<br />conexão com a internet?",
-        "dissatisfied-speed-desc": "Pode visitar o nosso website e preencher o formulário para apresentar uma denúncia. Podemos então trabalhar com os nossos fornecedores para garantir que estes prestam o serviço de qualidade que prometeram."
+        "dissatisfied-speed-desc": "Pode visitar o nosso website e preencher o formulário para apresentar uma denúncia. Podemos então trabalhar com os nossos fornecedores para garantir que estes prestam o serviço de qualidade que prometeram.",
+         "search-id": "RID de pesquisa"
     },
     "app": {
         "faq": "<ion-icon name=\"chatbox-outline\"></ion-icon>Perguntas frequentes",
@@ -79,16 +115,45 @@
         "about-project-connect": "SOBRE O {{appName}}",
         "project-connect-desc": "O {{appName}} está a mapear a conectividade de todas as escolas do mundo. O nosso objetivo é ligar todas as escolas à Internet e todos os jovens e crianças à informação, à oportunidade e à escolha.",
         "thank-you": "Obrigado por contribuir para o {{appName}}. Encontre a sua escola e saiba mais no nosso site. Adicionamos novas escolas todos os dias!",
-        "view-project-connect": "VER {{appName}}"
+        "view-project-connect": "VER {{appName}}",
+        "test-type-setting": "Configurações de tipo de teste",
+        "language-pref": "Preferências de idioma",
+        "wifi-network": "Configurações de redes Wi-Fi"
     },
     "startTest": {
+        "status": "Status",
+        "date": "Data",
         "startTest": "INICIAR TESTE",
+        "tryAgain": "TENTAR NOVAMENTE",
         "upload": "UPLOAD",
         "download": "DOWNLOAD",
         "testAgain": "INICIAR TESTE",
         "latency": "Latência: {{latency}}",
         "testFailed": "TESTE FALHOU",
-        "testFailedDesc": "A ligação foi interrompida antes de os testes poderem ser concluídos."
+        "testFailedDesc": "A conexão foi interrompida antes que o teste pudesse ser concluído. Tente novamente.",
+        "start": "INICIAR",
+        "test": "TESTE",
+        "network": "Rede do dispositivo",
+        "isp": "Provedor de Internet",
+        "server": "Servidor mais próximo",
+        "measurement": "Medições recentes",
+        "latencyDetail": "Latência",
+        "ping": "Ping",
+        "uploadLowerCase": "Envio",
+        "downloadLowerCase": "Download",
+        "home": "Início",
+        "about": "Sobre",
+        "total": "Histórico de testes (10 últimas medições)"
+
+    },
+    "registerSchoolPage" : {
+        "title1": "Você está prestes a registrar sua escola",
+        "title2": "Para garantir um bom processo de registro, certifique-se de que os computadores estejam:",
+        "readMore": "Saiba mais sobre como garantir um bom registro",
+        "tip1": "De preferência, em uma conexão com fio",
+        "tip2": "Instalado em 2 dispositivos que são mais usados",
+        "tip3": "Conectado apenas à internet da escola",
+        "privacy":"Concordo com o uso de dados pela Giga sob os termos"
     },
     "resultSchool": "RESULTADOS PARA O ID DA ESCOLA",
     "tryAgain": "TENTAR NOVAMENTE",

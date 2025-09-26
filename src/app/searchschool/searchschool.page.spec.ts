@@ -1,6 +1,6 @@
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { ComponentFixture, TestBed, waitForAsync } from '@angular/core/testing';
-import { HttpClientModule } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { IonicModule } from '@ionic/angular';
 import { RouterTestingModule } from '@angular/router/testing';
 import { SearchschoolPage } from './searchschool.page';
@@ -11,14 +11,11 @@ describe('SearchschoolPage', () => {
   let httpMock: HttpTestingController;
   beforeEach(waitForAsync(() => {
     TestBed.configureTestingModule({
-      declarations: [ SearchschoolPage ],
-      imports: [
-        IonicModule.forRoot(),
-        RouterTestingModule,
-        HttpClientModule,
-        HttpClientTestingModule
-      ]
-    }).compileComponents();
+    declarations: [SearchschoolPage],
+    imports: [IonicModule.forRoot(),
+        RouterTestingModule],
+    providers: [provideHttpClient(withInterceptorsFromDi()), provideHttpClientTesting()]
+}).compileComponents();
 
     fixture = TestBed.createComponent(SearchschoolPage);
     component = fixture.componentInstance;

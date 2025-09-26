@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import * as ndt7 from '../../assets/js/ndt/ndt7.js';
+import ndt7 from '../../assets/js/ndt/ndt7.js';
 import { BehaviorSubject, Observable, Subject, forkJoin } from 'rxjs';
 import { MeasurementService } from './measurement.service';
 import { HistoryService } from './history.service';
@@ -14,6 +14,11 @@ import { SharedService } from './shared-service.service';
 })
 export class MeasurementClientService {
   public measurementStatus = new Subject<any>();
+  public downloadComplete$ = new Subject<any>();
+  public uploadComplete$ = new Subject<any>();
+  public downloadStarted$ = new Subject<any>();
+  public uploadStarted$ = new Subject<any>();
+
   private TIME_EXPECTED = 10;
   private readonly measurementNotificationActivity = new BehaviorSubject<any>({}).asObservable();
   private readonly testConfig = {
@@ -146,6 +151,7 @@ export class MeasurementClientService {
     if (data.Source === 'client') {
       console.log(`Download: ${data.Data.MeanClientMbps.toFixed(2)} Mb/s`);
       measurementRecord.snapLog.s2cRate.push(data.Data.MeanClientMbps);
+      this.downloadStarted$.next(data)
       this.updateProgress('interval_s2c', data, data.Data.ElapsedTime);
     }
   };
@@ -157,6 +163,7 @@ export class MeasurementClientService {
     Instantaneous server bottleneck bandwidth estimate: ${serverBw} Mbps
     Mean client goodput: ${clientGoodput} Mbps`);
     measurementRecord.results['NDTResult.S2C'] = data;
+    this.downloadComplete$.next(data); // Emit event
     this.updateProgress('finished_s2c', data, data.LastClientMeasurement.ElapsedTime);
   };
 
@@ -168,6 +175,7 @@ export class MeasurementClientService {
         8
       ).toFixed(2);
       console.log(`Upload: ${uploadSpeed} Mb/s`);
+      this.uploadStarted$.next(data);
       measurementRecord.snapLog.c2sRate.push(Number(uploadSpeed));
       this.updateProgress('interval_c2s', data, elapsed / 1000000);
     }
@@ -180,6 +188,7 @@ export class MeasurementClientService {
     console.log(`Upload test completed in ${(elapsed / 1000000).toFixed(2)}s
       Mean server throughput: ${throughput} Mbps`);
     measurementRecord.results['NDTResult.C2S'] = data;
+    this.uploadComplete$.next(data); // Emit event
     this.updateProgress('finished_c2s', data, elapsed / 1000000);
   };
 
@@ -207,6 +216,8 @@ export class MeasurementClientService {
 
     if (this.settingsService.get('uploadEnabled')) {
       try {
+        this.historyService.add(measurementRecord);
+        this.sharedService.broadcast('history:measurement:change', 'history:measurement:change');
         await this.uploadService
           .uploadMeasurement(measurementRecord)
           .toPromise();

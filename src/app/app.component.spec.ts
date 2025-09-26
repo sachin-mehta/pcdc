@@ -3,23 +3,23 @@ import { TestBed, waitForAsync } from '@angular/core/testing';
 
 import { AppComponent } from './app.component';
 import { TranslateModule } from '@ngx-translate/core';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
 import { Network } from '@awesome-cordova-plugins/network/ngx';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 describe('AppComponent', () => {
 
   beforeEach(waitForAsync(() => {
 
     TestBed.configureTestingModule({
-      declarations: [AppComponent],
-      imports: [
-        HttpClientTestingModule,
-        TranslateModule.forRoot()
-      ],
-      providers:[
-        Network
-      ],
-      schemas: [CUSTOM_ELEMENTS_SCHEMA],
-    }).compileComponents();
+    declarations: [AppComponent],
+    schemas: [CUSTOM_ELEMENTS_SCHEMA],
+    imports: [TranslateModule.forRoot()],
+    providers: [
+        Network,
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting()
+    ]
+}).compileComponents();
   }));
 
   it('should create the app', () => {

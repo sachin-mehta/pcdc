@@ -1,0 +1,85 @@
+@import '../../../theme/variables.scss';
+
+.btn-holder {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+.nobtn,
+.yesbtn {
+    height: 40px;
+    border: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 400 !important;
+    font-size: 14px !important;
+    border-radius: 40px !important;
+    overflow: hidden;
+    color: #fff !important;
+}
+
+.nobtn {
+    border: 2px solid #277AFF;
+    background: #fff;
+    color: var(--ion-color-primary);
+    --ion-toolbar-color: #fff;
+    --ion-toolbar-background: var(--ion-color-primary);
+}
+
+.font_size {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 0;
+}
+
+.error-msg {
+    color: red;
+    font-size: 13px;
+    margin-top: 4px;
+}
+
+.ion-invalid {
+    --highlight-color-invalid: red;    
+    border-bottom: 1px solid red !important;
+
+}
+.ion-valid {
+    --highlight-color-valid: transparent;
+}
+
+.footer_button {
+    padding-inline-start: 0;
+    padding-inline-end: 0;
+    --padding-end: 0;
+    --padding-start: 0;
+}
+
+.label_top {
+    --padding-start: 0;
+}
+
+.text_under_input {
+    font-size: 12px;
+    font-weight: 400;
+    margin-top: 6px;
+    color: #474747;
+}
+
+.custom-gray-item {
+    --background: #E5E5E5; // Light gray
+    display: flex;
+    height: 48px;
+    padding: 15px 16px;
+    align-items: flex-start;
+    gap: 16px;
+    align-self: stretch;
+    border-bottom: 1px solid #6F6F6F;
+}
+
+.optional {
+    margin-bottom: 16px;
+    font-size: 16px;
+    font-weight: 400;
+}

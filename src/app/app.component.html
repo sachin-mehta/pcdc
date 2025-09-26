@@ -1,14 +1,46 @@
-<ion-app>
-  <ion-menu side="end" menuId="fourth" contentId="content" class="ionMenubg">
+<ion-app class="font_open_sans app_margin">
+  <ion-menu side="end" menuId="fourth" contentId="content" class="ionMenubg" [swipeGesture]="false">
+    <!-- <div>
+      <ion-label>Settings</ion-label>
+
+    </div> -->
     <div class="headerbar">
-      <ion-icon name="arrow-back-outline" class="backIcon" (click)="backMenu()"></ion-icon>
-      <ion-icon name="close-outline" class="closeIcon" (click)="closeMenu()"></ion-icon>
+      <ion-label class="setting_label">Settings</ion-label>
+      <!-- <ion-icon name="close-outline" class="closeIcon" (click)="closeMenu()"></ion-icon> -->
+      <ion-img src="assets/images/Close.svg" name="close-outline" class="closeIcon" (click)="closeMenu()"></ion-img>
     </div>
     <ion-content class="menuContent">
-      <div class="about-proj-con-sec">
-        <div class="freq-ques-txt abt-prj-con-txt"
-          [translate]="'app.about-project-connect' | translate:{ appName: (appName | uppercase) }"></div>
-        <div>
+      <ion-button class="button_disable_hover button_width" fill="clear"  (click)="backMenu()">
+        <ion-img src="assets/images/back_button.svg" name="arrow-back-outline" class="backIcon"></ion-img>
+      </ion-button>
+
+      <div class="your-school-id-sec">
+        <ion-breadcrumbs>
+          <ion-breadcrumb class="font_label" color="primary">Settings</ion-breadcrumb>
+          <ion-breadcrumb class="font_label">WiFi networks settings</ion-breadcrumb>
+        </ion-breadcrumbs>
+        <ion-card *ngFor="let network of networks" class="network-card">
+          <ion-card-content>
+            <ion-item lines="none" class="network-item">
+              <!-- First row: Name -->
+              <div class="wifi-details">
+                <ion-label class="wifi_name">{{ network.name }}</ion-label>
+                <ion-label class="wifi_ssid">{{ network.ssid }}</ion-label>
+                <ion-img class="img_wifi" src="assets/images/wifi-setting.svg"></ion-img>
+
+              </div>
+
+              <!-- Second row: Image & Checkbox -->
+              <div class="wifi-extras">
+                <ion-checkbox slot="end" [(ngModel)]="network.checked" (ionChange)="onCheckboxChange()"></ion-checkbox>
+              </div>
+            </ion-item>
+          </ion-card-content>
+        </ion-card>
+
+        <!-- <div class="freq-ques-txt abt-prj-con-txt"
+          [translate]="'app.about-project-connect' | translate:{ appName: (appName | uppercase) }"></div> -->
+        <!-- <div>
           <ion-img src="assets/images/project-connect.jpg" class="aboutprojConn"></ion-img>
         </div>
         <div>
@@ -19,102 +51,86 @@
         </div>
         <ion-button class="view-proj-btn" (click)="
             openExternalUrl('https://projectconnect.unicef.org/daily-check-app')
-          " [translate]="'app.view-project-connect' | translate:{ appName: (appName | uppercase) }"></ion-button>
+          " [translate]="'app.view-project-connect' | translate:{ appName: (appName | uppercase) }"></ion-button> -->
+        <!-- <div class="view-proj-btn"> -->
+        <ion-button color="primary" block class="dailycheck_btn" (click)="confirmSelection()"><span
+            class="submit_button_size" [translate]="'Confirm'" [disabled]="!networkSelected"></span></ion-button>
+        <!-- </div> -->
       </div>
     </ion-content>
   </ion-menu>
-  <ion-menu side="end" menuId="third" contentId="content" class="ionMenubg">
+  <ion-menu side="end" menuId="third" contentId="content" class="ionMenubg" [swipeGesture]="false">
     <div class="headerbar">
-      <ion-icon name="arrow-back-outline" class="backIcon" (click)="backMenu()"></ion-icon>
-      <ion-icon name="close-outline" class="closeIcon" (click)="closeMenu()"></ion-icon>
+      <ion-label class="setting_label">Settings</ion-label>
+      <!-- <ion-icon name="close-outline" class="closeIcon" (click)="closeMenu()"></ion-icon> -->
+      <ion-img src="assets/images/Close.svg" name="close-outline" class="closeIcon" (click)="closeMenu()"></ion-img>
+
+
     </div>
-    <div class="freq-ques-txt" [translate]="'faq.FAQ'"></div>
-    <ion-content class="menuContent">
-      <div class="accordion-sec">
-        <ion-accordion-group value="numbers">
-          <ion-accordion>
-            <ion-item slot="header">
-              <ion-label [translate]="'faq.what-is-school-id'"></ion-label>
-            </ion-item>
-            <ion-list slot="content">
-              <ion-item>
-                <ion-label [translate]="'faq.what-is-school-id-desc'"></ion-label>
-              </ion-item>
-            </ion-list>
-          </ion-accordion>
-          <ion-accordion>
-            <ion-item slot="header">
-              <ion-label [translate]="'faq.how-find-school-id'"></ion-label>
-            </ion-item>
-            <ion-list slot="content">
-              <ion-item>
-                <ion-label [translate]="'faq.how-find-school-id-desc'"></ion-label>
-              </ion-item>
-            </ion-list>
-          </ion-accordion>
-          <ion-accordion>
-            <ion-item slot="header">
-              <ion-label [translate]="'faq.can-close-app'"></ion-label>
-            </ion-item>
-            <ion-list slot="content">
-              <ion-item>
-                <ion-label text-wrap [translate]="'faq.can-close-app-desc'"></ion-label>
-              </ion-item>
-            </ion-list>
-          </ion-accordion>
-          <ion-accordion>
-            <ion-item slot="header">
-              <ion-label [innerHTML]="'faq.connectivity-checks-occur' | translate"></ion-label>
-            </ion-item>
-            <ion-list slot="content">
-              <ion-item>
-                <ion-label text-wrap [translate]="'faq.connectivity-checks-occur-desc'"></ion-label>
-              </ion-item>
-            </ion-list>
-          </ion-accordion>
-          <ion-accordion>
-            <ion-item slot="header">
-              <ion-label [translate]="'faq.can-change-id'"></ion-label>
-            </ion-item>
-            <ion-list slot="content">
-              <ion-item>
-                <ion-label [translate]="'faq.can-change-id-desc'"></ion-label>
-              </ion-item>
-            </ion-list>
-          </ion-accordion>
-          <ion-accordion>
-            <ion-item slot="header">
-              <ion-label [innerHTML]="'faq.multiple-installs' | translate"></ion-label>
-            </ion-item>
-            <ion-list slot="content">
-              <ion-item>
-                <ion-label [translate]="'faq.multiple-installs-desc'"></ion-label>
-              </ion-item>
-            </ion-list>
-          </ion-accordion>
-          <ion-accordion>
-            <ion-item slot="header">
-              <ion-label [innerHTML]="'faq.dissatisfied-speed' | translate"></ion-label>
-            </ion-item>
-            <ion-list slot="content">
-              <ion-item>
-                <ion-label [translate]="'faq.dissatisfied-speed-desc'"></ion-label>
-              </ion-item>
-            </ion-list>
-          </ion-accordion>
-        </ion-accordion-group>
-      </div>
-    </ion-content>
-  </ion-menu>
-  <ion-menu side="end" menuId="second" contentId="content" class="ionMenubg">
-    <div class="headerbar">
-      <ion-icon name="arrow-back-outline" class="backIcon" (click)="backMenu()"></ion-icon>
-      <ion-icon name="close-outline" class="closeIcon" (click)="closeMenu()"></ion-icon>
-    </div>
+    <ion-button class="button_disable_hover button_width" fill="clear" (click)="backMenu()">
+      <ion-img src="assets/images/back_button.svg" name="arrow-back-outline" class="backIcon"></ion-img>
+    </ion-button>
+
+
     <ion-content class="menuContent">
       <div class="your-school-id-sec">
-        <div class="freq-ques-txt your-school-id" [translate]="'app.school-id'"></div>
-        <div class="schoolid">
+        <ion-breadcrumbs>
+          <ion-breadcrumb class="font_label" color="primary">Settings</ion-breadcrumb>
+          <ion-breadcrumb class="font_label">Language preferences</ion-breadcrumb>
+        </ion-breadcrumbs>
+        <ion-item lines="none" class="select_type_dropdown">
+          <ion-label position="stacked">Select your language</ion-label>
+          <ion-item lines="none" class="searchCountry">
+            <ion-searchbar [(ngModel)]="languageSearch" (ionInput)="filterLanguages($event)" debounce="300"
+              placeholder="Search"></ion-searchbar>
+          </ion-item>
+
+          <ion-list *ngIf="filteredLanguages.length > 0" class="dropdown_width">
+            <ion-item *ngFor="let language of filteredLanguages" button="true" lines="none"  class="dropdown_list half-border-bottom"    (click)="selectLanguageDropdown(language)">
+              {{ language.label }}
+             </ion-item>
+          </ion-list>
+        </ion-item>
+      </div>
+    </ion-content>
+  </ion-menu>
+  <ion-menu side="end" menuId="second" contentId="content" class="ionMenubg" [swipeGesture]="false">
+    <div class="headerbar">
+      <ion-label class="setting_label">Settings</ion-label>
+      <!-- <ion-icon name="close-outline" class="closeIcon" (click)="closeMenu()"></ion-icon> -->
+      <ion-img src="assets/images/Close.svg" name="close-outline" class="closeIcon" (click)="closeMenu()"></ion-img>
+
+
+    </div>
+    <ion-button  class="button_disable_hover button_width" fill="clear" (click)="backMenu()">
+      <ion-img slot="start" src="assets/images/back_button.svg" name="arrow-back-outline" class="backIcon"></ion-img>
+    </ion-button>
+    <ion-content class="menuContent">
+      <div class="your-school-id-sec">
+
+        <ion-breadcrumbs>
+          <ion-breadcrumb class="font_label" color="primary">Settings</ion-breadcrumb>
+          <ion-breadcrumb class="font_label">Test type settings</ion-breadcrumb>
+        </ion-breadcrumbs>
+        <ion-item class="select_type_dropdown" lines="none">
+          <ion-label position="stacked">Select Test type</ion-label>
+          <ion-item lines="none" class="searchCountry">
+            <ion-searchbar [(ngModel)]="searchTerm" (ionInput)="filterOptions($event)" debounce="300"
+              placeholder="Search"></ion-searchbar>
+          </ion-item>
+
+          <ion-list *ngIf="filteredOptions.length > 0" class="dropdown_width">
+            <ion-item button="true" lines="none"  class="dropdown_list half-border-bottom"   *ngFor="let testSetting of filteredOptions" (click)="selectOption(testSetting)">
+              {{testSetting }}
+            </ion-item>
+          </ion-list>
+        </ion-item>
+
+        <!-- Apply a class like "dropdown" to ion-list so we can style it -->
+
+
+        <!-- <div class="freq-ques-txt your-school-id" [translate]="'app.school-id'"></div> -->
+        <!-- <div class="schoolid">
           <ion-label *ngIf="school">{{
             school.school_id | uppercase
             }}</ion-label>
@@ -131,35 +147,45 @@
             {{ school.postal_code ? school.postal_code + "," : "" }}
             {{ school.country }}</ion-label>
         </div>
-        <div class="h-line"></div>
+        <div class="h-line"></div> -->
       </div>
     </ion-content>
   </ion-menu>
-  <ion-menu side="end" menuId="first" contentId="content" class="ionMenubg">
+  <ion-menu side="end" menuId="help" contentId="content" class="ionMenubg" [swipeGesture]="false">
     <div class="headerbar">
-      <!--  <ion-icon name="arrow-back-outline" class="backIcon" (click)="backMenu()"></ion-icon> -->
-      <div></div>
-      <ion-icon name="close-outline" class="closeIcon" (click)="closeMenu()"></ion-icon>
+      <ion-label class="setting_label">Help</ion-label>
+      <!-- <ion-icon name="close-outline" class="closeIcon" (click)="closeHelpenu()"></ion-icon> -->
+      <ion-img src="assets/images/Close.svg" name="close-outline" class="closeIcon" (click)="closeHelpenu()"></ion-img>
+
     </div>
     <ion-content class="menuContent">
       <div class="accordion-sec">
         <ion-list>
-          <ion-item (click)="openSecond()">
-            <ion-label [innerHTML]="'app.my-school-id' | translate"></ion-label>
-            <ion-icon name="chevron-forward-outline"></ion-icon>
+          <ion-item (click)="openHelpMenu('about')">
+            <ion-img src="assets/images/about.svg"></ion-img>
+            <ion-label [innerHTML]="'app.about-help' | translate"></ion-label>
+            <!-- <ion-icon name="chevron-forward-outline"></ion-icon> -->
+            <ion-img src="assets/images/setting_arrow.svg"></ion-img>
+
           </ion-item>
-          <ion-item (click)="openThird()">
-            <ion-label [innerHTML]="'app.faq' | translate"></ion-label>
-            <ion-icon name="chevron-forward-outline"></ion-icon>
+          <ion-item  (click)="openHelpMenu('faq')">
+            <ion-img src="assets/images/faq.svg"></ion-img>
+            <ion-label [innerHTML]="'app.faq-help' | translate"></ion-label>
+            <!-- <ion-icon name="chevron-forward-outline"></ion-icon> -->
+            <ion-img src="assets/images/setting_arrow.svg"></ion-img>
+
           </ion-item>
-          <ion-item *ngIf="showAboutMenu" (click)="openFourth()">
-            <ion-label [innerHTML]="'app.about' | translate:{ appName }"></ion-label>
-            <ion-icon name="chevron-forward-outline"></ion-icon>
-          </ion-item>
-          <ion-item>
-            <ion-label class="small-font" slot="end" [translate]="'app.version'"
-              [translateParams]="{ app_version: app_version }"></ion-label>
-            <ion-icon name="chevron-download"></ion-icon>
+          <!-- <ion-item (click)="openHelpMenu('new')">
+            <ion-img src="assets/images/new.svg"></ion-img>
+            <ion-label [innerHTML]="'app.whats-new' | translate"></ion-label> -->
+            <!-- <ion-icon name="chevron-forward-outline"></ion-icon> -->
+            <!-- <ion-img src="assets/images/setting_arrow.svg"></ion-img> -->
+
+          <!-- </ion-item> -->
+          <ion-item (click)="copy(device_id)">
+            <ion-label class="small-font" [translate]="'app.device-id'" id="click-trigger"
+              [translateParams]="{ device_id: device_id_short }">
+            </ion-label>
           </ion-item>
           <ion-item>
             <ion-label class="small-font" slot="end" [translate]="'app.device-id'" id="click-trigger"
@@ -170,5 +196,213 @@
       </div>
     </ion-content>
   </ion-menu>
-  <ion-router-outlet Id="content"></ion-router-outlet>
+  <ion-menu side="end" menuId="faq" contentId="content" class="ionMenubg" [swipeGesture]="false">
+    <div class="headerbar">
+      <ion-label class="setting_label">Help</ion-label>
+      <!-- <ion-icon name="close-outline" class="closeIcon" (click)="closeHelpenu()"></ion-icon> -->
+      <ion-img src="assets/images/Close.svg" name="close-outline" class="closeIcon" (click)="closeHelpenu()"></ion-img>
+
+    </div>
+    <ion-button class="button_disable_hover button_width" fill="clear" (click)="backHelpMenu()">
+      <ion-img src="assets/images/back_button.svg" name="arrow-back-outline" class="backIcon"></ion-img>
+    </ion-button>
+
+    <ion-content class="menuContent">
+      <div class="your-school-id-sec">
+
+        <ion-breadcrumbs>
+          <ion-breadcrumb class="font_label" color="primary">Help</ion-breadcrumb>
+          <ion-breadcrumb class="font_label">FAQs</ion-breadcrumb>
+        </ion-breadcrumbs>
+
+        <div class="accordion-sec border_top">
+          <ion-accordion-group value="numbers">
+            <ion-accordion>
+              <ion-item slot="header" lines="none">
+                <ion-label [translate]="'faq.what-is-school-id'"></ion-label>
+              </ion-item>
+              <ion-list slot="content">
+                <ion-item lines="none">
+                  <ion-label class="label_color" [translate]="'faq.what-is-school-id-desc'"></ion-label>
+                </ion-item>
+              </ion-list>
+            </ion-accordion>
+            <ion-accordion>
+              <ion-item slot="header" lines="none">
+                <ion-label class="label_color" [translate]="'faq.how-find-school-id'"></ion-label>
+              </ion-item>
+              <ion-list slot="content">
+                <ion-item lines="none">
+                  <ion-label class="label_color" [translate]="'faq.how-find-school-id-desc'"></ion-label>
+                </ion-item>
+              </ion-list>
+            </ion-accordion>
+            <ion-accordion>
+              <ion-item slot="header" lines="none">
+                <ion-label class="label_color" [translate]="'faq.can-close-app'"></ion-label>
+              </ion-item>
+              <ion-list slot="content">
+                <ion-item lines="none">
+                  <ion-label class="label_color" text-wrap [translate]="'faq.can-close-app-desc'"></ion-label>
+                </ion-item>
+              </ion-list>
+            </ion-accordion>
+            <ion-accordion>
+              <ion-item slot="header" lines="none">
+                <ion-label class="label_color" [innerHTML]="'faq.connectivity-checks-occur' | translate"></ion-label>
+              </ion-item>
+              <ion-list slot="content">
+                <ion-item lines="none">
+                  <ion-label class="label_color" text-wrap [translate]="'faq.connectivity-checks-occur-desc'"></ion-label>
+                </ion-item>
+              </ion-list>
+            </ion-accordion>
+            <ion-accordion>
+              <ion-item slot="header" lines="none">
+                <ion-label class="label_color" [translate]="'faq.can-change-id'"></ion-label>
+              </ion-item>
+              <ion-list slot="content">
+                <ion-item lines="none">
+                  <ion-label class="label_color" [translate]="'faq.can-change-id-desc'"></ion-label>
+                </ion-item>
+              </ion-list>
+            </ion-accordion>
+            <ion-accordion>
+              <ion-item slot="header" lines="none"> 
+                <ion-label class="label_color" [innerHTML]="'faq.multiple-installs' | translate"></ion-label>
+              </ion-item>
+              <ion-list slot="content">
+                <ion-item lines="none">
+                  <ion-label class="label_color" [translate]="'faq.multiple-installs-desc'"></ion-label>
+                </ion-item>
+              </ion-list>
+            </ion-accordion>
+            <ion-accordion>
+              <ion-item slot="header" lines="none">
+                <ion-label class="label_color" [innerHTML]="'faq.dissatisfied-speed' | translate"></ion-label>
+              </ion-item>
+              <ion-list slot="content">
+                <ion-item lines="none">
+                  <ion-label class="label_color" [translate]="'faq.dissatisfied-speed-desc'"></ion-label>
+                </ion-item>
+              </ion-list>
+            </ion-accordion>
+          </ion-accordion-group>
+        </div>
+      </div>
+    </ion-content>
+  </ion-menu>
+  <ion-menu side="end" menuId="about" contentId="content" class="ionMenubg" [swipeGesture]="false">
+    <div class="headerbar">
+      <ion-label class="setting_label">Help</ion-label>
+      <!-- <ion-icon name="close-outline" class="closeIcon" (click)="closeHelpenu()"></ion-icon> -->
+      <ion-img src="assets/images/Close.svg" name="close-outline" class="closeIcon" (click)="closeHelpenu()"></ion-img>
+
+    </div>
+
+    <ion-button class="button_disable_hover button_width" fill="clear" (click)="backHelpMenu()">
+      <ion-img src="assets/images/back_button.svg" name="arrow-back-outline" class="backIcon"></ion-img>
+    </ion-button>
+
+    <ion-content class="menuContent">
+      <div class="your-school-id-sec">
+
+        <ion-breadcrumbs>
+          <ion-breadcrumb class="font_label" color="primary">Help</ion-breadcrumb>
+          <ion-breadcrumb class="font_label">About</ion-breadcrumb>
+        </ion-breadcrumbs>
+        <div class="accordion-sec">
+          <ion-label text-wrap [translate]="'app.project-connect-desc' | translate:{ appName }"></ion-label>
+        </div>
+        <!-- <div class="accordion-sec">
+          <ion-label text-wrap class="thank-txt" [translate]="'app.thank-you' | translate:{ appName }"></ion-label>
+        </div> -->
+        
+        <div class="accordion-sec">
+          <ion-img src="assets/images/project-connect.jpg" class="aboutprojConn"></ion-img>
+        </div>
+
+        <!-- <div class="view-proj-btn" 
+      >Giga.global</div>  -->
+      </div>
+    </ion-content>
+  </ion-menu>
+  <ion-menu side="end" menuId="new" contentId="content" class="ionMenubg" [swipeGesture]="false">
+    <div class="headerbar">
+      <ion-label class="setting_label">What’s new!</ion-label>
+      <!-- <ion-icon name="close-outline" class="closeIcon" (click)="closeHelpenu()"></ion-icon> -->
+      <ion-img src="assets/images/Close.svg" name="close-outline" class="closeIcon" (click)="closeHelpenu()"></ion-img>
+
+    </div>
+    <ion-button class="button_disable_hover button_width" fill="clear" (click)="backHelpMenu()">
+      <ion-img src="assets/images/back_button.svg" name="arrow-back-outline" class="backIcon"></ion-img>
+    </ion-button>
+
+    <ion-content class="menuContent">
+      <div class="your-school-id-sec">
+
+        <ion-breadcrumbs>
+          <ion-breadcrumb class="font_label" color="primary">Help</ion-breadcrumb>
+          <ion-breadcrumb class="font_label">What's new!</ion-breadcrumb>
+        </ion-breadcrumbs>
+        <div class="accordion-sec">
+          <ion-label text-wrap [translate]="'app.project-connect-desc' | translate:{ appName }"></ion-label>
+        </div>
+        <!-- <div class="accordion-sec">
+          <ion-label text-wrap class="thank-txt" [translate]="'app.thank-you' | translate:{ appName }"></ion-label>
+        </div> -->
+        <div class="accordion-sec"> 
+          <ion-img src="assets/images/project-connect.jpg" class="aboutprojConn"></ion-img>
+        </div>
+        <div class="accordion-sec">
+          <ion-label text-wrap [translate]="'app.project-connect-desc' | translate:{ appName }"></ion-label>
+        </div>
+        <div class="accordion-sec">
+          <ion-label text-wrap class="thank-txt" [translate]="'app.thank-you' | translate:{ appName }"></ion-label>
+        </div>
+      </div>
+    </ion-content>
+  </ion-menu>
+  <ion-menu side="end" menuId="setting" contentId="content" class="ionMenubg" [swipeGesture]="false">
+    <div class="headerbar">
+      <ion-label class="setting_label">Settings</ion-label>
+      <div></div>
+      <!-- <ion-icon name="close-outline" class="closeIcon" (click)="closeMenu()"></ion-icon> -->
+      <ion-img src="assets/images/Close.svg" name="close-outline" class="closeIcon" (click)="closeMenu()"></ion-img>
+
+    </div>
+    <ion-content class="menuContent">
+      <div class="accordion-sec">
+        <ion-list>
+          <!-- <ion-item (click)="openSecond()">
+            <ion-img src="assets/images/test-setting.svg"></ion-img>
+            <ion-label [innerHTML]="'app.test-type-setting' | translate"></ion-label> -->
+            <!-- <ion-icon name="chevron-forward-outline"></ion-icon> -->
+            <!-- <ion-img src="assets/images/setting_arrow.svg"></ion-img> -->
+
+          <!-- </ion-item> -->
+          <ion-item (click)="openThird()">
+            <ion-img src="assets/images/language-setting.svg"></ion-img>
+            <ion-label [innerHTML]="'app.language-pref' | translate"></ion-label>
+            <!-- <ion-icon name="chevron-forward-outline"></ion-icon> -->
+            <ion-img src="assets/images/setting_arrow.svg"></ion-img>
+
+          </ion-item>
+          <!-- <ion-item *ngIf="showAboutMenu" (click)="openFourth()">
+            <ion-img src="assets/images/wifi-setting.svg"></ion-img>
+            <ion-label [innerHTML]="'app.wifi-network' | translate"></ion-label> -->
+            <!-- <ion-icon name="chevron-forward-outline"></ion-icon> -->
+            <!-- <ion-img src="assets/images/setting_arrow.svg"></ion-img>
+
+          </ion-item> -->
+          <!-- <ion-item>
+            <ion-label class="small-font" slot="end" [translate]="'app.version'"
+              [translateParams]="{ app_version: app_version }"></ion-label>
+            <ion-icon name="chevron-download"></ion-icon>
+          </ion-item> -->
+        </ion-list>
+      </div>
+    </ion-content>
+  </ion-menu>
+  <ion-router-outlet id="content"></ion-router-outlet>
 </ion-app>

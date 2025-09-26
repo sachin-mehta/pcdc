@@ -1,101 +1,85 @@
 @import '../theme/variables.scss';
-.ionMenubg{
+
+.ionMenubg {
     // background-color: #1E2B46 !important;
     background-color: rgba(30, 43, 70, 0.5) !important;
     border-radius: 10px;
-    height:93%;
+    height: 100%;
+    --width: 95%;
+
 }
-.headerbar{
-    height: 40px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #1E2B46;
-    padding-top: 15px;  
-    padding-bottom: 10px;  
-    .closeIcon{
-       font-size: 24px;
-        margin-right: 20px;
-        color: $light-text1;
-    }
-    .closeIcon:hover{
-        background-color: #42516E;
-        border-radius: 50%;
-        width: 29px;
-        height: 29px;
-    }
-    .backIcon{
-        font-size: 24px;
-        margin-left: 20px;
-        color: $light-text1;
-    }
-    .backIcon:hover{
-        background-color:#42516E;
-        border-radius: 50%;
-        width: 28px;
-        height: 28px;
-    }
+
+.label_color {
+    color: #131313 !important;
 }
-.freq-ques-txt{
+
+.freq-ques-txt {
     text-align: left;
     color: #2779FF;
     padding: 10px 25px;
     font-size: 13px;
-    background: #1E2B46;
+    background: #ffffff;
 }
-.menuContent{
-    #background-content{
-        --ion-background-color: #1E2B46 !important;
-        border-radius: 0px 0px 0px 10px !important;
-    }
-}
-ion-content{
-    --ion-background-color: #1E2B46 !important;    
-    ion-list{
-        ion-item{      
-            padding-right: 20px;
+
+
+ion-content {
+    --ion-background-color: #ffffff !important;
+
+    ion-list {
+        ion-item {
+            color: #000;
             cursor: pointer;
-            .item-inner{                
+
+            .item-inner {
                 padding-right: 0px !important;
             }
-            ion-label{
-                color: $light-text2;
-                font-size: 13px;
+
+            ion-label {
+                color: #000;
+                font-size: 14px !important;
                 display: flex;
                 align-items: center;
-                .hash{
+                padding-left: 8px;
+                font-weight: 400;
+
+
+                .hash {
                     font-size: 18px;
-                    color:#505868;
+                    color: #000;
                     padding-right: 5px;
                 }
             }
-            ion-icon{
-                color:#505868;
+
+            ion-icon {
+                color: #505868;
                 padding-right: 5px;
             }
-            ion-icon[name="chevron-forward-outline"]{
+
+            ion-icon[name="chevron-forward-outline"] {
                 padding-right: 5px;
-                font-size: 15px;
-                color:#505868;
+                font-size: 14px;
+                color: #505868;
                 position: absolute;
-                right:0;
+                right: 0;
             }
         }
     }
-    ion-accordion-group{
-        margin-left:25px;
-        margin-right:15px;
-        ion-accordion{
-            --ion-background-color:#1E2B46;
+
+    ion-accordion-group {
+
+        ion-accordion {
+            --ion-background-color: #ffffff;
             padding: 0px;
-            border-bottom: 1px solid #353E52;
-            ion-label{
+            border-bottom: 1px solid #6F6F6F;
+
+            ion-label {
                 font-size: 13px;
                 color: $light-text2;
                 font-weight: 400px;
             }
-            ion-list{
-                ion-label{
+
+            ion-list {
+                ion-label {
                     font-size: 11px;
                     color: $light-text2;
                     font-weight: 400px;
@@ -105,56 +89,382 @@ ion-content{
         }
     }
 }
-.aboutprojConn{
-    width:252px;
-}
-.view-proj-btn{
+
+
+.view-proj-btn {
     width: 252px;
     margin: 20px 15px;
 }
-.abt-prj-con-txt{
-    padding:10px 15px 0px 15px !important;
+
+.abt-prj-con-txt {
+    padding: 10px 15px 0px 15px !important;
 }
-.about-proj-con-sec{    
-        padding: 0px 10px;
-        div{
-            padding: 10px 15px;
-            line-height: 14px !important;
-        ion-label{           
+
+.about-proj-con-sec {
+    padding: 0px 10px;
+
+    div {
+        padding: 10px 15px;
+        line-height: 14px !important;
+
+        ion-label {
             font-size: 13px;
             color: $light-text2;
-            font-weight: 400px;            
+            font-weight: 400px;
         }
-        .thank-txt{
+
+        .thank-txt {
             font-size: 11px !important;
             color: $light-text2;
             font-weight: 400px;
             line-height: 14px !important;
         }
-    }    
+    }
 }
-.your-school-id-sec{
-    padding: 10px 25px;          
-        .your-school-id{
-            padding: 0px 0px !important;
-        }
-        .schoolid{
-            font-size: 18px;
-            color: $light-text2;
-            font-weight: 400px;
-            padding-top: 20px;
-        }
-        .schoolname-txt{
-            font-size: 18px;
-            color: $light-text2;
-            font-weight: 400px;
-            padding-top: 10px;
-        }
-        .address-txt{
-            font-size: 13px;
-            color: $light-text2;
-            font-weight: 400px;
-            padding-top: 10px;
-        }
-    
+
+.your-school-id-sec {
+    padding: 10px 25px;
+
+    .your-school-id {
+        padding: 0px 0px !important;
+    }
+
+    .schoolid {
+        font-size: 18px;
+        color: $light-text2;
+        font-weight: 400px;
+        padding-top: 20px;
+    }
+
+    .schoolname-txt {
+        padding: 14px;
+        font-size: 18px;
+        color: $light-text2;
+        font-weight: 400;
+        padding-top: 10px;
+    }
+
+    .address-txt {
+        font-size: 13px;
+        color: $light-text2;
+        font-weight: 400px;
+        padding-top: 10px;
+    }
+
 }
+
+.dropdown_width {
+    width: 98%;
+    box-shadow: 0px 2px 6px 0px rgba(0, 0, 0, 0.50);
+    margin-bottom: 2px;
+    margin-left: 2px;
+    height: 256px;
+
+}
+
+.select_type_dropdown {
+    // Ensure your item has visible text if the background is white
+
+    --background: #fff;
+    --color: #6F6F6F;
+    margin-top: 10px;
+
+    ion-label {
+        margin-bottom: 12px;
+        font-size: 12px;
+        font-weight: 400;
+    }
+}
+
+.network-card {
+    --background: #fff; // White card background
+    --color: #000; // Black text
+    margin: 0.5rem 0;
+
+    ion-item {
+        --background: #fff; // Ensure item matches card
+        --color: #000;
+    }
+
+    ion-checkbox {
+        --background: #fff; // Checkbox fill
+        --border-color: #ccc; // Checkbox outline
+        --checkmark-color: #000; // Checkmark color
+    }
+}
+
+
+.dropdown {
+    position: absolute; // So the dropdown floats
+    z-index: 999; // On top of other elements
+    background: #fff; // White background
+    width: 100%; // Match the input width
+    border: 1px solid #6F6F6F; // Outline
+    border-radius: 4px;
+    margin-top: 0.25rem; // Small gap below the input
+
+    ion-item {
+        --background: #fff; // White item background
+        --color: #000; // Black text
+        --border-color: transparent;
+
+        &:hover {
+            background: #f0f0f0; // Hover effect
+        }
+    }
+}
+
+.font_label {
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.dropdown_list {
+    color: #000000;
+    text-transform: none;
+    font-size: 14px;
+    font-weight: 400;
+
+    &:hover {
+        background: none;
+    }
+}
+
+.dropdown_list {
+    font-size: 14px !important;
+    font-weight: 400 !important;
+
+    &:hover {
+        background: none;
+    }
+}
+
+.searchCountry {
+    -webkit-app-region: no-drag;
+    width: 100%;
+    border-bottom: 1px solid #6F6F6F; // change color and size as needed
+    border-top: none;
+    border-left: none;
+    border-right: none;
+    outline: none;
+    color: #fff;
+    --ion-background-color: #F4F4F4;
+
+}
+
+.img_wifi {
+    height: 20px;
+    width: 20px;
+}
+
+.network-card {
+    --background: #fff; // White background for light theme
+    --color: #000; // Black text
+    margin: 0.5rem 0;
+}
+
+.network-item {
+    display: flex;
+    flex-direction: column; // Stack items vertically
+    align-items: flex-start;
+    justify-content: center;
+}
+
+.wifi-details {
+    display: flex;
+    flex-direction: column; // Stack labels in a column
+    align-items: flex-start;
+    width: 100%; // Take full width
+    margin-bottom: 8px;
+}
+
+.wifi_name {
+    font-size: 20px;
+    font-weight: 400;
+    padding-bottom: 16px;
+
+}
+
+.wifi_ssid {
+    font-size: 14px;
+    font-weight: 400;
+    padding-bottom: 10px;
+
+}
+
+.wifi-extras {
+    display: flex;
+    justify-content: space-between; // Image on left, checkbox on right
+    align-items: center;
+}
+
+.img_wifi {
+    width: 24px; // Adjust size as needed
+    height: 24px;
+}
+
+.setting_label {
+    font-size: 20px;
+    font-weight: 700;
+    color: #222 !important;
+}
+
+.backIcon {
+    margin: 12px;
+    width: 32px;
+    height: 32px;
+}
+
+.button_width {
+    margin: 12px 0 0 24px;
+    width: 50px;
+}
+
+::ng-deep {
+    .searchbar-input.sc-ion-searchbar-md {
+        box-shadow: none !important;
+        font-size: 14px;
+        font-weight: 400;
+
+    }
+
+    .searchbar-search-icon.sc-ion-searchbar-md {
+        left: 0;
+    }
+
+    .searchbar-input.sc-ion-searchbar-md {
+        padding-left: 30px;
+        padding-right: 30px;
+    }
+
+    .searchbar-clear-button.sc-ion-searchbar-md {
+        right: 0;
+    }
+
+
+
+    .list-md {
+        z-index: 9999;
+        position: relative;
+        margin: 0;
+        border-radius: 5px;
+        padding-left: 0;
+    }
+}
+
+.accordion-sec {
+    margin-top: 22px;
+    margin-left: 16px;
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.border_top {
+    border-top: 1px solid #6F6F6F;
+}
+
+::ng-deep {
+    .searchbar-input.sc-ion-searchbar-md {
+        box-shadow: none !important;
+        font-size: 14px;
+        font-weight: 400;
+
+    }
+
+    .sc-ion-searchbar-md-h {
+        padding: 0;
+    }
+
+    .searchbar-search-icon.sc-ion-searchbar-md {
+        left: 0;
+        display: none;
+    }
+
+    .searchbar-search-icon.sc-ion-searchbar-md.md.hydrated {
+        display: none;
+    }
+
+    .searchbar-clear-icon.sc-ion-searchbar-md {
+        width: 16px;
+        height: 16px;
+    }
+
+    .searchbar-input.sc-ion-searchbar-md {
+        padding-left: 0px;
+        padding-right: 30px;
+    }
+
+    .list-md {
+        z-index: 9999;
+        position: relative;
+        margin: 0;
+        border-radius: 5px;
+        padding-left: 0;
+    }
+}
+
+::ng-deep {
+    .searchbar-search-icon.sc-ion-searchbar-md {
+        left: 0;
+        display: none;
+    }
+
+    .searchbar-search-icon.sc-ion-searchbar-md.md.hydrated {
+        display: none;
+    }
+}
+
+
+ion-breadcrumb::part(separator) {
+    color: #3880ff; // light gray or any desired color
+}
+
+.sc-ion-label-md-h {
+    color: #474747;
+}
+
+.half-border-bottom::after {
+    content: "";
+    display: block;
+    width: 108%;
+    border-bottom: 1px solid #ccc;
+    margin-top: 1px;
+    /* space between content and border */
+}
+
+::ng-deep {
+    ion-content {
+
+        // Target WebKit browsers (Chrome, Edge, Safari)
+        &::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        &::-webkit-scrollbar-thumb {
+            border-radius: 4px;
+            border: 2px solid transparent;
+        }
+
+        scrollbar-color: #a3acbb transparent;
+        scrollbar-width: thin;
+    }
+
+    .border_top ion-accordion-group ion-accordion ion-icon {
+    margin-inline: -15px !important;
+}
+
+
+
+
+}
+
+ion-content.menuContent::part(scroll) {
+    scrollbar-width: thin;
+    /* For Firefox */
+}
+
+ion-content.menuContent::part(scroll)::-webkit-scrollbar {
+    width: 6px;
+    /* For Chrome, Edge, Safari */
+}
+
