@@ -1,49 +1,52 @@
 <app-pcdc-header></app-pcdc-header>
-<ion-content>
+<ion-content class="font_open_sans">
+  <ion-button class="button_disable_hover" fill="clear" [routerLink]="['/searchcountry']">
+
+    <ion-img src="assets/images/back_button.svg" name="arrow-back-outline" class="backIcon"></ion-img>
+  </ion-button>
   <div class="container">
-    <div class="top-layout">
-      <div class="provide-id" [translate]="'searchSchool.provide-school-id'"></div>
+    <app-selected-detail></app-selected-detail>
+
+    <div>
+      <div class="provide_id" [translate]="'searchSchool.provide-school-id'"></div>
       <div class="wrap">
         <div class="search">
           <input type="text" class="searchTerm" placeholder="{{ 'searchSchool.placeholder-school-id' | translate }}"
-            [(ngModel)]="schoolId" (ngModelChange)="validateSchoolId($event)" required minlength="2"
-            (keyup.enter)="searchSchoolBySchooIdAndCountryCode()" />
-          <button type="submit" class="searchButton" (click)="searchSchoolBySchooIdAndCountryCode()"
+            [(ngModel)]="schoolId" (ngModelChange)="validateSchoolId($event)" required minlength="2" />
+          <!-- <button type="submit" class="searchButton" (click)="searchSchoolBySchooIdAndCountryCode()"
             [disabled]="isDisabled">
             <ion-icon name="search-outline" class="searchIcon"></ion-icon>
-          </button>
+          </button> -->
         </div>
       </div>
       <div class="learn-more noschoolid-link"
-        (click)="openExternalUrl('https://projectconnect.unicef.org/daily-check-app')"
         [innerHTML]="'searchSchool.user-has-not-id' | translate"></div>
     </div>
     <div class="bottom-layout">
-      <div class="freq-txt" [translate]="'faq.FAQ'"></div>
       <div class="accordion-sec">
-        <ion-accordion-group value="numbers">
+        <ion-accordion-group value="numbers" class="acc_border">
           <ion-accordion value="faq1">
-            <ion-item slot="header">
-              <ion-label [translate]="'faq.what-is-school-id'"></ion-label>
+            <ion-item lines="none" slot="header">
+              <ion-label class="label_padding" [translate]="'faq.what-is-school-id'"></ion-label>
             </ion-item>
             <ion-list slot="content">
-              <ion-item>
-                <ion-label [translate]="'faq.what-is-school-id-desc'">
+              <ion-item lines="none" >
+                <ion-label class="label_padding" [translate]="'faq.what-is-school-id-desc'">
                 </ion-label>
               </ion-item>
             </ion-list>
           </ion-accordion>
           <ion-accordion value="faq2">
             <ion-item slot="header">
-              <ion-label [translate]="'faq.how-find-school-id'"></ion-label>
+              <ion-label class="label_padding" [translate]="'faq.how-find-school-id'"></ion-label>
             </ion-item>
             <ion-list slot="content">
-              <ion-item>
-                <ion-label [translate]="'faq.how-find-school-id-desc'"></ion-label>
+              <ion-item lines="none" >
+                <ion-label class="label_padding" [translate]="'faq.how-find-school-id-desc'"></ion-label>
               </ion-item>
             </ion-list>
           </ion-accordion>
-          <ion-accordion value="faq3">
+          <!-- <ion-accordion value="faq3">
             <ion-item slot="header">
               <ion-label [translate]="'faq.school-id-not-found' | translate:{ appName }"></ion-label>
             </ion-item>
@@ -52,8 +55,11 @@
                 <ion-label [translate]="'faq.school-id-not-found-desc'"></ion-label>
               </ion-item>
             </ion-list>
-          </ion-accordion>
+          </ion-accordion> -->
         </ion-accordion-group>
+        <ion-button color="primary" appEnterKeyClick  type="submit" [innerHTML]="'faq.search-id' | translate" class="searchButton submit_button_size dailycheck_btn"
+          (click)="searchSchoolBySchooIdAndCountryCode()" [disabled]="isDisabled"></ion-button>
+
       </div>
     </div>
   </div>

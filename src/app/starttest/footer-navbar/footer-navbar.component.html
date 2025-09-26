@@ -1,0 +1,19 @@
+<ion-footer class="ion-no-border home_about">
+  <div class="giga-map-link">
+    <span class="googleCheck linkColor">
+     <!-- <span class="underline" [translate]="'schoolDetails.checkGiga' | translate"></span>
+      <ion-img src="assets/images/Launch.png" class="welcome_icon"></ion-img> -->
+    </span>
+  </div>
+
+  <ion-toolbar>
+    <ion-segment [(ngModel)]="activeSegment" (ionChange)="onSegmentChange($event)">
+      <ion-segment-button value="home">
+        <ion-label [translate]="'startTest.home'"></ion-label>
+      </ion-segment-button>
+      <ion-segment-button value="about">
+        <ion-label [translate]="'startTest.about'"></ion-label>
+      </ion-segment-button>
+    </ion-segment>
+  </ion-toolbar>
+</ion-footer>

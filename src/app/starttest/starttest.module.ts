@@ -6,6 +6,8 @@ import { SharedModule } from '../shared/shared.module';
 import { StarttestPage } from './starttest.page';
 import { StarttestPageRoutingModule } from './starttest-routing.module';
 import { PcdcHeaderComponent } from '../pcdc-header/pcdc-header.component';
+import { TestDetailComponent } from './test-detail/test-detail.component';
+import { FooterNavbarComponent } from './footer-navbar/footer-navbar.component';
 
 @NgModule({
   imports: [
@@ -15,6 +17,6 @@ import { PcdcHeaderComponent } from '../pcdc-header/pcdc-header.component';
     StarttestPageRoutingModule,
     SharedModule,
   ],
-  declarations: [StarttestPage, PcdcHeaderComponent],
+  declarations: [StarttestPage, PcdcHeaderComponent, TestDetailComponent, FooterNavbarComponent],
 })
 export class StarttestPageModule {}

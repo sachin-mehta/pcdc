@@ -2,6 +2,15 @@ import { randomBytes } from 'crypto';
 import { ipcRenderer, contextBridge } from 'electron';
 import { EventEmitter } from 'events';
 
+declare global {
+  namespace NodeJS {
+    // Don't extend, just declare the interface exists
+    interface EventEmitter {}
+  }
+}
+
+export {};
+
 ////////////////////////////////////////////////////////
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const plugins = require('./electron-plugins');

@@ -15,9 +15,13 @@ import { environment } from 'src/environments/environment';
   selector: 'app-searchcountry',
   templateUrl: 'searchcountry.page.html',
   styleUrls: ['searchcountry.page.scss'],
+  standalone: false
+
 })
 export class SearchcountryPage {
   @ViewChild(IonAccordionGroup, { static: true })
+  automaticSearched = false;
+  selectedFromList: boolean = false;
   accordionGroup: IonAccordionGroup;
   detectedCountry: any;
   selectedCountry: any;
@@ -1027,6 +1031,9 @@ export class SearchcountryPage {
   ];
   appName = environment.appName;
   appNameSuffix = environment.appNameSuffix;
+  searchTerm: string = '';
+  filteredCountries: Country[] = [];
+
   constructor(
     private storage: StorageService,
     private networkService: NetworkService,
@@ -1037,11 +1044,74 @@ export class SearchcountryPage {
     private translate: TranslateService
   ) {
     const appLang = this.settingsService.get('applicationLanguage');
-    this.translate.use(appLang.code);
+    this.translate.use(appLang?.code);
   }
   ngOnInit() {
     this.getCountry();
   }
+
+  filterCountries(event: any) {
+    if (event.target.value === '') {
+      this.filteredCountries = [];
+    } else {
+      const searchTerm = event.target.value.toLowerCase();
+      this.filteredCountries = this.countries.filter(country =>
+        country.name.toLowerCase().includes(searchTerm)
+      );
+      this.selectedFromList = false;
+    }
+  }
+
+  selectCountry(country: Country) {
+    this.selectedFromList = true;
+    this.searchTerm = country.name;
+    this.filteredCountries = [];
+    this.automaticSearched = false;
+
+    // Validate PCDC eligibility immediately
+    this.validateSelectedCountry(country);
+  }
+
+  validateSelectedCountry(country: Country) {
+    // if (!this.selectedCountry) return;
+
+    this.countryService.getPcdcCountryByCode(country.code).subscribe(
+      (response) => {
+        this.pcdcCountry = response;
+        if (this.pcdcCountry.length > 0) {
+          this.isPcdcCountry = true;
+          this.selectedCountry = country.code;
+
+        } else {
+          this.isPcdcCountry = false;
+          // this.selectedCountry = country.code;
+        }
+      },
+      (err) => {
+        console.log('Validation error:', err);
+        this.isPcdcCountry = false;
+        // this.selectedCountry = country.code;
+
+      }
+    );
+  }
+
+  confirmCountry() {
+    if (!this.selectedCountry || !this.isPcdcCountry) return;
+
+    if (this.detectedCountry === undefined || this.detectedCountry === null) {
+      this.detectedCountry = this.selectedCountry;
+    }
+
+    const selectedCountryName = this.pcdcCountry?.[0]?.name || '';
+    this.router.navigate([
+      'searchschool',
+      this.selectedCountry,
+      this.detectedCountry,
+      selectedCountryName
+    ]);
+  }
+
   getCountry() {
     /* Store school id and giga id inside storage */
     let countryData = {};
@@ -1054,8 +1124,19 @@ export class SearchcountryPage {
         ip_address: c.ip,
         country_code: c.country,
       };
+      this.automaticSearched = true;
+      this.searchTerm = this.filterCountryByCode(this.selectedCountry).name;
+      this.selectCountry({name: this.searchTerm, code: c.country})
+
+    }, error => {
+      this.automaticSearched = false;
     });
   }
+
+  filterCountryByCode(countryCode: string): any {
+    return this.countries.find(country => country.code.toLowerCase() === countryCode.toLowerCase());
+  }
+
   // onCountryChange(event) {
   //   this.selectedCountry = event.target.value;
   //   this.selectedCountryName = event.selectedText;
@@ -1082,48 +1163,69 @@ export class SearchcountryPage {
       this.detectedCountry
     );
   }
-  confirmCountry() {
-    //this.loading.dismiss();
+  // confirmCountry() {
+  //   //this.loading.dismiss();
 
-    if (this.detectedCountry === undefined || this.detectedCountry === null) {
-      this.detectedCountry = this.selectedCountry;
+  //   if (this.detectedCountry === undefined || this.detectedCountry === null) {
+  //     this.detectedCountry = this.selectedCountry;
+  //   }
+  //   const loadingMsg =
+  //     // eslint-disable-next-line max-len
+  //     '<div class="loadContent"><ion-img src="assets/loader/new_loader.gif" class="loaderGif"></ion-img><p class="white" [translate]="\'searchCountry.check\'"></p></div>';
+  //   this.loading.present(loadingMsg, 9000, 'pdcaLoaderClass', 'null');
+
+  //   this.countryService.getPcdcCountryByCode(this.selectedCountry).subscribe(
+  //     (response) => {
+  //       this.pcdcCountry = response;
+  //       console.log('pcdc country', response);
+  //     },
+  //     (err) => {
+  //       console.log('ERROR: ' + err);
+  //       this.loading.dismiss();
+  //     },
+  //     () => {
+  //       this.loading.dismiss();
+  //       if (this.pcdcCountry.length > 0) {
+  //         this.isPcdcCountry = true;
+  //         console.log(this.pcdcCountry)
+  //         const selectedCountryName = this.pcdcCountry[0].name
+  //         this.router.navigate([
+  //           'searchschool',
+  //           this.selectedCountry,
+  //           this.detectedCountry,
+  //           selectedCountryName
+  //         ]);
+  //       } else {
+  //         this.isPcdcCountry = false;
+  //       }
+  //     }
+  //   );
+
+  //   console.log(
+  //     'selected',
+  //     this.selectedCountry,
+  //     'detected: ',
+  //     this.detectedCountry
+  //   );
+  //   //this.router.navigate(['schoolnotfound', this.schoolId]);
+  //   //this.router.navigate(['searchschool', this.selectedCountry, this.detectedCountry]);
+  // }
+  onSearchInput(event: any): void {
+    const value = event.target.value?.trim();
+
+    if (!value) {
+      // Reset everything if input is empty
+      this.isPcdcCountry = true;
+      this.selectedCountry = '';
+      this.filteredCountries = [];
+      this.selectedFromList = false;
+      this.automaticSearched = true;
+      return;
     }
-    const loadingMsg =
-      // eslint-disable-next-line max-len
-      '<div class="loadContent"><ion-img src="assets/loader/loader.gif" class="loaderGif"></ion-img><p class="white" [translate]="\'searchCountry.check\'"></p></div>';
-    this.loading.present(loadingMsg, 3000, 'pdcaLoaderClass', 'null');
 
-    this.countryService.getPcdcCountryByCode(this.selectedCountry).subscribe(
-      (response) => {
-        this.pcdcCountry = response;
-        console.log('pcdc country', response);
-      },
-      (err) => {
-        console.log('ERROR: ' + err);
-        this.loading.dismiss();
-      },
-      () => {
-        this.loading.dismiss();
-        if (this.pcdcCountry.length > 0) {
-          this.isPcdcCountry = true;
-          this.router.navigate([
-            'searchschool',
-            this.selectedCountry,
-            this.detectedCountry,
-          ]);
-        } else {
-          this.isPcdcCountry = false;
-        }
-      }
-    );
-
-    console.log(
-      'selected',
-      this.selectedCountry,
-      'detected: ',
-      this.detectedCountry
-    );
-    //this.router.navigate(['schoolnotfound', this.schoolId]);
-    //this.router.navigate(['searchschool', this.selectedCountry, this.detectedCountry]);
+    // Otherwise, do normal filtering
+    this.isPcdcCountry = true; // temporarily assume it's valid during input
+    this.filterCountries(event);
   }
+
 }

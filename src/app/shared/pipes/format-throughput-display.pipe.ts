@@ -1,7 +1,8 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-  name: 'formatThroughputDisplay'
+    name: 'formatThroughputDisplay',
+    standalone: false
 })
 export class FormatThroughputDisplayPipe implements PipeTransform {
 

@@ -1,0 +1,119 @@
+@import "../../../theme/variables.scss";
+
+.linkColor {
+  color: #277AFF;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #fff;
+  font-size: 14px;
+  font-weight: 400;
+  // padding-top: 8px;
+  text-align: center;
+}
+
+.giga-map-link {
+  display: flex;
+  justify-content: center;
+  background: #fff;
+}
+
+.welcome_icon {
+  width: 16px;
+  height: 16px;
+  margin-left: 4px;
+}
+
+ion-segment,
+ion-button,
+ion-footer,
+input,
+.selectable,
+.clickable {
+  -webkit-app-region: no-drag;
+}
+
+.home_about {
+  background: white;
+  ion-toolbar {
+    --background: white;
+    --border-color: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 48px; // Standard height
+    margin-top: 8px;
+
+  }
+
+  ion-segment {
+    --height: 40px !important;
+    width: 100%;
+    justify-content: center;
+    --background: transparent;
+    --indicator-color: #277AFF;
+    --indicator-height: 5px;
+    --color-checked: #277AFF;
+    --padding-bottom: 2px;
+    --min-height: 40px !important;
+  }
+
+  ion-segment-button {
+    flex: 1;
+    max-width: 80px;
+    padding: 0 !important; // reduce inner padding if needed
+
+
+    ion-label {
+      font-size: 14px;
+      font-weight: 600;
+      text-align: center;
+      text-transform : none;
+    }
+
+    &.segment-button-checked,
+    &[aria-checked="true"] {
+      ion-label {
+        color: #000;
+        
+      }
+    }
+  }
+}
+ion-segment-button {
+  flex: 1;
+  max-width: 80px;
+  padding: 0 !important;
+  position: relative;
+
+  ion-label {
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    text-transform: none;
+  }
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 1px;
+    right: 1px;
+    height: 2px;
+    background-color: #C6C6C6; // black for inactive
+    transition: background-color 0.3s ease;
+  }
+
+  &.segment-button-checked::after,
+  &[aria-checked='true']::after {
+    background-color: #277AFF; // blue for active
+  }
+
+  &.segment-button-checked,
+  &[aria-checked='true'] {
+    --indicator-color: transparent;
+  }
+}
+.underline {
+  text-decoration: underline;
+}

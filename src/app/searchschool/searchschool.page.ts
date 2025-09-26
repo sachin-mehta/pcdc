@@ -7,9 +7,10 @@ import { SettingsService } from '../services/settings.service';
 import { TranslateService } from '@ngx-translate/core';
 import { environment } from 'src/environments/environment';
 @Component({
-  selector: 'app-searchschool',
-  templateUrl: 'searchschool.page.html',
-  styleUrls: ['searchschool.page.scss'],
+    selector: 'app-searchschool',
+    templateUrl: 'searchschool.page.html',
+    styleUrls: ['searchschool.page.scss'],
+    standalone: false
 })
 export class SearchschoolPage {
   @ViewChild(IonAccordionGroup, { static: true })
@@ -19,12 +20,13 @@ export class SearchschoolPage {
   schoolData: any;
   isLoading = false;
   selectedCountry: any;
+  selectedCountryName: any;
   detectedCountry: any;
   sub: any;
   appName = environment.appName;
   private loadingMsg =
     // eslint-disable-next-line max-len
-    '<div class="loadContent"><ion-img src="assets/loader/loader.gif" class="loaderGif"></ion-img><p class="white" [translate]="\'searchSchool.search\'"></p></div>';
+    '<div class="loadContent"><ion-img src="assets/loader/new_loader.gif" class="loaderGif"></ion-img><p class="white" [translate]="\'searchSchool.search\'"></p></div>';
 
   constructor(
     private router: Router,
@@ -40,6 +42,7 @@ export class SearchschoolPage {
     this.sub = this.activatedroute.params.subscribe((params) => {
       this.selectedCountry = params.selectedCountry;
       this.detectedCountry = params.detectedCountry;
+      this.selectedCountryName = params.selectedCountryName;
     });
   }
 
@@ -48,7 +51,7 @@ export class SearchschoolPage {
    */
   searchSchoolById() {
     if (this.schoolId) {
-      this.loading.present(this.loadingMsg, 3000, 'pdcaLoaderClass', 'null');
+      // this.loading.present(this.loadingMsg, 3000, 'pdcaLoaderClass', 'null');
       this.schoolService.getById(this.schoolId).subscribe(
         (response) => {
           this.schoolData = response;
@@ -88,8 +91,11 @@ export class SearchschoolPage {
    */
   searchSchoolBySchooIdAndCountryCode() {
     if (this.schoolId && this.selectedCountry) {
-      this.loading.present(this.loadingMsg, 3000, 'pdcaLoaderClass', 'null');
-      this.schoolService
+      const loadingMsg =
+      // eslint-disable-next-line max-len
+    //   '<div class="loadContent"><ion-img src="assets/loader/new_loader.gif" class="loaderGif"></ion-img><p class="green_loader">Searching School IDs</p></div>';
+    // this.loading.present(loadingMsg, 40000000, 'pdcaLoaderClass', 'null'); 
+         this.schoolService
         .getBySchoolIdAndCountryCode(this.schoolId, this.selectedCountry)
         .subscribe(
           (response) => {
@@ -104,6 +110,7 @@ export class SearchschoolPage {
               this.schoolId,
               this.selectedCountry,
               this.detectedCountry,
+              this.selectedCountryName
             ]);
             /* Redirect to no result found page */
           },
@@ -115,6 +122,7 @@ export class SearchschoolPage {
                 this.schoolId,
                 this.selectedCountry,
                 this.detectedCountry,
+                this.selectedCountryName
               ]);
             } else {
               /* Redirect to no result found page */
@@ -123,6 +131,7 @@ export class SearchschoolPage {
                 this.schoolId,
                 this.selectedCountry,
                 this.detectedCountry,
+                this.selectedCountryName
               ]);
             }
           }
@@ -142,9 +151,5 @@ export class SearchschoolPage {
     } else {
       this.isDisabled = true;
     }
-  }
-
-  openExternalUrl(href) {
-    this.settingsService.getShell().shell.openExternal(href);
   }
 }

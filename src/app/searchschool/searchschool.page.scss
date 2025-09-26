@@ -1,93 +1,156 @@
 @import '../../theme/variables.scss';
-    .school-label {
-    color: $text-color;
-    padding-top:20px;
-    font-size: 12px;
-  }
-  ion-content{
-    --keyboard-offset:0px !important;
-  }
-  .container a {
-    text-decoration: none;
-  }
-  ion-label{
-    font-size: 12px;
-  }  
-  .school-label{
-    margin-top: 20px;
-  }
-  .schoolid-input{
-    margin-top: 20px;
-    width: 100%;
-  }  
-  .schoolid-input{
-    color: $text-color;
-    margin-top:20px;
-    border:1px solid #fff;
-    border-radius: 5px;
-  }
-  .provide-id{
-    color: $text-color;
-    margin: 5px auto;
-    font-size: 16px;
-    text-align: center;    
-    font-weight: 400;
-    opacity: 0.8;
-    width: 80%;
-  }
-  .accordion-sec{
-    padding: 0px 30px;
-  }
-  .noschoolid-link {
-    color:#A3ACBB;
-    padding-top:20px;
-    text-align: center;
-    font-size: 11px;
-  } 
-  .search-btn{
-    margin-top:20px;
-    width: 100%;
-    font-size: 12px;
-    border-radius: 3px !important;
-    height: 50px;
-    border-radius: 5px;
-  }
-  .wrap{
-    margin-top:18px;
-  }
-  .search {
-    width: 100%;
-    position: relative;
-    display: flex;
-    ion-icon{
-      color: #e2e2e2;
-    }
-  }
- .searchTerm {
-    width: 100%;
-    border: 3px solid $color-blue;
-    border-right: none;
-    padding: 5px;
-    border-radius: 5px 0 0 5px;
-    outline: none;
-    color: #e2e8e5;
+
+.school-label {
+  color: $text-color;
+  padding-top: 20px;
+  font-size: 12px;
 }
- .searchTerm:focus{
-    color:#e2e8e5;
+
+ion-content {
+  --keyboard-offset: 0px !important;
+}
+
+.container a {
+  text-decoration: none;
+}
+
+ion-label {
+  font-size: 14px !important;
+  font-weight: 400;
+  color: #222222 !important;
+}
+
+.school-label {
+  margin-top: 20px;
+}
+
+.schoolid-input {
+  margin-top: 20px;
+  width: 100%;
+}
+
+.schoolid-input {
+  color: $text-color;
+  margin-top: 20px;
+  border: 1px solid #fff;
+  border-radius: 5px;
+}
+
+.provide-id {
+  color: $text-color;
+  margin: 5px auto;
+  font-size: 16px;
+  text-align: center;
+  font-weight: 400;
+  opacity: 0.8;
+  width: 80%;
+}
+
+.accordion-sec {
+  padding: 0px 30px;
+}
+
+.noschoolid-link {
+  color: #161616;
+  padding-top: 10px;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+.search-btn {
+  margin-top: 20px;
+  width: 100%;
+  font-size: 12px;
+  border-radius: 3px !important;
+  height: 50px;
+  border-radius: 5px;
+}
+
+.wrap {
+  margin-top: 18px;
+}
+
+.search {
+  width: 100%;
+  position: relative;
+  display: flex;
+
+  ion-icon {
+    color: #e2e2e2;
   }
- .searchButton {
-    width: 40px;
-    height: 40px;
-    border: 1px solid;
-    border-color: $color-blue;
-    background: $color-blue;
-    text-align: center;
-    color: #fff;
-    border-radius: 0 5px 5px 0;
-    cursor: pointer;
-    font-size: 20px;
+}
+
+.searchTerm {
+  width: 100%;
+  border-bottom: 1px solid #6F6F6F; // change color and size as needed
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  /* border-right: none; */
+  padding: 25px;
+  outline: none;
+  height: 40px;
+  font-size: 14px;
+  font-weight: 400;
+}
+
+.searchTerm:focus {
+  color: #222222;
+}
+
+.searchButton {
+  text-transform: unset;
+  border: 1px solid;
+  border-color: #2779FF;
+  background: #2779FF;
+  text-align: center;
+  color: #fff;
+  border-radius: 41px;
+  cursor: pointer;
+  width: 100%;
+  overflow: hidden;
+  position: absolute;
+  left: 0;
+  bottom: 24px;
+
+}
+
+.provide_id {
+  margin: 5px 0;
+  font-size: 16px;
+  text-align: left;
+  font-weight: 400;
+  opacity: 0.8;
+  width: 100%;
+}
+
+.bottom-layout {
+  position: static;
+  bottom: 40px;
+  left: 50%;
+  width: 100%;
+  transform: none;
+
+  .accordion-sec {
+    padding: 20px 0;
   }
 
-  .learn-more{
-    cursor: pointer;
-  }
+
+}
+
+.accordion-sec .label_padding {
+  padding-left: 15px;
+}
+
+.accordion-sec ion-accordion-group ion-icon {
+  margin-inline: 0px !important;
+}
+
+.accordion-sec ion-accordion-group ion-accordion {
+  padding: 0 !important;
+  
+}
+.acc_border {
+  border-top: 1px solid #3f3c55;
+}

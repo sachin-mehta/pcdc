@@ -13,11 +13,17 @@ import { SyncService } from './services/sync.service';
 
 // const shell = require('electron').shell;
 @Component({
-  selector: 'app-root',
-  templateUrl: 'app.component.html',
-  styleUrls: ['app.component.scss'],
+    selector: 'app-root',
+    templateUrl: 'app.component.html',
+    styleUrls: ['app.component.scss'],
+    standalone: false
 })
 export class AppComponent {
+  languages = environment.languages;
+  filteredLanguages = [];
+  languageSearch = '';
+  selectedLanguage: string;
+  selectedLanguageName: string;
   isToastOpen = true;
   school: any;
   historyState: any;
@@ -29,6 +35,16 @@ export class AppComponent {
   device_id_short: string;
   appName = environment.appName;
   showAboutMenu = environment.showAboutMenu;
+  testOptions: string[] = ['Ping', 'Download', 'Upload', 'Latency'];
+  searchTerm = 'Ping';
+  filteredOptions: string[] = [];
+  showDropdown: boolean = false;
+  networks = [
+    { name: 'WIFI 1', ssid: 'SSID', checked: false },
+    { name: 'WIFI 2', ssid: 'SSID', checked: false },
+    { name: 'LAN', ssid: 'SSID', checked: false },
+  ];
+  networkSelected = false
   constructor(
     private menu: MenuController,
     private storage: StorageService,
@@ -41,6 +57,13 @@ export class AppComponent {
     private localStorageService: IndexedDBService,
     private syncService: SyncService
   ) {
+    this.filteredOptions = [];
+    this.selectedLanguage =
+      this.settingsService.get('applicationLanguage')?.code ??
+      translate.defaultLang;
+    this.languageSearch = this.languages.find(
+      (l) => l?.code === this.selectedLanguage
+    )?.label ?? '';
     translate.setDefaultLang('en');
     const appLang = this.settingsService.get('applicationLanguage') ?? {
       code: 'en',
@@ -48,7 +71,7 @@ export class AppComponent {
     this.translate.use(appLang.code);
     this.app_version = environment.app_version;
     this.device_id = this.storage.get('schoolUserId') || 'unknown-device';
-    this.device_id_short = this.device_id.substring(0, 8) + '...';
+    this.device_id_short = this.device_id.substring(0, 16) + '...';
     if (this.storage.get('schoolId')) {
       this.school = JSON.parse(this.storage.get('schoolInfo'));
     }
@@ -138,14 +161,66 @@ export class AppComponent {
   }
 
   closeMenu() {
-    this.menu.enable(true, 'first');
+    this.menu.enable(true, 'setting');
     this.menu.close();
   }
 
+
+
   backMenu() {
     this.closeMenu();
-    this.menu.enable(true, 'first');
-    this.menu.open('first');
+    this.menu.enable(true, 'setting');
+    this.menu.open('setting');
+  }
+  cleanHistory() {
+    this.historyService.set({});
+  }
+
+  filterLanguages(event: any) {
+    const langSearched = event.target.value.toLowerCase();
+    this.languageSearch = event.target.value;
+    this.filteredLanguages = this.languages.filter(option =>
+      option.label.toLowerCase().includes(langSearched)
+    );
+  }
+
+  selectLanguageDropdown(option: any) {
+    this.languageSearch = option.label;
+    console.log(this.searchTerm)
+    this.filteredLanguages = [];
+    this.settingsService.setSetting(
+      'applicationLanguage',
+      this.languages.find((l) => l.code === option.code)
+    );
+    // this.selectedLanguageName = this.languages.find(
+    //   (l) => l.code === option.code
+    // ).label;
+    window.location.reload();
+    // Hide the dropdown
+  }
+  filterOptions(event: any) {
+    console.log('here')
+    const term = event.target.value.toLowerCase();
+    // Filter based on user input
+    this.searchTerm = event.target.value;
+    console.log(this.searchTerm)
+    this.filteredOptions = this.testOptions.filter(option =>
+      option.toLowerCase().includes(term)
+    );
+    console.log('hhhih', this.filteredOptions.length, this.searchTerm.length, term.length)
+
+    // Show dropdown if there's at least one match and user has typed something
+    this.showDropdown = this.filteredOptions.length > 0 && this.searchTerm.length > 0;
+    console.log('thi', this.showDropdown)
+  }
+
+  selectOption(option: string) {
+    // Set the input to the selected option
+    this.searchTerm = option;
+    console.log(this.searchTerm)
+    this.filteredOptions = [];
+    // Hide the dropdown
+    this.showDropdown = false;
   }
   refreshHistory() {
     const data = this.historyService.get();
@@ -157,12 +232,38 @@ export class AppComponent {
     this.historyState = { dataConsumed };
   }
 
+  onCheckboxChange() {
+    // Check if at least one network is selected
+    this.networkSelected = this.networks.some(network => network.checked);
+  }
+
+  confirmSelection() {
+    // Handle the confirm logic
+    // e.g., call an API, or navigate to another page
+    console.log('Selection confirmed:', this.networks.filter(n => n.checked));
+  }
+
+
   refreshSchedule() {
     this.scheduleSemaphore = this.scheduleService.getSemaphore();
   }
 
   openExternalUrl(href) {
     this.settingsService.getShell().shell.openExternal(href);
+  }
+
+  closeHelpenu() {
+    this.menu.enable(true, 'help');
+    this.menu.close();
+  }
+  backHelpMenu() {
+    this.closeMenu();
+    this.menu.enable(true, 'help');
+    this.menu.open('help');
+  }
+  openHelpMenu(menuid: string) {
+    this.menu.enable(true, menuid);
+    this.menu.open(menuid);
   }
   async copy(text: string): Promise<boolean> {
     try {

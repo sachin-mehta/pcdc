@@ -9,9 +9,10 @@ import { environment } from 'src/environments/environment';
 import { MeasurementClientService } from '../services/measurement-client.service';
 
 @Component({
-  selector: 'app-schoolsuccess',
-  templateUrl: 'schoolsuccess.page.html',
-  styleUrls: ['schoolsuccess.page.scss'],
+    selector: 'app-schoolsuccess',
+    templateUrl: 'schoolsuccess.page.html',
+    styleUrls: ['schoolsuccess.page.scss'],
+    standalone: false
 })
 export class SchoolsuccessPage {
   @ViewChild(IonAccordionGroup, { static: true })
@@ -20,7 +21,13 @@ export class SchoolsuccessPage {
   schools: any;
   schoolId: any;
   slideOpts = {
+    initialSlide: 0,
     speed: 400,
+    pagination: {
+      el: '.swiper-pagination', // target class for bullets
+      clickable: true
+    }
+  
   };
   isLast = false;
   appName = environment.appName;
@@ -39,6 +46,13 @@ export class SchoolsuccessPage {
   }
   reachedEnd() {
     this.isLast = true;
+  }
+
+  async checkCurrentSlide() {
+    const index = await this.slides.getActiveIndex();
+    const total = await this.slides.length(); // Total number of slides
+
+    this.isLast = index === total - 1;
   }
   moveToStartTest() {
     // this.measurementClientService.runTest(

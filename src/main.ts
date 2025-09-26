@@ -8,8 +8,25 @@ import * as Sentry from '@sentry/browser';
 // Initialize Sentry
 initSentry();
 
-if (environment.production) {
-  enableProdMode();
+enableProdMode();
+
+// Only include Electron code when running in Electron
+if (window.require) {
+  const { app, BrowserWindow } = window.require('electron');
+  const remoteMain = window.require('@electron/remote/main');
+
+  remoteMain.initialize();
+
+  function createWindow() {
+    const win = new BrowserWindow({
+      webPreferences: {
+        nodeIntegration: true,
+        contextIsolation: false
+      }
+    });
+
+    remoteMain.enable(win.webContents);
+  }
 }
 
 platformBrowserDynamic().bootstrapModule(AppModule)

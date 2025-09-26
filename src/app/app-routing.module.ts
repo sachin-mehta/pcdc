@@ -7,7 +7,7 @@ const routes: Routes = [
     loadChildren: () => import('./home/home.module').then( m => m.HomePageModule)
   },
   {
-    path: 'searchschool/:selectedCountry/:detectedCountry',
+    path: 'searchschool/:selectedCountry/:detectedCountry/:selectedCountryName',
     loadChildren: () => import('./searchschool/searchschool.module').then( m => m.SearchschoolPageModule)
   },
   {
@@ -15,16 +15,24 @@ const routes: Routes = [
     loadChildren: () => import('./searchcountry/searchcountry.module').then( m => m.SearchcountryPageModule)
   },
   {
-    path: 'schooldetails/:schoolId/:selectedCountry/:detectedCountry',
+    path: 'register-school',
+    loadChildren: () => import('./register-school/register-school.module').then( m => m.RegisterSchoolModule)
+  },
+  {
+    path: 'schooldetails/:schoolId/:selectedCountry/:detectedCountry/:selectedCountryName',
     loadChildren: () => import('./schooldetails/schooldetails.module').then( m => m.SchooldetailsPageModule)
   },
   {
-    path: 'confirmschool/:schoolId/:selectedCountry/:detectedCountry',
+    path: 'confirmschool/:schoolId/:selectedCountry/:detectedCountry/:selectedCountryName',
     loadChildren: () => import('./confirmschool/confirmschool.module').then( m => m.ConfirmschoolPageModule)
   }
   ,
   {
-    path: 'schoolnotfound/:schoolId/:selectedCountry/:detectedCountry',
+    path: 'save-email/:schoolId/:selectedCountry/:detectedCountry',
+    loadChildren: () => import('./school-email-register/school-email-register.module').then( m => m.SchoolEmailRegisterModule)
+  },
+  {
+    path: 'schoolnotfound/:schoolId/:selectedCountry/:detectedCountry/:selectedCountryName',
     loadChildren: () => import('./schoolnotfound/schoolnotfound.module').then( m => m.SchoolnotfoundPageModule)
   },
   {

@@ -1,0 +1,8 @@
+<ion-item lines="none" class="location-item">
+    <ion-img name="information-circle-outline" [ngClass]="{'icon_placemeent': !showSchoolId || !schoolId}"  class="location-icon" src="assets/images/Location.svg"></ion-img>
+
+  <ion-label>
+    <div class="country-text">Country - {{selectedCountry}} </div>
+    <div *ngIf="showSchoolId && schoolId" class="school-id">School ID - {{schoolId}}</div>
+  </ion-label>
+</ion-item>

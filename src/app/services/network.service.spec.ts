@@ -1,6 +1,6 @@
-import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
+import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { TestBed } from '@angular/core/testing';
-import { HttpClientModule } from '@angular/common/http';
+import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { Network } from '@awesome-cordova-plugins/network/ngx';
 import { NetworkService } from './network.service';
 
@@ -9,14 +9,13 @@ describe('NetworkService', () => {
 
   beforeEach(() => {
     TestBed.configureTestingModule({
-      imports: [
-        HttpClientModule,
-        HttpClientTestingModule
-      ],
-      providers:[
-        Network
-      ]
-    });
+    imports: [],
+    providers: [
+        Network,
+        provideHttpClient(withInterceptorsFromDi()),
+        provideHttpClientTesting()
+    ]
+});
     service = TestBed.inject(NetworkService);
   });
 

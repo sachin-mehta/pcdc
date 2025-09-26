@@ -1,62 +1,152 @@
-@import '../../theme/variables.scss'; 
-  ion-label{
-    font-size: 12px;
-  }
-  .provide-id{
-    margin-top: 20px;
-  }
-  .school-label{
-    margin-top: 20px;
-  }
-  .schoolid-input{
-    margin-top: 20px;
-  }
-  .label-txt{
-    color: $light-text2;
-    font-size: 13px;
-    line-height: 18px;
-    padding-top: 20px;
-    padding-left: 15px;
-    width:76%;
-  }
-  ion-item{
-    --background: $color-black;
-    --border-color:#141923;
-  }
- .schoolDetails{
-   width: 100%;
-   min-height: 178px;
-   border-radius: 10px;
-   background-color: $color-blue;
-   margin-top: 20px;
-   padding: 25px;
- }
- .schoolname{
-    color: $text-color;
-    font-size: 20px;
-    width:80%;
-    height: 50px;
- }
- .schoolAddress{
-    color: $text-color;
-    font-size: 13px;
-    padding-top: 30px;
-    font-family: Roboto;
- }
- .schoolid{
-    color: $color-grey;
-    font-size: 13px;
-    padding-top: 10px;
-    /* font-family: Roboto; */
- }
- .btn-holder{
-   display: flex;
-   justify-content: space-between;
-   margin-top: 20px;
- } 
-.confirm-txt{   
-  padding-left: 15px;
-  color: $light-text2;
-  font-size: 13px;
+@import '../../theme/variables.scss';
+
+ion-label {
+  font-size: 12px;
 }
 
+.provide-id {
+  margin-top: 20px;
+}
+
+.school-label {
+  margin-top: 20px;
+}
+
+.schoolid-input {
+  margin-top: 20px;
+}
+
+.label-txt {
+  color: $color-black;
+  font-size: 16px;
+  line-height: 20px;
+  width: 76%;
+  font-weight: 400;
+  margin-bottom: 10px;
+}
+
+ion-item {
+  --background: $color-black;
+  --border-color: #141923;
+}
+
+.schoolDetails {
+  width: 100%;
+  min-height: 178px;
+  border-radius: 10px;
+  margin-top: 20px;
+  padding: 25px;
+  color: #161616;
+}
+
+.schoolName {
+  color: #161616;
+  font-size: 20px;
+  width: 80%;
+  height: 50px;
+  font-weight: 500;
+}
+.linkColor {
+  color: #3880ff;
+  text-decoration: underline;
+}
+
+.googleCheck {
+  margin-top: 10px;
+  display: flex;
+}
+
+
+.schoolAddress {
+  color: $text-color;
+  font-size: 13px;
+  padding-top: 30px;
+  font-family: Roboto;
+}
+
+.schoolid {
+  color: $color-grey;
+  font-size: 13px;
+  padding-top: 10px;
+  /* font-family: Roboto; */
+}
+
+.btn-holder {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.confirm-txt {
+  color: $text-color;
+  font-size: 12px;
+  margin-bottom: 8px;
+  padding-top: 16px;
+
+}
+
+.MakeSureText {
+  padding: 0 10px;
+  margin: 0;
+  font-size: 12px;
+  font-weight: 400;
+}
+
+
+.nobtn,
+.yesbtn {
+  margin-bottom: 30px;
+  height: 40px;
+  border: 0;
+  display: flex;
+  border-radius: 6px; // or 40px if you want a pill shape
+  align-items: center;
+  justify-content: center;
+  font-weight: 400 !important;
+  font-size: 14px !important;
+  border-radius: 40px !important;
+  overflow: hidden;
+  color: #fff !important;
+  --border-width: 0px;
+
+}
+.nobtn {
+  border: 2px solid #277AFF !important;
+
+}
+
+.notification {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-around;
+  margin: 0 0;
+  border-left: 2px solid blue;
+  background: #E5E5E5;
+  padding: 15px;
+  margin-top: 20px;
+
+  .hydrated {
+    background: none !important;
+    width: 32px;
+  }
+}
+
+.welcome_icon {
+  width: 20px;
+  height: 20px;
+}
+.school_detail {
+  font-size: 14px;
+  font-weight: 400;
+}
+.detail_box {
+  background: #D6E4FD
+  ;
+}
+
+.box_margin{
+  margin-top: 20px;
+  margin-bottom: 20px;
+
+
+}

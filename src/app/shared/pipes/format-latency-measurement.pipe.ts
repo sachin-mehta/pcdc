@@ -1,7 +1,8 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-  name: 'formatLatencyMeasurement'
+    name: 'formatLatencyMeasurement',
+    standalone: false
 })
 export class FormatLatencyMeasurementPipe implements PipeTransform {
 

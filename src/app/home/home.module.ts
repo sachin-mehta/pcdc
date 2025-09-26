@@ -6,6 +6,7 @@ import { HomePage } from './home.page';
 import { SharedModule } from '../shared/shared.module';
 import { HomePageRoutingModule } from './home-routing.module';
 import { PcdcHeaderComponent } from '../pcdc-header/pcdc-header.component';
+import { EnterKeyClickDirective } from '../shared/directives/enter-key-click.directive';
 
 @NgModule({
   imports: [
@@ -13,8 +14,9 @@ import { PcdcHeaderComponent } from '../pcdc-header/pcdc-header.component';
     FormsModule,
     IonicModule,
     HomePageRoutingModule,
-    SharedModule,
+    SharedModule
+    
   ],
-  declarations: [HomePage, PcdcHeaderComponent],
+  declarations: [HomePage, PcdcHeaderComponent,EnterKeyClickDirective],
 })
 export class HomePageModule {}

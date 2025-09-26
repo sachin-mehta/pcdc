@@ -10,7 +10,7 @@
  .schoolsuccess{  
     --bullet-background: #eee;
     --bullet-background-active: #51E12B;
-    height: 82%;
+    height: 90%;
   }
  .swiper-slide {
    height: 70% !important;
@@ -40,20 +40,37 @@
       width:125px !important;
     }
     .success-txt{
-      color: #51E12B;
+      color: #46C66D;
       text-align: center;
       padding-top: 15px;
-      font-size: 16px;
+      font-size: 20px;
+      text-transform: unset;
+      font-weight: 400;
     }
     .success-desc-txt{
-      color: $light-text2;
+      color: #46C66D;
       text-align: center;
-      padding-top: 10px;
-      font-size: 13px;
+      padding-top: 16px;
+      font-size: 14px;
+      font-weight: 400;
     }
   }  
   .bottom-layout{
-    padding: 0px 30px;
-    bottom: 50px !important;
+    padding: 0px 0px;
+    bottom: 24px !important;
   }
  
+
+  .btn_margin {
+    margin-inline-end: 0;
+    margin-inline-start:0;
+    font-weight: 400;
+    font-size: 14px;
+  }
+  ::ng-deep .swiper-pagination-bullet {
+    margin: 0 4px;
+  }
+  .swiper-pagination {
+    left: 0;
+    width: 100%;
+  }

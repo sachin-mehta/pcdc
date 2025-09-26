@@ -6,6 +6,7 @@ import { ConfirmschoolPage } from './confirmschool.page';
 import { SharedModule } from '../shared/shared.module';
 import { ConfirmschoolPageRoutingModule } from './confirmschool-routing.module';
 import { PcdcHeaderComponent } from '../pcdc-header/pcdc-header.component';
+import { EnterKeyClickDirective } from '../shared/directives/enter-key-click.directive';
 
 @NgModule({
   imports: [
@@ -15,6 +16,6 @@ import { PcdcHeaderComponent } from '../pcdc-header/pcdc-header.component';
     ConfirmschoolPageRoutingModule,
     SharedModule,
   ],
-  declarations: [ConfirmschoolPage, PcdcHeaderComponent],
+  declarations: [ConfirmschoolPage, PcdcHeaderComponent, EnterKeyClickDirective],
 })
 export class ConfirmschoolPageModule {}

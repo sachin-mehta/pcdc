@@ -1,0 +1,249 @@
+@import "../../../theme/variables.scss";
+
+.container {
+  margin: 0px 0 0px 0;
+  height: 90%;
+  min-height: 88%;
+  background-size: 100% 100%;
+  border-radius: 0px 0px 10px 10px;
+}
+
+.schoolsuccess {
+  --bullet-background: #eee;
+  --bullet-background-active: #51E12B;
+  height: 70%;
+}
+
+.swiper-slide {
+  height: 70% !important;
+}
+
+ion-label {
+  font-size: 12px;
+}
+
+.label-txt {
+  color: $text-color;
+  font-size: 20px;
+}
+
+.successInfo-slide3 {
+  padding-top: 50px;
+
+  ion-img {
+    width: auto !important;
+    margin: 20px auto;
+    display: flex;
+    justify-content: center;
+  }
+
+  .icon1 {
+    width: 124px !important;
+  }
+
+  .icon2 {
+    width: 110px !important;
+  }
+
+  .icon3 {
+    width: 125px !important;
+    height: 125px; // 
+    object-fit: contain; // or `cover` if needed
+    display: block;
+    margin: 20px auto;
+  }
+
+
+  .success-txt {
+    color: #46C66D;
+    text-align: center;
+    font-size: 20px;
+    text-transform: unset;
+    font-weight: 400;
+  }
+
+  .success-desc-txt {
+    color: #222222;
+    text-align: center;
+    padding-top: 16px;
+    font-size: 14px;
+    font-weight: 400;
+  }
+}
+
+.successInfo {
+  padding-top: 100px;
+
+  ion-img {
+    width: auto !important;
+    margin: 20px auto;
+    display: flex;
+    justify-content: center;
+  }
+
+  .icon1 {
+    width: 124px !important;
+  }
+
+  .icon2 {
+    width: 110px !important;
+  }
+
+  .icon3 {
+    width: 125px !important;
+  }
+
+  .success-txt {
+    color: #46C66D;
+    text-align: center;
+    padding-top: 15px;
+    font-size: 20px;
+    text-transform: unset;
+    font-weight: 400;
+  }
+
+  .success-desc-txt {
+    color: #222222;
+    text-align: center;
+    padding-top: 16px;
+    font-size: 14px;
+    font-weight: 400;
+  }
+}
+
+.bottom-layout {
+  padding: 0px 0px;
+  bottom: 24px !important;
+}
+
+
+.btn_margin {
+  margin-inline-end: 0;
+  margin-inline-start: 0;
+  font-weight: 400;
+  font-size: 14px;
+}
+
+::ng-deep .swiper-pagination-bullet {
+  margin: 0 4px;
+}
+
+.swiper-pagination {
+  bottom: 54px;
+  left: 0;
+  width: 100%;
+}
+
+.last-step {
+  padding-left: 60px;
+  padding-right: 60px;
+}
+
+.read_content {
+  display: flex;
+  padding-bottom: 10px;
+  text-decoration: underline;
+  cursor: pointer;
+  color: #277AFF;
+  padding: 16px 0 16px 0;
+}
+
+.register_readMore {
+  padding-left: 5px;
+  font-size: 12px;
+  font-weight: 400;
+  display: flex;
+
+}
+
+.middle-layout {
+  text-align: left;
+  background-color: #ffffff;
+  display: flex;
+  bottom: 120px;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 0 0;
+  color: #E2E2E2;
+  flex-flow: wrap;
+  position: absolute;
+  left: 0;
+}
+
+.middle-layout ion-checkbox {
+  --size: 20px;
+
+  /* Align checkbox with text */
+  flex-shrink: 0;
+  /* Prevent checkbox from shrinking */
+  border: solid rgba(255, 255, 255, 0.51) 2px;
+  border-radius: 4px;
+}
+
+.learnmore {
+  font-size: 11px;
+  padding: 0px 30px;
+  padding-top: 10px;
+  color: $light-text1;
+
+  span {
+    font-size: 24px;
+    padding-left: 5px;
+  }
+}
+
+
+.middle-layout .learnmore {
+  flex: 1;
+  /* Allow text to take available space */
+  font-size: 12px;
+  padding: 0;
+  line-height: 16px;
+  /* Ensure text is aligned properly */
+  color: #222222;
+  font-weight: 400;
+  letter-spacing: 0.32px;
+
+}
+
+.checkbox {
+  z-index: 10;
+  pointer-events: auto;
+}
+
+.privacy-container {
+  display: flex;
+  border: 0px;
+  gap: 10px;
+}
+
+.input {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+}
+
+.privacy_height {
+  height: 82% !important;
+}
+
+.underline {
+  text-decoration: underline;
+  cursor: pointer;
+
+}
+
+.txt-font {
+  font-weight: bold !important;
+
+}
+
+.top-layout {
+  padding-right: 26px;
+  padding-left: 26px;
+}  
+.last-slide-active {
+    height: 63% !important;
+  }

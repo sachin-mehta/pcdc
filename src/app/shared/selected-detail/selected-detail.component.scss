@@ -1,0 +1,27 @@
+.location-item {
+  --padding-start: 0;
+  --inner-padding-end: 0;
+  --background: transparent;
+  color: #277AFF;
+  font-size: 14px !important;
+
+  .location-icon {
+    margin: 0 2px 20px 0;
+  }
+
+  .icon_placemeent {
+    margin: 0 2px;
+  }
+  .country-text {
+    display: flex;
+    align-items: center;
+    font-weight: 400;
+    color: #277AFF;
+  }
+
+  .school-id {
+    margin-top: 2px;
+    color: #277AFF;
+    font-weight: 400;
+  }
+}

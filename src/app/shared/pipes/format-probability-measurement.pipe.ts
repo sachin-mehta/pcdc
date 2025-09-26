@@ -1,7 +1,8 @@
 import { Pipe, PipeTransform } from '@angular/core';
 
 @Pipe({
-  name: 'formatProbabilityMeasurement'
+    name: 'formatProbabilityMeasurement',
+    standalone: false
 })
 export class FormatProbabilityMeasurementPipe implements PipeTransform {
 
