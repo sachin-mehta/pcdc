@@ -8,7 +8,7 @@ import { autoUpdater } from 'electron-updater';
 import fs from 'fs-extra';
 import path from 'path';
 
-import { ElectronCapacitorApp, setupContentSecurityPolicy, setupReloadWatcher } from './setup';
+import { ElectronCapacitorApp, setupContentSecurityPolicy, setupReloadWatcher, setIsQuiting, getIsQuiting } from './setup';
 import { captureException } from '@sentry/node';
 
 // Set userData path to use name instead of productName - must be set before app is ready
@@ -32,7 +32,6 @@ unhandled({
 
 
 
-let isQuiting = false;
 let mainWindow = null;
 let isDownloaded = false;
 
@@ -45,8 +44,8 @@ const trayMenuTemplate: (MenuItemConstructorOptions | MenuItem)[] = [
   }),
   new MenuItem({
     label: 'Quit App', click: function () {
-      isQuiting = true;
-      // myCapacitorApp.getMainWindow().close();
+      setIsQuiting(true);
+      myCapacitorApp.cleanup();
       app.quit();
     }
   })
@@ -88,7 +87,7 @@ if (!gotTheLock) {
         mainWindow.show();
       }
       mainWindow.focus();
-      if (isQuiting) {
+      if (getIsQuiting()) {
         // mainWindow.close();
         app.quit();
       }
@@ -206,22 +205,13 @@ autoUpdater.on('error', (error) => {
   // Check for updates if we are in a packaged app.
   // autoUpdater.checkForUpdatesAndNotify();
 }
-if (mainWindow) {
-  mainWindow.on('close', (event) => {
-    if (!isQuiting) {
-      event.preventDefault();
-      mainWindow.hide();
-      return false;
-    } else {
-      app.quit();
-    }
-  });
-}
 // Handle when all of our windows are close (platforms have their own expectations).
 app.on('window-all-closed', function () {
   // On OS X it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
   if (process.platform !== 'darwin') {
+    setIsQuiting(true);
+    myCapacitorApp.cleanup(); // Cleanup resources before quitting
     app.quit();
   }
 });
@@ -230,12 +220,21 @@ app.on('window-all-closed', function () {
 app.on('activate', async function () {
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
-  if (myCapacitorApp.getMainWindow().isDestroyed()) {
+  const mainWindow = myCapacitorApp.getMainWindow();
+  if (mainWindow && mainWindow.isDestroyed()) {
     await myCapacitorApp.init();
+  } else if (mainWindow) {
+    // Just show the existing window instead of recreating everything
+    mainWindow.show();
+    mainWindow.focus();
   }
 });
 
-
+// Handle app quitting to cleanup resources
+app.on('before-quit', () => {
+  setIsQuiting(true);
+  myCapacitorApp.cleanup();
+});
 
 // Place all ipc or other electron api calls and custom functionality under this line
 

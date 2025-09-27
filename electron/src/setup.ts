@@ -29,6 +29,15 @@ import { Console } from 'console';
 var AutoLaunch = require('auto-launch');
 var isQuiting = false;
 
+// Export functions to control quitting state
+export function setIsQuiting(quitting: boolean) {
+  isQuiting = quitting;
+}
+
+export function getIsQuiting(): boolean {
+  return isQuiting;
+}
+
 // Enhanced Sentry configuration
 Sentry.init({
   dsn: 'https://e52e97fc558344bc80a218fc22a9a6a9@excubo.unicef.io/47',
@@ -120,9 +129,9 @@ export class ElectronCapacitorApp {
     new MenuItem({
       label: 'Quit App',
       click: function () {
-        isQuiting = true;
+        setIsQuiting(true);
+        // Note: cleanup will be handled by the before-quit event
         app.quit();
-        this.MainWindow.close();
       },
     }),
   ];
@@ -172,6 +181,14 @@ export class ElectronCapacitorApp {
 
   getCustomURLScheme(): string {
     return this.customScheme;
+  }
+
+  // Cleanup method to properly destroy tray icon
+  cleanup(): void {
+    if (this.TrayIcon && !this.TrayIcon.isDestroyed()) {
+      this.TrayIcon.destroy();
+      this.TrayIcon = null;
+    }
   }
 
   async init(): Promise<void> {
@@ -259,6 +276,15 @@ export class ElectronCapacitorApp {
       );
     }
 
+    // Handle native close button to minimize to tray instead of closing
+    this.MainWindow?.on('close', (event) => {
+      if (!isQuiting) {
+        event.preventDefault();
+        this.MainWindow?.hide();
+        return false;
+      }
+    });
+
     // If we close the main window with the splashscreen enabled we need to destory the ref.
     this.MainWindow?.on('closed', () => {
       if (
@@ -270,6 +296,10 @@ export class ElectronCapacitorApp {
     });
     // When the tray icon is enabled, setup the options.
     if (this.CapacitorFileConfig?.electron?.trayIconAndMenuEnabled) {
+      // Cleanup existing tray icon to prevent duplicates
+      if (this.TrayIcon && !this.TrayIcon.isDestroyed()) {
+        this.TrayIcon.destroy();
+      }
       this.TrayIcon = new Tray(icon);
       this.TrayIcon?.on('double-click', () => {
         if (this.MainWindow) {
