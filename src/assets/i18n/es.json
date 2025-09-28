@@ -143,7 +143,12 @@
         "downloadLowerCase": "Descarga",
         "home": "Inicio",
         "about": "Acerca de",
-        "total": "Historial de pruebas (últimas 10 mediciones)"
+        "total": "Historial de pruebas (últimas 10 mediciones)",
+        "congratulations": "¡Felicitaciones!",
+        "schoolRegistered": "Escuela registrada exitosamente",
+        "testWorking": "La prueba está funcionando",
+        "backgroundMessage": "La aplicación continuará ejecutándose en segundo plano.",
+        "closingIn": "Cerrando en"
     },
     "registerSchoolPage" : {
         "title1": "Estás a punto de registrar tu escuela",
@@ -154,6 +159,10 @@
         "tip3": "Conectado únicamente a internet de la escuela",
         "privacy": "Acepto el uso de datos por parte de Giga bajo los"
 
+    },
+    "notifications": {
+        "registrationCompleted": "Registro completado",
+        "runningFirstTest": "Ejecutando tu primera prueba"
     },
     "resultSchool": "RESULTADOS PARA EL ID DE LA ESCUELA",
     "tryAgain": "INTENTAR DE NUEVO",

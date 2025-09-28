@@ -13,6 +13,7 @@ import { Device } from '@capacitor/device';
 import { DatePipe } from '@angular/common';
 import { environment } from 'src/environments/environment';
 import { SettingsService } from '../services/settings.service';
+import { SharedService } from '../services/shared-service.service';
 import { TranslateService } from '@ngx-translate/core';
 @Component({
   selector: 'app-confirmschool',
@@ -40,7 +41,8 @@ export class ConfirmschoolPage {
     private settings: SettingsService,
     public loading: LoadingService,
     private datePipe: DatePipe,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private sharedService: SharedService
   ) {
     const appLang = this.settings.get('applicationLanguage');
     this.translate.use(appLang.code);
@@ -107,8 +109,13 @@ export class ConfirmschoolPage {
               this.storage.setRegistrationCompleted(Date.now());
 
               this.loading.dismiss();
-              // Redirect directly to dashboard instead of success page
-              this.router.navigate(['/starttest']);
+              
+              // Navigate to starttest page normally
+              this.router.navigate(['/starttest']).then(() => {
+                // Broadcast registration completion event after navigation
+                // This will trigger the first-time flow in StartTest component
+                this.sharedService.broadcast('registration:completed');
+              });
 
               this.settings.setSetting('scheduledTesting', true);
             }),

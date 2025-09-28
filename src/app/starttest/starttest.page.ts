@@ -207,6 +207,9 @@ export class StarttestPage implements OnInit, OnDestroy {
 
     // IMPORTANT: Check for first-time visit LAST to ensure all event listeners are ready
     this.checkFirstTimeVisit();
+    
+    // Set up listener for registration completion events
+    this.setupRegistrationListener();
   }
 
   /**
@@ -222,6 +225,20 @@ export class StarttestPage implements OnInit, OnDestroy {
       this.refreshHistory.bind(this)
     );
     this.sharedService.on('history:reset', this.refreshHistory.bind(this));
+  }
+
+  /**
+   * Set up listener for registration completion to handle first-time flow
+   */
+  private setupRegistrationListener() {
+    // Listen for registration completion events from other components
+    this.sharedService.on('registration:completed', () => {
+      console.log('🎉 DEBUG: Registration completion event received - re-checking first time visit');
+      // Re-check first time visit status after registration
+      setTimeout(() => {
+        this.checkFirstTimeVisit();
+      }, 100); // Small delay to ensure storage is updated
+    });
   }
 
   /**
@@ -781,6 +798,52 @@ export class StarttestPage implements OnInit, OnDestroy {
     });
 
     return await modal.present();
+  }
+
+  /**
+   * Testing methods for development purposes
+   * These should be removed in production
+   */
+
+  /**
+   * Show the first-time modal for testing purposes
+   */
+  async showFirstTimeModalForTesting() {
+    console.log('Testing: Showing first-time modal');
+    await this.showFirstTestSuccessModal();
+  }
+
+  /**
+   * Show notification banners for testing purposes
+   */
+  showNotificationForTesting() {
+    console.log('Testing: Showing notification banners');
+    this.showRegistrationBanner = true;
+    this.registrationStatus = 'completed';
+    this.isFirstVisit = true;
+
+    // Simulate progression through notification states
+    setTimeout(() => {
+      this.registrationStatus = 'testing';
+      this.ref.markForCheck();
+    }, 2000);
+
+    setTimeout(() => {
+      this.registrationStatus = 'done';
+      this.ref.markForCheck();
+    }, 4000);
+  }
+
+  /**
+   * Hide all testing elements and reset state
+   */
+  hideTestingElements() {
+    console.log('Testing: Resetting all testing elements');
+    this.showRegistrationBanner = false;
+    this.isFirstVisit = false;
+    this.registrationStatus = 'completed';
+    this.firstTestTriggered = false;
+    this.ref.markForCheck();
   }
 
   ngOnDestroy() {

@@ -1,5 +1,22 @@
 <app-pcdc-header></app-pcdc-header>
 
+<!-- Testing Controls for Development (Remove in Production) -->
+<!-- <div class="testing-controls">
+  <span>🧪 DEV TESTING:</span>
+  <ion-button size="small" fill="outline" color="primary" (click)="showFirstTimeModalForTesting()">
+    <ion-icon name="trophy-outline" slot="start"></ion-icon>
+    First-Time Modal
+  </ion-button>
+  <ion-button size="small" fill="outline" color="secondary" (click)="showNotificationForTesting()">
+    <ion-icon name="notifications-outline" slot="start"></ion-icon>
+    Notifications
+  </ion-button>
+  <ion-button size="small" fill="clear" color="danger" (click)="hideTestingElements()">
+    <ion-icon name="refresh-outline" slot="start"></ion-icon>
+    Reset
+  </ion-button>
+</div> -->
+
 <!-- Registration Banners for First-Time Visit -->
 <div class="notification-container" *ngIf="showRegistrationBanner">
   <!-- Registration Completed Notification -->
@@ -8,8 +25,7 @@
       name="checkmark-circle"
       style="color: #007bff; font-size: 20px; margin-right: 5px"
     ></ion-icon>
-    <div class="notification-text" [translate]="'Registration completed'"></div>
-    <button class="close-button" (click)="dismissBanner()">×</button>
+    <div class="notification-text" [translate]="'notifications.registrationCompleted'"></div>
   </div>
 
   <!-- Running First Test Notification -->
@@ -27,9 +43,8 @@
 
     <div
       class="notification-text"
-      [translate]="'Running your first test'"
+      [translate]="'notifications.runningFirstTest'"
     ></div>
-    <button class="close-button" (click)="dismissBanner()">×</button>
   </div>
 </div>
 
