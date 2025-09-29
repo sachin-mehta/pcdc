@@ -445,3 +445,26 @@ ion-breadcrumb::part(native) {
   max-height: 80vh;
   overflow-y: auto;
 }
+
+/* What's New Modal Styles */
+.whats-new-modal {
+  --width: auto;
+  --height: auto;
+  --min-width: 320px;
+  --max-width: 400px;
+  --border-radius: 16px;
+  --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  --backdrop-opacity: 0.5;
+}
+
+.whats-new-modal ion-backdrop {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.whats-new-modal .modal-wrapper {
+  background: white;
+  border-radius: 16px;
+  margin: 0;
+  max-height: 80vh;
+  overflow-y: auto;
+}

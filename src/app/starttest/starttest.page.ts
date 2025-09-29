@@ -207,7 +207,7 @@ export class StarttestPage implements OnInit, OnDestroy {
 
     // IMPORTANT: Check for first-time visit LAST to ensure all event listeners are ready
     this.checkFirstTimeVisit();
-    
+
     // Set up listener for registration completion events
     this.setupRegistrationListener();
   }
@@ -233,7 +233,9 @@ export class StarttestPage implements OnInit, OnDestroy {
   private setupRegistrationListener() {
     // Listen for registration completion events from other components
     this.sharedService.on('registration:completed', () => {
-      console.log('🎉 DEBUG: Registration completion event received - re-checking first time visit');
+      console.log(
+        '🎉 DEBUG: Registration completion event received - re-checking first time visit'
+      );
       // Re-check first time visit status after registration
       setTimeout(() => {
         this.checkFirstTimeVisit();
@@ -706,7 +708,7 @@ export class StarttestPage implements OnInit, OnDestroy {
       // Auto-trigger first test after a short delay
       setTimeout(() => {
         this.autoTriggerFirstTest();
-      }, 2000); // 2 second delay to show the banner first
+      }, 500); // 2 second delay to show the banner first
     } else if (this.isFirstVisit) {
       // Clear stale first visit flag if registration is old
       this.storage.clearFirstTimeVisit();
@@ -773,7 +775,7 @@ export class StarttestPage implements OnInit, OnDestroy {
       // Show success modal after a short delay
       setTimeout(async () => {
         await this.showFirstTestSuccessModal();
-      }, 1000);
+      }, 300);
     }
   }
 

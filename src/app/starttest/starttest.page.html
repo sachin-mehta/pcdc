@@ -3,15 +3,30 @@
 <!-- Testing Controls for Development (Remove in Production) -->
 <!-- <div class="testing-controls">
   <span>🧪 DEV TESTING:</span>
-  <ion-button size="small" fill="outline" color="primary" (click)="showFirstTimeModalForTesting()">
+  <ion-button
+    size="small"
+    fill="outline"
+    color="primary"
+    (click)="showFirstTimeModalForTesting()"
+  >
     <ion-icon name="trophy-outline" slot="start"></ion-icon>
     First-Time Modal
   </ion-button>
-  <ion-button size="small" fill="outline" color="secondary" (click)="showNotificationForTesting()">
+  <ion-button
+    size="small"
+    fill="outline"
+    color="secondary"
+    (click)="showNotificationForTesting()"
+  >
     <ion-icon name="notifications-outline" slot="start"></ion-icon>
     Notifications
   </ion-button>
-  <ion-button size="small" fill="clear" color="danger" (click)="hideTestingElements()">
+  <ion-button
+    size="small"
+    fill="clear"
+    color="danger"
+    (click)="hideTestingElements()"
+  >
     <ion-icon name="refresh-outline" slot="start"></ion-icon>
     Reset
   </ion-button>
@@ -25,7 +40,10 @@
       name="checkmark-circle"
       style="color: #007bff; font-size: 20px; margin-right: 5px"
     ></ion-icon>
-    <div class="notification-text" [translate]="'notifications.registrationCompleted'"></div>
+    <div
+      class="notification-text"
+      [translate]="'notifications.registrationCompleted'"
+    ></div>
   </div>
 
   <!-- Running First Test Notification -->

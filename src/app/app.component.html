@@ -279,13 +279,11 @@
             <!-- <ion-icon name="chevron-forward-outline"></ion-icon> -->
             <ion-img src="assets/images/setting_arrow.svg"></ion-img>
           </ion-item>
-          <!-- <ion-item (click)="openHelpMenu('new')">
+          <ion-item (click)="openHelpMenu('new')">
             <ion-img src="assets/images/new.svg"></ion-img>
-            <ion-label [innerHTML]="'app.whats-new' | translate"></ion-label> -->
-          <!-- <ion-icon name="chevron-forward-outline"></ion-icon> -->
-          <!-- <ion-img src="assets/images/setting_arrow.svg"></ion-img> -->
-
-          <!-- </ion-item> -->
+            <ion-label [innerHTML]="'app.whats-new' | translate"></ion-label>
+            <ion-img src="assets/images/setting_arrow.svg"></ion-img>
+          </ion-item>
           <ion-item (click)="copy(device_id)">
             <ion-label
               class="small-font"
@@ -552,33 +550,43 @@
           >
           <ion-breadcrumb class="font_label">What's new!</ion-breadcrumb>
         </ion-breadcrumbs>
-        <div class="accordion-sec">
-          <ion-label
-            text-wrap
-            [translate]="'app.project-connect-desc' | translate : { appName }"
-          ></ion-label>
+
+        <!-- Release Notes Section -->
+        <div class="whats-new-section" *ngFor="let release of whatsNewReleases">
+          <div class="release-header">
+            <ion-label class="release-date"
+              >{{ release.date }} - v{{ release.version }}</ion-label
+            >
+          </div>
+
+          <div class="release-content">
+            <ion-label class="release-title"
+              >Headline: {{ release.title }}</ion-label
+            >
+
+            <div class="release-items">
+              <div class="release-item" *ngFor="let item of release.items">
+                <span class="bullet">•</span>
+                <ion-label class="item-text">{{ item }}</ion-label>
+              </div>
+            </div>
+
+            <ion-button
+              fill="clear"
+              class="release-notes-link"
+              (click)="openReleaseNotes()"
+            >
+              Check Release notes →
+            </ion-button>
+          </div>
         </div>
-        <!-- <div class="accordion-sec">
-          <ion-label text-wrap class="thank-txt" [translate]="'app.thank-you' | translate:{ appName }"></ion-label>
-        </div> -->
-        <div class="accordion-sec">
-          <ion-img
-            src="assets/images/project-connect.jpg"
-            class="aboutprojConn"
-          ></ion-img>
-        </div>
-        <div class="accordion-sec">
-          <ion-label
-            text-wrap
-            [translate]="'app.project-connect-desc' | translate : { appName }"
-          ></ion-label>
-        </div>
-        <div class="accordion-sec">
-          <ion-label
-            text-wrap
-            class="thank-txt"
-            [translate]="'app.thank-you' | translate : { appName }"
-          ></ion-label>
+
+        <!-- Show message if no releases available -->
+        <div
+          class="no-releases"
+          *ngIf="!whatsNewReleases || whatsNewReleases.length === 0"
+        >
+          <ion-label>No recent updates available.</ion-label>
         </div>
       </div>
     </ion-content>
