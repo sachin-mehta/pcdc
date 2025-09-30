@@ -24,6 +24,7 @@ import { Subscription } from 'rxjs';
 import { CountryService } from '../services/country.service';
 import { mlabInformation, accessInformation } from '../models/models';
 import { FirstTestSuccessModalComponent } from '../components/first-test-success-modal/first-test-success-modal.component';
+import { ConfettiService } from '../services/confetti.service';
 
 @Component({
   selector: 'app-starttest',
@@ -128,7 +129,8 @@ export class StarttestPage implements OnInit, OnDestroy {
     public translate: TranslateService,
     private ref: ChangeDetectorRef,
     private storage: StorageService,
-    private countryService: CountryService
+    private countryService: CountryService,
+    private confettiService: ConfettiService
   ) {
     if (this.storage.get('schoolId')) {
       this.school = JSON.parse(this.storage.get('schoolInfo'));
@@ -797,15 +799,46 @@ export class StarttestPage implements OnInit, OnDestroy {
     modal.onDidDismiss().then(() => {
       // Clear first visit flag and dismiss banner after modal is closed
       this.dismissBanner();
+      // Stop confetti when modal is dismissed
+      this.confettiService.stopConfetti();
     });
 
-    return await modal.present();
+    // Start confetti animation when modal is presented
+    await modal.present();
+
+    // Add a small delay to ensure modal is visible before starting confetti
+    setTimeout(() => {
+      this.confettiService.startConfetti(5000); // 5 seconds of confetti
+    }, 300);
+
+    return modal;
   }
 
   /**
    * Testing methods for development purposes
    * These should be removed in production
    */
+
+  /**
+   * Test confetti animation (development only)
+   */
+  testConfetti(): void {
+    this.confettiService.startConfetti(3000);
+  }
+
+  /**
+   * Test fireworks confetti (development only)
+   */
+  testFireworksConfetti(): void {
+    this.confettiService.celebrateWithFireworks();
+  }
+
+  /**
+   * Test school colors confetti (development only)
+   */
+  testSchoolConfetti(): void {
+    this.confettiService.schoolColorsConfetti();
+  }
 
   /**
    * Show the first-time modal for testing purposes
