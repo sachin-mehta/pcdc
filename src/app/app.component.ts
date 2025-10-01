@@ -115,6 +115,12 @@ export class AppComponent {
       'history:measurement:change',
       this.refreshHistory.bind(this)
     );
+
+    // Listen for registration completion to update device ID
+    this.sharedService.on(
+      'registration:completed',
+      this.updateDeviceId.bind(this)
+    );
     this.refreshHistory();
     this.initiatePingService();
     setInterval(() => {
@@ -434,6 +440,18 @@ export class AppComponent {
         this.whatsNewReleases = [];
       },
     });
+  }
+
+  /**
+   * Update device ID from storage after registration completion
+   */
+  private updateDeviceId(): void {
+    const newDeviceId = this.storage.get('schoolUserId');
+    if (newDeviceId) {
+      this.device_id = newDeviceId;
+      this.device_id_short = newDeviceId;
+      console.log('Device ID updated after registration:', newDeviceId);
+    }
   }
 
   /**

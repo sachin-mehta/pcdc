@@ -22,8 +22,8 @@
     "date": "Monday, 15 Sep 2025",
     "items": [
       "Improved user interface with better navigation",
-      "Added support for multiple languages",
-      "Fixed memory leaks in background processes"
+      "Triggers a test as soon as the school is registered",
+      "Connectivity checks every 15 minutes"
     ]
   }
 }
