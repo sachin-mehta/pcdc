@@ -63,13 +63,13 @@ export class SyncService {
 
     try {
       await this.http
-        .post(`${environment.restAPI}/measurements/batch`, payload)
+        .post(`${environment.restAPI}measurements/multiple`, payload)
         .toPromise();
     } catch (error) {
       console.warn('Initial measurement sync failed. Retrying once...');
       try {
         await this.http
-          .post(`${environment.restAPI}/measurements/batch`, payload)
+          .post(`${environment.restAPI}measurements/multiple`, payload)
           .toPromise();
       } catch (retryError) {
         console.error('Retry for measurements failed:', retryError);

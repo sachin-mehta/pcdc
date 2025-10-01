@@ -67,7 +67,7 @@ export class AppComponent {
     };
     this.translate.use(appLang.code);
     this.app_version = environment.app_version;
-    if (this.storage.get('schoolId')) {
+    if (this.storage.get('schoolId') && this.storage.get('schoolInfo')) {
       this.school = JSON.parse(this.storage.get('schoolInfo'));
     }
     this.sharedService.on(
