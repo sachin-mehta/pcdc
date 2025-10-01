@@ -172,7 +172,7 @@
   },
   "notifications": {
     "registrationCompleted": "Registration completed",
-    "runningFirstTest": "Running your first test"
+    "runningFirstTest": "Running connectivity and speed tests"
   },
   "resultSchool": "RESULTS FOR SCHOOL ID",
   "tryAgain": "Try again",

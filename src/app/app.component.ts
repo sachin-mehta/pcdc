@@ -29,6 +29,7 @@ export class AppComponent {
   isToastOpen = false;
   toastMessage = '';
   toastColor = 'success';
+  showCopySuccess = false;
   school: any;
   historyState: any;
   availableSettings: any;
@@ -78,13 +79,8 @@ export class AppComponent {
     this.translate.use(appLang.code);
     this.app_version = environment.app_version;
     this.device_id = this.storage.get('schoolUserId') || 'unknown-device';
-    // Show more characters but still keep it readable
-    this.device_id_short =
-      this.device_id.length > 24
-        ? this.device_id.substring(0, 12) +
-          '...' +
-          this.device_id.substring(this.device_id.length - 8)
-        : this.device_id;
+    // Show the full device ID as requested
+    this.device_id_short = this.device_id;
     if (this.storage.get('schoolId')) {
       this.school = JSON.parse(this.storage.get('schoolInfo'));
     }
@@ -314,9 +310,15 @@ export class AppComponent {
         this.fallbackCopyTextToClipboard(text);
       }
 
-      const successMessage = this.translate.instant('app.device-id-copied');
-      this.showToast(successMessage, 'success');
+      // Show temporary success state with checkmark
+      this.showCopySuccess = true;
       console.log('Text copied to clipboard:', text);
+
+      // Hide success state after 3 seconds
+      setTimeout(() => {
+        this.showCopySuccess = false;
+      }, 3000);
+
       return true;
     } catch (error) {
       const errorMessage = this.translate.instant('app.device-id-copy-failed');
