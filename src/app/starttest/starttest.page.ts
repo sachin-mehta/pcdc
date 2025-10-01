@@ -25,6 +25,7 @@ import { CountryService } from '../services/country.service';
 import { mlabInformation, accessInformation } from '../models/models';
 import { FirstTestSuccessModalComponent } from '../components/first-test-success-modal/first-test-success-modal.component';
 import { ConfettiService } from '../services/confetti.service';
+import { IndexedDBService } from '../services/indexed-db.service';
 
 @Component({
   selector: 'app-starttest',
@@ -97,6 +98,9 @@ export class StarttestPage implements OnInit, OnDestroy {
   public connectionStatus: any;
   private sub: any;
   private downloadSub!: Subscription;
+  public lastPingResult: any;
+  public pingStatus: string = '---';
+  public pingTimestamp: Date | undefined;
   private uploadSub!: Subscription;
   private downloadStartedSub!: Subscription;
   private uploadStartedSub!: Subscription;
@@ -130,7 +134,8 @@ export class StarttestPage implements OnInit, OnDestroy {
     private ref: ChangeDetectorRef,
     private storage: StorageService,
     private countryService: CountryService,
-    private confettiService: ConfettiService
+    private confettiService: ConfettiService,
+    private indexedDBService: IndexedDBService
   ) {
     if (this.storage.get('schoolId')) {
       this.school = JSON.parse(this.storage.get('schoolInfo'));
@@ -206,6 +211,7 @@ export class StarttestPage implements OnInit, OnDestroy {
     // Load historical data
     this.refreshHistory();
     this.loadLatestMeasurement();
+    this.loadLatestPingResult();
 
     // IMPORTANT: Check for first-time visit LAST to ensure all event listeners are ready
     this.checkFirstTimeVisit();
@@ -358,6 +364,7 @@ export class StarttestPage implements OnInit, OnDestroy {
 
     // Load latest measurement data for dashboard display
     this.loadLatestMeasurement();
+    this.loadLatestPingResult();
   }
 
   /**
@@ -449,6 +456,39 @@ export class StarttestPage implements OnInit, OnDestroy {
   }
 
   /**
+   * Load the latest ping result from IndexedDB to display in the dashboard
+   */
+  async loadLatestPingResult() {
+    try {
+      const pingResults = await this.indexedDBService.getPingResults();
+
+      if (pingResults && pingResults.length > 0) {
+        // Sort by timestamp to get the latest result
+        const sortedResults = pingResults.sort(
+          (a, b) =>
+            new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+        );
+
+        this.lastPingResult = sortedResults[0];
+        this.pingStatus = this.lastPingResult.isConnected
+          ? 'Success'
+          : 'Failed';
+        this.pingTimestamp = new Date(this.lastPingResult.timestamp);
+      } else {
+        // No ping results available
+        this.pingStatus = '---';
+        this.pingTimestamp = undefined;
+        this.lastPingResult = null;
+      }
+    } catch (error) {
+      console.error('Error loading latest ping result:', error);
+      this.pingStatus = '---';
+      this.pingTimestamp = undefined;
+      this.lastPingResult = null;
+    }
+  }
+
+  /**
    * Clear the latest measurement display values
    */
   private clearLatestMeasurementDisplay() {
@@ -458,6 +498,10 @@ export class StarttestPage implements OnInit, OnDestroy {
     this.currentDate = undefined;
     this.measurementnetworkServer = undefined;
     this.measurementISP = undefined;
+    // Clear ping data as well
+    this.pingStatus = '---';
+    this.pingTimestamp = undefined;
+    this.lastPingResult = null;
   }
 
   openFirst() {
@@ -477,7 +521,7 @@ export class StarttestPage implements OnInit, OnDestroy {
     this.router.navigate(['connectivitytest']);
   }
 
-  startNDT() {
+  startNDT(notes: string = 'manual') {
     try {
       this.uploadProgressStarted = false;
       this.downloadStarted = false;
@@ -499,7 +543,7 @@ export class StarttestPage implements OnInit, OnDestroy {
       this.latency = undefined;
       this.connectionStatus = '';
       this.uploadProgressStarted = false;
-      this.measurementClientService.runTest();
+      this.measurementClientService.runTest(notes);
     } catch (e) {
       console.log(e);
     }
@@ -746,7 +790,7 @@ export class StarttestPage implements OnInit, OnDestroy {
         );
       }
 
-      this.startNDT();
+      this.startNDT('first');
     } else {
       console.log('Auto-trigger conditions not met:', {
         firstTestTriggered: this.firstTestTriggered,

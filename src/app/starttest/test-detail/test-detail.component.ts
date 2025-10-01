@@ -9,14 +9,13 @@ import { Router, NavigationEnd } from '@angular/router';
   selector: 'app-test-detail',
   templateUrl: './test-detail.component.html',
   styleUrls: ['./test-detail.component.scss'],
-  standalone: false
-
+  standalone: false,
 })
 export class TestDetailComponent implements OnInit {
   schoolId: string;
-  school: any
+  school: any;
   historicalData: any;
-  measurementsData: []
+  measurementsData: [];
   accessInformation = {
     ip: '',
     city: '',
@@ -36,15 +35,15 @@ export class TestDetailComponent implements OnInit {
   measurementnetworkServer: any;
   measurementISP: any;
   selectedCountry: any;
-  constructor(private storage: StorageService,
+  constructor(
+    private storage: StorageService,
     private historyService: HistoryService,
     private countryService: CountryService,
     private router: Router
-
   ) {
     this.router.events.subscribe((event) => {
       if (event instanceof NavigationEnd) {
-        this.loadData()
+        this.loadData();
       }
     });
   }
@@ -58,19 +57,29 @@ export class TestDetailComponent implements OnInit {
         },
         (err) => {
           console.log('ERROR: ' + err);
-        })
+        }
+      );
     }
     this.loadData();
   }
 
   loadData() {
     let historicalData = this.historyService.get();
-    if (historicalData !== null && historicalData !== undefined && historicalData.measurements.length) {
-      this.measurementnetworkServer = historicalData.measurements[historicalData.measurements.length - 1].mlabInformation.city;
-      this.measurementISP = historicalData.measurements[historicalData.measurements.length - 1].accessInformation.org;
+    if (
+      historicalData !== null &&
+      historicalData !== undefined &&
+      historicalData.measurements.length
+    ) {
+      this.measurementnetworkServer =
+        historicalData.measurements[
+          historicalData.measurements.length - 1
+        ].mlabInformation.city;
+      this.measurementISP =
+        historicalData.measurements[
+          historicalData.measurements.length - 1
+        ].accessInformation.org;
     }
     this.schoolId = this.storage.get('schoolId');
-
 
     if (this.storage.get('historicalDataAll')) {
       this.historicalData = JSON.parse(this.storage.get('historicalDataAll'));
@@ -78,9 +87,27 @@ export class TestDetailComponent implements OnInit {
 
       // Get the last 10 measurements (sorted by timestamp descending)
       this.measurementsData = allMeasurements
-        .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()) // descending order
+        .sort(
+          (a, b) =>
+            new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+        ) // descending order
         .slice(0, 10); // take last 10
     }
   }
 
+  /**
+   * Map Notes values to display text for Test Trigger column
+   * @param notes The Notes value from measurement data
+   * @returns Mapped display text
+   */
+  getTestTriggerDisplayText(notes: string): string {
+    const triggerMapping = {
+      startup: 'Startup',
+      daily: 'Daily',
+      manual: 'Manual',
+      first: 'First',
+    };
+
+    return triggerMapping[notes] || notes || '-';
+  }
 }

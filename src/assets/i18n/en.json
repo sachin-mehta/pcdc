@@ -110,7 +110,7 @@
     "school-id": "YOUR SCHOOL ID",
     "my-school-id": "<span class=\"hash\">#</span>My School Id",
     "version": "VERSION {{ app_version }}",
-    "device-id": "DEVICE ID {{ device_id }}",
+    "device-id": "DEVICE ID {{ device_id }} (Tap to copy)",
     "about-project-connect": "ABOUT {{appName}}",
     "project-connect-desc": "{{appName}} is monitoring the connectivity of every school in the world. We aim to connect all schools to the Internet and all young people to information, opportunity and choice.",
     "thank-you": "Thank you for contributing to {{appName}}. Find your school and learn more at our website. We add new schools every day!",
@@ -120,7 +120,9 @@
     "wifi-network": "WiFi networks settings",
     "about-help": "About",
     "faq-help": "FAQs",
-    "whats-new": "What's new!"
+    "whats-new": "What's new!",
+    "device-id-copied": "Device ID copied to clipboard!",
+    "device-id-copy-failed": "Failed to copy Device ID. Please try again."
   },
   "whatsNew": {
     "congratulations": "Congratulations!",
@@ -149,6 +151,7 @@
     "ping": "Ping",
     "uploadLowerCase": "Upload",
     "downloadLowerCase": "Download",
+    "testTrigger": "Trigger",
     "home": "Home",
     "about": "About",
     "total": "Test history (latest 10 measurements)",

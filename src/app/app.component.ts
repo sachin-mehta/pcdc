@@ -26,7 +26,9 @@ export class AppComponent {
   languageSearch = '';
   selectedLanguage: string;
   selectedLanguageName: string;
-  isToastOpen = true;
+  isToastOpen = false;
+  toastMessage = '';
+  toastColor = 'success';
   school: any;
   historyState: any;
   availableSettings: any;
@@ -76,7 +78,13 @@ export class AppComponent {
     this.translate.use(appLang.code);
     this.app_version = environment.app_version;
     this.device_id = this.storage.get('schoolUserId') || 'unknown-device';
-    this.device_id_short = this.device_id.substring(0, 16) + '...';
+    // Show more characters but still keep it readable
+    this.device_id_short =
+      this.device_id.length > 24
+        ? this.device_id.substring(0, 12) +
+          '...' +
+          this.device_id.substring(this.device_id.length - 8)
+        : this.device_id;
     if (this.storage.get('schoolId')) {
       this.school = JSON.parse(this.storage.get('schoolInfo'));
     }
@@ -298,13 +306,61 @@ export class AppComponent {
   }
   async copy(text: string): Promise<boolean> {
     try {
-      await navigator.clipboard.writeText(text);
-      this.isToastOpen = true;
+      // Try modern clipboard API first
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        // Fallback for older browsers or non-secure contexts
+        this.fallbackCopyTextToClipboard(text);
+      }
+
+      const successMessage = this.translate.instant('app.device-id-copied');
+      this.showToast(successMessage, 'success');
       console.log('Text copied to clipboard:', text);
       return true;
-    } catch {
+    } catch (error) {
+      const errorMessage = this.translate.instant('app.device-id-copy-failed');
+      this.showToast(errorMessage, 'danger');
+      console.error('Failed to copy to clipboard:', error);
       return false;
     }
+  }
+
+  private fallbackCopyTextToClipboard(text: string): void {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+
+    // Avoid scrolling to bottom
+    textArea.style.top = '0';
+    textArea.style.left = '0';
+    textArea.style.position = 'fixed';
+    textArea.style.opacity = '0';
+
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+
+    try {
+      document.execCommand('copy');
+    } catch (err) {
+      throw new Error('Fallback copy method failed');
+    }
+
+    document.body.removeChild(textArea);
+  }
+
+  private showToast(message: string, color: string = 'success') {
+    this.toastMessage = message;
+    this.toastColor = color;
+    this.isToastOpen = true;
+    // Auto-close toast after 3 seconds
+    setTimeout(() => {
+      this.isToastOpen = false;
+    }, 3000);
+  }
+
+  setOpen(isOpen: boolean) {
+    this.isToastOpen = isOpen;
   }
 
   /**

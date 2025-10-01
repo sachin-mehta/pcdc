@@ -284,14 +284,18 @@
             <ion-label [innerHTML]="'app.whats-new' | translate"></ion-label>
             <ion-img src="assets/images/setting_arrow.svg"></ion-img>
           </ion-item>
-          <ion-item (click)="copy(device_id)">
-            <ion-label
-              class="small-font"
-              [translate]="'app.device-id'"
-              id="click-trigger"
-              [translateParams]="{ device_id: device_id_short }"
-            >
-            </ion-label>
+          <ion-item (click)="copy(device_id)" class="copy-item">
+            <div class="device-id-container">
+              <ion-label
+                class="small-font device-id-label"
+                [translate]="'app.device-id'"
+                id="click-trigger"
+                [translateParams]="{ device_id: device_id_short }"
+              >
+              </ion-label>
+              <ion-icon name="copy-outline" class="copy-icon"></ion-icon>
+            </div>
+            <ion-ripple-effect></ion-ripple-effect>
           </ion-item>
         </ion-list>
       </div>
@@ -644,4 +648,14 @@
     </ion-content>
   </ion-menu>
   <ion-router-outlet id="content"></ion-router-outlet>
+
+  <!-- Toast for copy feedback -->
+  <ion-toast
+    [isOpen]="isToastOpen"
+    [message]="toastMessage"
+    [duration]="3000"
+    position="bottom"
+    (didDismiss)="setOpen(false)"
+    [color]="toastColor"
+  ></ion-toast>
 </ion-app>

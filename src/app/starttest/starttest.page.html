@@ -307,17 +307,26 @@
           </ion-card-header>
         </ion-card>
 
-        <ion-card class="footer-card" style="background: #f5f5f5">
-          <!-- <ion-card-header class="footer_card_header">
+        <ion-card class="footer-card" color="medium">
+          <ion-card-header class="footer_card_header">
             <ion-card-title>
               <span class="footer_text">
                 <img src="assets/images/Arrows--horizontal.svg" />
-                <span [translate]="'startTest.ping'"></span> </span> <span class="time">{{ currentDate | date:'shortTime' }}</span>
+                <span [translate]="'startTest.ping'"></span>
+              </span>
+              <span class="time"
+                >{{ pingTimestamp ? (pingTimestamp | date:'shortTime') : '---'
+                }}</span
+              >
             </ion-card-title>
-            <ion-card-subtitle [ngClass]="{'error_status': (connectionStatus=='error' && currentState == undefined) ||
-            (!onlineStatus)}">---
+            <ion-card-subtitle
+              [ngClass]="{
+                'error_status': pingStatus === 'Failed' || pingStatus === '---',
+                'success_status': pingStatus === 'Success'
+              }"
+              >{{ pingStatus }}
             </ion-card-subtitle>
-          </ion-card-header> -->
+          </ion-card-header>
         </ion-card>
       </div>
     </div>
