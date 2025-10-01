@@ -25,7 +25,7 @@ export class SentryService {
           scope.setExtra(key, context[key]);
         });
       }
-      Sentry.captureMessage(message, level);
+      Sentry.captureMessage(message, level as any);
     });
   }
 
