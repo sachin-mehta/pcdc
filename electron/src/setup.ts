@@ -29,6 +29,7 @@ import * as Sentry from '@sentry/node';
 import { Capacitor } from '@capacitor/core';
 import { Severity } from '@sentry/node';
 
+import { Console } from 'console';
 var AutoLaunch = require('auto-launch');
 var isQuiting = false;
 

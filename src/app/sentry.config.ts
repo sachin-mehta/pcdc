@@ -9,7 +9,12 @@ export function initSentry() {
     dsn: Capacitor.isNativePlatform()
       ? 'https://425388d87bae44d7be09a88dd5548d7e@excubo.unicef.io/77'
       : 'https://e52e97fc558344bc80a218fc22a9a6a9@excubo.unicef.io/47', // Replace with your actual DSN
-    environment: environment.mode === 'dev' ? 'development' : 'production',
+    environment:
+      environment.mode === 'prod'
+        ? 'production'
+        : environment.mode === 'stg'
+        ? 'staging'
+        : 'development',
     integrations: [
       new Sentry.Integrations.GlobalHandlers(),
       new Sentry.Integrations.TryCatch(),
