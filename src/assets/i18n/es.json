@@ -121,7 +121,7 @@
     "my-school-id": "<span class=\"hash\">#</span>Mi ID de Escuela",
     "version": "VERSIÓN {{ app_version }}",
     "about-project-connect": "ACERCA DE {{appName}}",
-    "project-connect-desc": "{{appName}} está mapeando la conectividad de cada escuela en el mundo. Nuestro objetivo es conectar todas las escuelas a Internet y a todos los jóvenes a la información, oportunidades y opciones.",
+    "project-connect-desc": "{{appName}} mide automáticamente el rendimiento de internet durante el día, construyendo una imagen clara de la conectividad en las escuelas a lo largo del tiempo. Los resultados se sincronizan perfectamente con Giga Maps - un mapa global y abierto que muestra el estado de conectividad de las escuelas en tiempo real. Garantizar conexiones de internet sólidas en las escuelas apoya la misión de Giga de conectar a todos los jóvenes con información, oportunidades y opciones.",
     "thank-you": "Gracias por contribuir a {{appName}}. Encuentra tu escuela y obtén más información en nuestro sitio web. ¡Añadimos nuevas escuelas todos los días!",
     "view-project-connect": "VER {{appName}}",
     "test-type-setting": "Configuración del tipo de prueba",
