@@ -1,0 +1,44 @@
+/* eslint-disable max-len */
+// This file can be replaced during build by using the `fileReplacements` array.
+// `ng build --prod` replaces `environment.ts` with `environment.prod.ts`.
+// The list of file replacements can be found in `angular.json`.
+
+export const environment = {
+  production: false,
+  restAPI: 'REST_API_URL', //PROD
+  restAPIDev: 'REST_API_URL', //DEV
+  tokenDev:'DEV_TOKEN',
+  tokenStg:'STG_TOKEN',
+  token:
+    'PROD_TOKEN',
+  restAPIStg: 'REST_API_URL', //STG
+  ipInfoToken:'IPINFO_TOKEN',
+  mode: 'dev',// 'prod' | 'dev' | 'stg'
+  languages: [
+    {
+      name: 'En',
+      label: 'English',
+      code: 'en',
+    },
+    {
+      name: 'Es',
+      label: 'Español',
+      code: 'es',
+    },
+    {
+      name: 'Pt',
+      label: 'Português',
+      code: 'pt',
+    },
+    {
+      name: 'Ru',
+      label: 'Russian',
+      code: 'ru',
+    },
+    {
+      name: 'Fr',
+      label: 'French',
+      code: 'fr',
+    },
+  ],// available languages
+};

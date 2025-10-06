@@ -6,6 +6,7 @@ import { IonSlides } from '@ionic/angular';
 import { TranslateService } from '@ngx-translate/core';
 import { SettingsService } from '../services/settings.service';
 import { environment } from 'src/environments/environment';
+import { MeasurementClientService } from '../services/measurement-client.service';
 
 @Component({
     selector: 'app-schoolsuccess',
@@ -34,7 +35,8 @@ export class SchoolsuccessPage {
     public loading: LoadingService,
     private router: Router,
     private translate: TranslateService,
-    private settingsService: SettingsService
+    private settingsService: SettingsService,
+    private measurementClientService: MeasurementClientService
   ) {
     const appLang = this.settingsService.get('applicationLanguage');
     this.translate.use(appLang.code);
@@ -53,6 +55,9 @@ export class SchoolsuccessPage {
     this.isLast = index === total - 1;
   }
   moveToStartTest() {
+    // this.measurementClientService.runTest(
+    //   'registration',
+    // );
     this.router.navigate(['starttest']);
   }
 }

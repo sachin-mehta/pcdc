@@ -182,7 +182,11 @@
             <!-- <ion-img src="assets/images/setting_arrow.svg"></ion-img> -->
 
           <!-- </ion-item> -->
-
+          <ion-item (click)="copy(device_id)">
+            <ion-label class="small-font" [translate]="'app.device-id'" id="click-trigger"
+              [translateParams]="{ device_id: device_id_short }">
+            </ion-label>
+          </ion-item>
         </ion-list>
       </div>
     </ion-content>
