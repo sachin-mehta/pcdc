@@ -13,7 +13,7 @@ export class FirstTestSuccessModalComponent implements OnInit, OnDestroy {
   @Input() selectedCountry: string;
   @Input() schoolId: string;
 
-  countdown: number = 5;
+  countdown: number = 10;
   private countdownTimer: any;
 
   constructor(

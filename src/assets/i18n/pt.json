@@ -39,7 +39,7 @@
     "checkGiga": "Verifique os mapas Giga",
     "searchSchool": "Pesquisando IDs de escolas",
     "select": "Selecione",
-    "confirmText": "Verifique sua seleção de escola. Depois de tocar em <b>&quot;Sim&quot;</b>, mudar de escola exigirá reinstalar o aplicativo.",
+    "confirmText": "Depois de tocar em <b>&quot;Sim&quot;</b>, mudar sua escola exigirá desinstalar e reinstalar o aplicativo.",
     "skip": "Pular",
     "add": "Adicionar"
   },
@@ -61,11 +61,11 @@
     "go-dashboard": "Ir para o seu painel"
   },
   "registerSchool": {
-    "register-step-1": "Você está prestes a registrar sua escola",
-    "register-part-2": "Certifique-se de que os computadores estão conectados via cabo",
-    "register-step-2": "Certifique-se de que o aplicativo está instalado em 2 dispositivos usados regularmente",
-    "register-step-3": "Certifique-se de estar conectado apenas à internet da escola",
-    "start-registeration": "Iniciar registro"
+    "register-step-1": "Você está prestes a registrar sua escola.",
+    "register-part-2": "Cada escola pode instalar e registrar até dois dispositivos, a menos que seja instruído de outra forma.",
+    "register-step-2": "Instale o Giga Meter em computadores que são usados frequentemente e conecte apenas à internet da escola.",
+    "register-step-3": "Se possível, certifique-se de que pelo menos um computador se conecte à Internet usando uma conexão com fio (Ethernet).",
+    "start-registeration": "Iniciar Registro"
   },
   "searchCountry": {
     "loading": "Carregando",
@@ -95,14 +95,24 @@
     "can-close-app": "Posso fechar o aplicativo?",
     "can-close-app-desc": "Sim, você pode fechar o aplicativo clicando no botão de fechar no canto superior direito. O aplicativo continuará sendo executado em segundo plano e relatará o seu estado de conectividade.",
     "connectivity-checks-occur": "Quando é que ocorrem as verificações de <br />conectividade da minha escola?",
-    "connectivity-checks-occur-desc": "Há sempre duas verificações por dia que ocorrem de forma aleatória. A velocidade média entre os dois controlos é a velocidade que será indicada como a sua velocidade diária.",
+    "connectivity-checks-occur-desc": "O Giga Meter executa até quatro testes de velocidade por dia, e testes de ping a cada 15 minutos. Estes testes ocorrem entre as 8h e 20h hora local. Se o dispositivo estiver offline ou desligado, as verificações não serão executadas. Você pode acionar um teste manual a qualquer momento.",
     "can-change-id": "Posso mudar o ID da minha escola?",
     "can-change-id-desc": "De momento, não é possível alterar o ID da escola. Se cometeu um erro e precisa de introduzir um novo ID, deve desinstalar a aplicação e começar de novo.",
     "multiple-installs": "Posso instalar este aplicativo <br />em mais de um computador?",
     "multiple-installs-desc": "Sim, pode. De facto, encorajamo-lo. Se várias máquinas comunicarem dados à plataforma, a medição será mais fiável.",
-    "dissatisfied-speed": "O que posso fazer se estiver insatisfeito/a<br />com a velocidade ou confiabilidade da minha<br />conexão com a internet?",
-    "dissatisfied-speed-desc": "Pode visitar o nosso website e preencher o formulário para apresentar uma denúncia. Podemos então trabalhar com os nossos fornecedores para garantir que estes prestam o serviço de qualidade que prometeram.",
-    "search-id": "RID de pesquisa"
+    "search-id": "RID de pesquisa",
+    "where-see-results": "Onde posso ver os resultados de medições passadas?",
+    "where-see-results-desc-part1": "Você pode ver os últimos 10 testes bem-sucedidos no painel de medições, na página \"Dados\". Os resultados de cada dia são calculados em média e publicados no Giga Maps. Visite ",
+    "where-see-results-link": "maps.giga.global",
+    "where-see-results-desc-part2": " para encontrar sua escola e ver como sua conectividade se compara globalmente.",
+    "what-data-access": "Que tipo de dados o Giga Meter tem acesso?",
+    "what-data-access-desc": "O Giga Meter acessa apenas informações do sistema e da rede necessárias para medir a qualidade da internet - como velocidade de conexão, disponibilidade, detalhes da rede e tipo de dispositivo. Ele não acessa seus arquivos pessoais, histórico de navegação ou conteúdo.",
+    "who-has-access": "Quem tem acesso aos dados de medição?",
+    "who-has-access-desc-part1": "Um subconjunto dos dados coletados pelo Giga Meter - como velocidade de download, velocidade de upload, latência, tempo de atividade e um identificador único da escola - é disponibilizado publicamente como parte do conjunto de dados abertos de conectividade escolar da Giga. Estes dados são licenciados sob ",
+    "who-has-access-link": "CC BY 4.0",
+    "who-has-access-desc-part2": ", permitindo que qualquer pessoa acesse, use e compartilhe livremente. Nenhum dado pessoal é jamais compartilhado.",
+    "how-improve-access": "Como o Giga Meter ajuda a melhorar o acesso à internet?",
+    "how-improve-access-desc": "O Giga Meter não conserta a internet diretamente, mas torna os problemas visíveis. Estes dados ajudam governos e provedores a priorizar melhorias onde são mais necessárias."
   },
   "app": {
     "faq": "<ion-icon name=\"chatbox-outline\"></ion-icon>Perguntas frequentes",
@@ -140,11 +150,11 @@
     "uploadLowerCase": "Envio",
     "downloadLowerCase": "Download",
     "home": "Início",
-    "about": "Sobre",
+    "about": "Dados",
     "total": "Histórico de testes (10 últimas medições)",
-    "congratulations": "Parabéns!",
+    "congratulations": "Parabéns - você terminou tudo!",
     "schoolRegistered": "Escola registrada com sucesso",
-    "testWorking": "O teste está funcionando",
+    "testWorking": "Primeiro teste concluído",
     "backgroundMessage": "O aplicativo continuará rodando em segundo plano.",
     "closingIn": "Fechando em"
   },
@@ -155,11 +165,11 @@
     "tip1": "De preferência, em uma conexão com fio",
     "tip2": "Instalado em 2 dispositivos que são mais usados",
     "tip3": "Conectado apenas à internet da escola",
-    "privacy": "Concordo com o uso de dados pela Giga sob os termos"
+    "privacy": "Ao me registrar e usar o Giga Meter, concordo com a coleta, processamento e publicação das minhas medições e outros dados de apoio pela Giga sob a"
   },
   "notifications": {
     "registrationCompleted": "Registro concluído",
-    "runningFirstTest": "Executando testes de conectividade e velocidade"
+    "runningFirstTest": "Executando testes de conectividade"
   },
   "resultSchool": "RESULTADOS PARA O ID DA ESCOLA",
   "tryAgain": "TENTAR NOVAMENTE",

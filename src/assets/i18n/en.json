@@ -1,7 +1,7 @@
 {
   "home": {
     "title1": "Welcome to {{appName}} <span class='daily-chk-blue'>{{appNameSuffix}}</span>",
-    "title2": "Help your school get better connectivity. Share your school's internet status with {{appName}} every day.",
+    "title2": "Monitor your school’s internet quality. Daily measurements help track performance and guide efforts to improve school connectivity.",
     "next": "Next",
     "learn-more": "LEARN MORE ABOUT {{appName}}",
     "checkboxText": "By registering and using GigaMeter, I agree to the collection, processing and publication of my measurement and other supporting data by Giga under the",
@@ -39,7 +39,7 @@
     "checkGiga": "Check on Giga Maps",
     "searchSchool": "Searching School IDs",
     "select": "Select",
-    "confirmText": "Double-check your school selection. Once you tap <b>&quot;Yes&quot;</b> changing your school will require reinstalling the app.",
+    "confirmText": "Once you tap <b>&quot;Yes&quot;</b> changing your school will require uninstalling and reinstalling the app.",
     "skip": "Skip",
     "add": "Add"
   },
@@ -50,7 +50,7 @@
     "notRegister": "Unfortunately your school is not registered with {{appName}}\nPlease contact your school administrator to register your school on\nPCDC again."
   },
   "schoolSuccess": {
-    "congratulations": "Congratulations!",
+    "congratulations": "Congratulations - you are all done!",
     "school-registered": "Your School has been registered on <br />{{appName}}",
     "success-txt": "Your daily internet <br />check is set!",
     "internet-checks": "This App will check your <br />internet status 4 times a day.",
@@ -61,10 +61,10 @@
     "go-dashboard": "Go to your dashboard"
   },
   "registerSchool": {
-    "register-step-1": "You’re about to register your school",
-    "register-part-2": "Make sure the computers are connected on a wired connection",
-    "register-step-2": "Make sure that the application is Installed on 2 devices that are regularly used",
-    "register-step-3": "Make sure you are connected only to the school internet",
+    "register-step-1": "You are about to register your school.",
+    "register-part-2": "Each school can install and register up to two devices, unless instructed otherwise.",
+    "register-step-2": "Install Giga Meter on computers that are used frequently and connect only to the school’s internet.",
+    "register-step-3": "If possible, ensure at least one computer connects to the Internet using a wired (Ethernet) connection.",
     "start-registeration": "Start Registration"
   },
   "searchCountry": {
@@ -81,28 +81,38 @@
   "searchSchool": {
     "search": "Searching for your school...",
     "placeholder-school-id": "eg. 00000000",
-    "provide-school-id": "Please type & enter your school ID",
+    "provide-school-id": "Please type and enter your school ID",
     "user-has-not-id": "Once you type your school ID we will search for ids that match with your input."
   },
   "faq": {
     "FAQ": "FREQUENTLY ASKED QUESTIONS",
     "what-is-school-id": "What is a School ID?",
-    "what-is-school-id-desc": "A school ID is a unique identifier for your school that was provided by the government. There are different formats, but usually looks something like \"BR12345\" or \"12345678\"",
+    "what-is-school-id-desc": "A school ID is a unique identifier for your school that was provided by the government. There are different formats, but it usually looks something like \"BR12345\" or \"12345678\"",
     "how-find-school-id": "How do I find my School ID?",
-    "how-find-school-id-desc": "Your school administrator or IT department will know. The school ID will be the number that is used in your national registration system.",
+    "how-find-school-id-desc": "Ask your school administrator or IT department. The school ID will be the number that is used in your national registration system.",
     "school-id-not-found": "My school is not part of {{appName}} yet. What can I do?",
     "school-id-not-found-desc": "You can visit our website and fill out the contact form to indicate to us that you would like to join our initiative.",
     "can-close-app": "Can I close the application?",
-    "can-close-app-desc": "Yes, you can close the application by clicking the close button in the top right. The application will continue running in the background and will report your connectivity status.",
+    "can-close-app-desc": "Yes, you can close the application by clicking the close button in the top right corner. The application will continue running in the background and will report your connectivity status.",
     "connectivity-checks-occur": "When do my school's <br />connectivity checks occur?",
-    "connectivity-checks-occur-desc": "There are always two checks per day that occur at random. The average speed between the two is the speed that will be reported as your daily speed.",
+    "connectivity-checks-occur-desc": "Giga Meter runs up to four speed tests per day, and ping tests every 15 minutes. These tests occur between 8am and 8pm local time. If the device is offline or off, the checks will not run. You can trigger a manual test any time.",
     "can-change-id": "Can I change my school ID?",
     "can-change-id-desc": "Right now it is not possible to change your school ID. If you've made a mistake and need to enter a new ID, you should uninstall the application and start over.",
     "multiple-installs": "Can I install this application <br />on more than one computer?",
-    "multiple-installs-desc": "Yes you can. In fact, we encourage it. If multiple machines report data to the platform, the measurement will be more reliable",
-    "dissatisfied-speed": "What can I do if I am unhappy<br />with the speed or reliability of <br /> my internet connection?",
-    "dissatisfied-speed-desc": "You can visit our site and fill out the form to file a report. We can then work with our suppliers to ensure they deliver the quality of service they promised.",
-    "search-id": "Search ID"
+    "multiple-installs-desc": "Yes you can. In fact, we encourage it. If multiple machines report data to the platform, the measurement will be more reliable.",
+    "search-id": "Search ID",
+    "where-see-results": "Where can I see past measurement results?",
+    "where-see-results-desc-part1": "You can view the last 10 successful tests in the measurement dashboard, under the \"Data\" page. Each day's results are averaged and published to Giga Maps. Visit ",
+    "where-see-results-link": "maps.giga.global",
+    "where-see-results-desc-part2": " to find your school and see how its connectivity compares globally.",
+    "what-data-access": "What kind of data does Giga Meter have access to?",
+    "what-data-access-desc": "Giga Meter only accesses system and network information needed to measure internet quality - such as connection speed, availability, network details, and device type. It does not access your personal files, browsing history, or content.",
+    "who-has-access": "Who has access to the measurement data?",
+    "who-has-access-desc-part1": "A subset of the data collected by Giga Meter- such as download speed, upload speed, latency, uptime and a unique school identifier- is made publicly available as part of Giga's open school connectivity dataset. This data is licensed under ",
+    "who-has-access-link": "CC BY 4.0",
+    "who-has-access-desc-part2": ", allowing anyone to access, use, and share it freely. No personal data is ever shared.",
+    "how-improve-access": "How does Giga Meter help improve internet access?",
+    "how-improve-access-desc": "Giga Meter doesn't fix the internet directly, but it makes problems visible. This data helps governments and providers prioritize improvements where they're needed most."
   },
   "app": {
     "faq": "<ion-icon name=\"chatbox-outline\"></ion-icon>Frequently asked questions",
@@ -153,11 +163,11 @@
     "downloadLowerCase": "Download",
     "testTrigger": "Trigger",
     "home": "Home",
-    "about": "About",
+    "about": "Data",
     "total": "Test history (latest 10 measurements)",
-    "congratulations": "Congratulations!",
+    "congratulations": "Congratulations - you are all done!",
     "schoolRegistered": "School registered successfully",
-    "testWorking": "Test is working",
+    "testWorking": "Completed first test",
     "backgroundMessage": "The app will continue running in the background.",
     "closingIn": "Closing in"
   },
@@ -168,11 +178,11 @@
     "tip1": "Preferably, on a wired connection",
     "tip2": "Installed on 2 devices that are mostly used",
     "tip3": "Connected only to the school internet",
-    "privacy": "I agree to the use of data by Giga under the"
+    "privacy": "By registering and using Giga Meter, I agree to the collection, processing and publication of my measurement and other supporting data by Giga under the"
   },
   "notifications": {
-    "registrationCompleted": "Registration completed",
-    "runningFirstTest": "Running connectivity and speed tests"
+    "registrationCompleted": "Registration complete",
+    "runningFirstTest": "Running connectivity tests"
   },
   "resultSchool": "RESULTS FOR SCHOOL ID",
   "tryAgain": "Try again",
