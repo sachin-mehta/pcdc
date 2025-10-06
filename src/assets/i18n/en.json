@@ -122,7 +122,7 @@
     "version": "VERSION {{ app_version }}",
     "device-id": "DEVICE ID {{ device_id }} (Tap to copy)",
     "about-project-connect": "ABOUT {{appName}}",
-    "project-connect-desc": "{{appName}} is monitoring the connectivity of every school in the world. We aim to connect all schools to the Internet and all young people to information, opportunity and choice.",
+    "project-connect-desc": "{{appName}} automatically measures internet performance throughout the day, building a clear picture of connectivity in schools over time. The results are seamlessly synced with Giga Maps- a global, open map showing schools’ connectivity status in real time. Ensuring strong internet connections in schools supports Giga’s mission to connect all young people to information opportunity and choice. ",
     "thank-you": "Thank you for contributing to {{appName}}. Find your school and learn more at our website. We add new schools every day!",
     "view-project-connect": "VIEW {{appName}}",
     "test-type-setting": "Test type settings",
