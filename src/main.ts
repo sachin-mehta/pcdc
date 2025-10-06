@@ -8,9 +8,7 @@ import * as Sentry from '@sentry/browser';
 // Initialize Sentry
 initSentry();
 
-if (environment.production) {
-  enableProdMode();
-}
+enableProdMode();
 
 // Only include Electron code when running in Electron
 if (window.require) {
