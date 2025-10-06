@@ -25,7 +25,6 @@ import electronServe from 'electron-serve';
 import windowStateKeeper from 'electron-window-state';
 import { join } from 'path';
 import * as Sentry from '@sentry/node';
-import type { SeverityLevel } from '@sentry/types';
 import { Console } from 'console';
 var AutoLaunch = require('auto-launch');
 var isQuiting = false;
@@ -203,12 +202,17 @@ export class ElectronCapacitorApp {
       frame: true,
       useContentSize: true,    //Make content area exactly 390x700
       transparent: false,
+      focusable: true,
       webPreferences: {
-        nodeIntegration: true,
+        nodeIntegration: false, 
         contextIsolation: true,
-        // Use preload to inject the electron varriant overrides for capacitor plugins.
-        // preload: join(app.getAppPath(), "node_modules", "@capacitor-community", "electron", "dist", "runtime", "electron-rt.js"),
+        sandbox: false, 
+        webSecurity: true, 
+        allowRunningInsecureContent: false,
         preload: preloadPath,
+      backgroundThrottling: false, // Disable throttling to ensure API calls work reliably
+        spellcheck: false,
+        experimentalFeatures: false,
       },
     });
 
@@ -226,7 +230,7 @@ export class ElectronCapacitorApp {
 
     this.MainWindow?.on('unresponsive', () => {
       Sentry.captureMessage('Window became unresponsive', {
-        level: 'error' as SeverityLevel,
+        level: 'error',
         extra: {
           windowId: this.MainWindow?.id,
         },
@@ -235,13 +239,14 @@ export class ElectronCapacitorApp {
 
     this.MainWindow?.webContents?.on(
       'console-message',
-      (event, level, message, line, sourceId) => {
-        if (level === 2) {
+      ({ level, message, lineNumber, sourceId, frame }) => {
+        if (level === 'error') {
           // error level
           Sentry.captureMessage(`Console Error: ${message}`, {
             extra: {
-              line,
+              line: lineNumber,
               sourceId,
+              frame,
             },
           });
         }
