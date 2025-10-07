@@ -18,7 +18,7 @@ export class SentryService {
     });
   }
 
-  captureMessage(message: string, level: Sentry.Severity = Sentry.Severity.Info, context?: Record<string, any>) {
+  captureMessage(message: string, level: 'fatal' | 'error' | 'warning' | 'log' | 'info' | 'debug' = 'info', context?: Record<string, any>) {
     Sentry.withScope((scope) => {
       if (context) {
         Object.keys(context).forEach(key => {

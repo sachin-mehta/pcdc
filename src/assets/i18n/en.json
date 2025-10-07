@@ -113,6 +113,7 @@
         "school-id": "YOUR SCHOOL ID",
         "my-school-id": "<span class=\"hash\">#</span>My School Id",
         "version": "VERSION {{ app_version }}",
+        "device-id": "DEVICE ID {{ device_id }}",
         "about-project-connect": "ABOUT {{appName}}",
         "project-connect-desc": "{{appName}} is monitoring the connectivity of every school in the world. We aim to connect all schools to the Internet and all young people to information, opportunity and choice.",
         "thank-you": "Thank you for contributing to {{appName}}. Find your school and learn more at our website. We add new schools every day!",
