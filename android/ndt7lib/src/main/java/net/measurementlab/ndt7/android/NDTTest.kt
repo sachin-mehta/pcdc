@@ -57,13 +57,15 @@ abstract class NDTTest(private var httpClient: OkHttpClient? = null) : DataPubli
             val numUrls = hostInfo.results?.size!!
             for (i in 0 until numUrls) {
               try {
-                if (!hostInfo.results[i].urls.ndt7DownloadWSS.contains(".deenet.autojoin.")) {
-                  selectTestType(testType, hostInfo.results[i].urls, speedtestLock)
-                  return
-                } else if (numUrls == 1) {
-                  selectTestType(testType, hostInfo.results[i].urls, speedtestLock)
-                  return
-                }
+                selectTestType(testType, hostInfo.results[i].urls, speedtestLock)
+                return
+//                if (!hostInfo.results[i].urls.ndt7DownloadWSS.contains(".deenet.autojoin.")) {
+//                  selectTestType(testType, hostInfo.results[i].urls, speedtestLock)
+//                  return
+//                } else if (numUrls == 1) {
+//                  selectTestType(testType, hostInfo.results[i].urls, speedtestLock)
+//                  return
+//                }
               } catch (e: Exception) {
                 Log.d("GIGA", e.toString())
                 if (i == numUrls - 1) throw e
