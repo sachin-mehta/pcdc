@@ -55,6 +55,10 @@ export class TestDetailComponent implements OnInit {
     });
   }
 
+  isNativeApp(): boolean {
+    return this.isNative;
+  }
+
   handleBackButton() {
     App.addListener('backButton', async () => {
       if (this.isNative) {
