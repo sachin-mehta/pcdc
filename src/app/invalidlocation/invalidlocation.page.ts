@@ -4,12 +4,13 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { LoadingService } from '../services/loading.service';
 import { TranslateService } from '@ngx-translate/core';
 import { SettingsService } from '../services/settings.service';
+import { Capacitor } from '@capacitor/core';
 
 @Component({
-    selector: 'app-invalidlocation',
-    templateUrl: 'invalidlocation.page.html',
-    styleUrls: ['invalidlocation.page.scss'],
-    standalone: false
+  selector: 'app-invalidlocation',
+  templateUrl: 'invalidlocation.page.html',
+  styleUrls: ['invalidlocation.page.scss'],
+  standalone: false,
 })
 export class InvalidLocationPage {
   @ViewChild(IonAccordionGroup, { static: true })
@@ -19,6 +20,8 @@ export class InvalidLocationPage {
   selectedCountry: any;
   country: any;
   sub: any;
+  isNative: boolean;
+
   constructor(
     private activatedroute: ActivatedRoute,
     public router: Router,
@@ -28,10 +31,14 @@ export class InvalidLocationPage {
   ) {
     const appLang = this.settingsService.get('applicationLanguage');
     this.translate.use(appLang.code);
+    this.isNative = Capacitor.isNativePlatform();
     this.sub = this.activatedroute.params.subscribe((params) => {
       this.schoolId = params.schoolId;
       this.selectedCountry = params.selectedCountry;
       this.country = params.country;
     });
+  }
+  isNativeApp(): boolean {
+    return this.isNative;
   }
 }

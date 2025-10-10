@@ -126,8 +126,8 @@ object GigaUtil {
   fun createSpeedTestPayload(
     uploadMeasurement: Measurement?,
     downloadMeasurement: Measurement?,
-    clientInfoRequestEntity: ClientInfoRequestEntity,
-    serverInfoRequestEntity: ServerInfoRequestEntity,
+    clientInfoRequestEntity: ClientInfoRequestEntity?,
+    serverInfoRequestEntity: ServerInfoRequestEntity?,
     schoolId: String,
     gigaSchoolId: String,
     appVersion: String,
@@ -167,7 +167,7 @@ object GigaUtil {
         download = (meanDownloadClientMbps ?: 0.0) * 1000,
         upload = (meanUploadClientMbps ?: 0.0) * 1000,
         gigaIdSchool = gigaSchoolId,
-        ipAddress = if (ipAddress == "") clientInfoRequestEntity.ip else ipAddress,
+        ipAddress = if (ipAddress == "") clientInfoRequestEntity?.ip else ipAddress,
         latency = (if (uploadMeasurement?.tcpInfo?.minRtt != null) uploadMeasurement.tcpInfo!!.minRtt!! / 1000 else 0.0).toInt()
           .toString(),
         notes = scheduleType,

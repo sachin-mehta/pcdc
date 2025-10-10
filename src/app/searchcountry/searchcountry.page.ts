@@ -11,6 +11,7 @@ import { Country } from '../shared/country.model';
 import { CountryService } from '../services/country.service';
 import { TranslateService } from '@ngx-translate/core';
 import { environment } from 'src/environments/environment';
+import { Capacitor } from '@capacitor/core';
 @Component({
   selector: 'app-searchcountry',
   templateUrl: 'searchcountry.page.html',
@@ -1032,6 +1033,7 @@ export class SearchcountryPage {
   appNameSuffix = environment.appNameSuffix;
   searchTerm: string = '';
   filteredCountries: Country[] = [];
+  isNative: boolean;
 
   constructor(
     private storage: StorageService,
@@ -1043,6 +1045,7 @@ export class SearchcountryPage {
     private translate: TranslateService
   ) {
     const appLang = this.settingsService.get('applicationLanguage');
+    this.isNative = Capacitor.isNativePlatform();
     this.translate.use(appLang?.code);
   }
   ngOnInit() {
@@ -1091,6 +1094,10 @@ export class SearchcountryPage {
         // this.selectedCountry = country.code;
       }
     );
+  }
+
+  isNativeApp(): boolean {
+    return this.isNative;
   }
 
   confirmCountry() {

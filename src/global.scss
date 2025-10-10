@@ -329,6 +329,16 @@ ion-loading {
   --border-radius: 0;
   margin: 4px 0 0 0;
 }
+.button_disable_hover_native {
+  --background: transparent;
+  --background-hover: transparent;
+  --background-activated: transparent;
+  --padding-end: 0;
+  --padding-start: 0;
+  --box-shadow: none;
+  --border-radius: 0;
+  margin: 16px 0 0 0;
+}
 .font_open_sans{
   font-family: 'Open Sans';
 }
@@ -397,6 +407,13 @@ ion-loading {
   width: 28px;
   height: 28px;
 }
+.backIconNative {
+  margin-top: 40px;
+  font-size: 24px;
+  color: $light-text1;
+  width: 28px;
+  height: 28px;
+}
 
 // .backIcon:hover {
 //   background-color: #42516E;
@@ -427,6 +444,16 @@ ion-breadcrumb::part(native) {
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch; /* Enables momentum scroll on macOS/iOS */
   touch-action: auto; 
+}
+
+.native_scrollable_content {
+  -webkit-app-region: no-drag;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+  /* Enables momentum scroll on macOS/iOS */
+  touch-action: auto;
+  margin-bottom: 32px;
 }
 
 .content_paddding {

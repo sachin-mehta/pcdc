@@ -39,6 +39,8 @@ export class RegisterSchoolPageComponent implements OnInit {
   privacyUrl2 = 'https://www.measurementlab.net/privacy/';
   targetUrl = '_blank';
   isPrivacyChecked = false;
+  isNative: boolean;
+
   constructor(
     public loading: LoadingService,
     private readonly router: Router,
@@ -47,6 +49,7 @@ export class RegisterSchoolPageComponent implements OnInit {
   ) {
     const appLang = this.settingsService.get('applicationLanguage');
     this.translate.use(appLang.code);
+    this.isNative = Capacitor.isNativePlatform();
   }
 
   ngOnInit() {}
@@ -56,6 +59,10 @@ export class RegisterSchoolPageComponent implements OnInit {
   }
   reachedEnd() {
     this.isLast = true;
+  }
+
+  isNativeApp(): boolean {
+    return this.isNative;
   }
   moveToStartTest() {
     const translatedText = this.translate.instant('searchCountry.check');

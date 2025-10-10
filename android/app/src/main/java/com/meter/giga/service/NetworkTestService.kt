@@ -351,9 +351,9 @@ class NetworkTestService : LifecycleService() {
           var speedTestResultRequestEntity: SpeedTestResultRequestEntity? = null
           var clientInfoResponse: ClientInfoResponseEntity? = null
           var serverInfoResponse: ServerInfoResponseEntity? = null
-          if (clientInfo != null && serverInfo != null) {
-            var clientInfoRequest: ClientInfoRequestEntity? = null
-            var serverInfoRequest: ServerInfoRequestEntity? = null
+          var clientInfoRequest: ClientInfoRequestEntity? = null
+          var serverInfoRequest: ServerInfoRequestEntity? = null
+          if (clientInfo != null) {
             when (clientInfo) {
               is ResultState.Success<*> -> {
                 clientInfoResponse = clientInfo.data as ClientInfoResponseEntity
@@ -395,6 +395,8 @@ class NetworkTestService : LifecycleService() {
                 )
               }
             }
+          }
+          if (serverInfo != null) {
             when (serverInfo) {
               is ResultState.Success<*> -> {
                 serverInfoResponse = serverInfo.data as ServerInfoResponseEntity
@@ -426,124 +428,141 @@ class NetworkTestService : LifecycleService() {
                 )
               }
             }
-
-            if (clientInfoRequest != null && serverInfoRequest != null && lastUploadMeasurement != null
-              && lastDownloadMeasurement != null && lastUploadResponse != null && lastDownloadResponse != null
-            ) {
-              speedTestResultRequestEntity = GigaUtil.createSpeedTestPayload(
-                lastUploadMeasurement,
-                lastDownloadMeasurement,
-                clientInfoRequest,
-                serverInfoRequest,
-                schoolId,
-                gigaSchoolId,
-                appVersion,
-                scheduleType,
-                if (isRunningOnChromebook) {
-                  DEVICE_TYPE_CHROMEBOOK
-                } else {
-                  DEVICE_TYPE_ANDROID
-                },
-                browserId,
-                countryCode,
-                ipAddress,
-                lastDownloadResponse,
-                lastUploadResponse
-              )
-              val existingSpeedTestData = prefs.oldSpeedTestData
-              val historyDataIndex = prefs.historyDataIndex
-              val measurementsItem = GigaUtil.getMeasurementItem(
-                clientInfoResponse = clientInfoResponse,
-                c2sLastServerManagement = lastUploadMeasurement,
-                s2cLastServerManagement = lastDownloadMeasurement,
-                serverInfoResponse = serverInfoResponse,
-                scheduleType = scheduleType,
-                results = speedTestResultRequestEntity?.results,
-                c2sRate = c2sRate,
-                s2cRate = s2cRate,
-                historyDataIndex
-              )
-              prefs.historyDataIndex = historyDataIndex + 1
-              Log.d(
-                "GIGA NetworkTestService",
-                "Existing Speed Test Data $existingSpeedTestData"
-              )
-              val postSpeedTestUseCase = PostSpeedTestUseCase()
-              val uploadKey = secureDataStore.getMlabUploadKey()
-              if (speedTestResultRequestEntity != null) {
-                val postSpeedTestResultState =
-                  postSpeedTestUseCase.invoke(speedTestResultRequestEntity, uploadKey)
-                when (postSpeedTestResultState) {
-                  is ResultState.Failure -> {
-                    Log.d(
-                      "GIGA NetworkTestService",
-                      "Speed Test Not Published Successfully Due to ${postSpeedTestResultState.error}"
-                    )
-                    measurementsItem.uploaded = false
-                    val updateSpeedTestData = GigaUtil.addJsonItem(
-                      existingSpeedTestData,
-                      Gson().toJson(measurementsItem)
-                    )
-                    Log.d(
-                      "GIGA NetworkTestService",
-                      "Updated Speed Test Data $updateSpeedTestData"
-                    )
-                    prefs.oldSpeedTestData = updateSpeedTestData
-                    Sentry.captureMessage("Failed to sync speed test data", SentryLevel.INFO)
-                  }
-
-                  ResultState.Loading -> {
-                    Log.d(
-                      "GIGA NetworkTestService",
-                      "Uploading Speed Test Data"
-                    )
-                  }
-
-                  is ResultState.Success<*> -> {
-                    Log.d(
-                      "GIGA NetworkTestService",
-                      "Speed Test Data Published Successfully"
-                    )
-                    measurementsItem.uploaded = true
-                    val updateSpeedTestData = GigaUtil.addJsonItem(
-                      existingSpeedTestData,
-                      Gson().toJson(measurementsItem)
-                    )
-                    Log.d(
-                      "GIGA NetworkTestService",
-                      "Updated Speed Test Data $updateSpeedTestData"
-                    )
-                    prefs.oldSpeedTestData = updateSpeedTestData
-                    GigaAppPlugin.sendSpeedTestCompleted(
-                      speedTestResultRequestEntity,
-                      measurementsItem
-                    )
-                    Sentry.captureMessage("Synced speed test data successfully", SentryLevel.INFO)
-                  }
-                }
-              }
-            } else {
-              updateNotification("Speed Test Failed")
-              GigaAppPlugin.sendSpeedTestCompletedWithError()
-            }
-          } else {
-            if (clientInfo == null) {
-              Sentry.captureMessage("Failed to fetch Client Info", SentryLevel.INFO)
-            } else {
-              Sentry.captureMessage("Failed to fetch Server Info", SentryLevel.INFO)
-            }
-            updateNotification("Speed Test Failed")
-            Log.e("NetworkTestService", "Failed to fetch one or both APIs")
           }
+          uploadSpeedTestData(
+            clientInfoRequest,
+            serverInfoRequest,
+            clientInfoResponse,
+            serverInfoResponse
+          )
         } catch (e: Exception) {
-          Sentry.captureException(e)
-          updateNotification("Speed Test Failed")
-          Log.e("GIGA NetworkTestService", "Error: ${e.message}")
-          GigaAppPlugin.sendSpeedTestCompletedWithError()
+          if (lastUploadMeasurement != null
+            && lastDownloadMeasurement != null && lastUploadResponse != null && lastDownloadResponse != null
+          ) {
+            uploadSpeedTestData(
+              null,
+              null,
+              null,
+              null
+            )
+          } else {
+            Sentry.captureException(e)
+            updateNotification("Speed Test Failed")
+            Log.e("GIGA NetworkTestService", "Error: ${e.message}")
+            GigaAppPlugin.sendSpeedTestCompletedWithError()
+          }
+
         } finally {
           delay(5000)
           Log.d("GIGA NetworkTestService", "Speed Test Completed}")
         }
+      }
+    }
+
+    private suspend fun uploadSpeedTestData(
+      clientInfoRequest: ClientInfoRequestEntity?,
+      serverInfoRequest: ServerInfoRequestEntity?,
+      clientInfoResponse: ClientInfoResponseEntity?,
+      serverInfoResponse: ServerInfoResponseEntity?
+    ) {
+      if (lastUploadMeasurement != null
+        && lastDownloadMeasurement != null && lastUploadResponse != null && lastDownloadResponse != null
+      ) {
+        val speedTestResultRequestEntity = GigaUtil.createSpeedTestPayload(
+          lastUploadMeasurement,
+          lastDownloadMeasurement,
+          clientInfoRequest,
+          serverInfoRequest,
+          schoolId,
+          gigaSchoolId,
+          appVersion,
+          scheduleType,
+          if (isRunningOnChromebook) {
+            DEVICE_TYPE_CHROMEBOOK
+          } else {
+            DEVICE_TYPE_ANDROID
+          },
+          browserId,
+          countryCode,
+          ipAddress,
+          lastDownloadResponse,
+          lastUploadResponse
+        )
+        val existingSpeedTestData = prefs.oldSpeedTestData
+        val historyDataIndex = prefs.historyDataIndex
+        val measurementsItem = GigaUtil.getMeasurementItem(
+          clientInfoResponse = clientInfoResponse,
+          c2sLastServerManagement = lastUploadMeasurement,
+          s2cLastServerManagement = lastDownloadMeasurement,
+          serverInfoResponse = serverInfoResponse,
+          scheduleType = scheduleType,
+          results = speedTestResultRequestEntity?.results,
+          c2sRate = c2sRate,
+          s2cRate = s2cRate,
+          historyDataIndex
+        )
+        prefs.historyDataIndex = historyDataIndex + 1
+        Log.d(
+          "GIGA NetworkTestService",
+          "Existing Speed Test Data $existingSpeedTestData"
+        )
+        val postSpeedTestUseCase = PostSpeedTestUseCase()
+        val uploadKey = secureDataStore.getMlabUploadKey()
+        if (speedTestResultRequestEntity != null) {
+          val postSpeedTestResultState =
+            postSpeedTestUseCase.invoke(speedTestResultRequestEntity, uploadKey)
+          when (postSpeedTestResultState) {
+            is ResultState.Failure -> {
+              Log.d(
+                "GIGA NetworkTestService",
+                "Speed Test Not Published Successfully Due to ${postSpeedTestResultState.error}"
+              )
+              measurementsItem.uploaded = false
+              val updateSpeedTestData = GigaUtil.addJsonItem(
+                existingSpeedTestData,
+                Gson().toJson(measurementsItem)
+              )
+              Log.d(
+                "GIGA NetworkTestService",
+                "Updated Speed Test Data $updateSpeedTestData"
+              )
+              prefs.oldSpeedTestData = updateSpeedTestData
+              Sentry.captureMessage("Failed to sync speed test data", SentryLevel.INFO)
+            }
+
+            ResultState.Loading -> {
+              Log.d(
+                "GIGA NetworkTestService",
+                "Uploading Speed Test Data"
+              )
+            }
+
+            is ResultState.Success<*> -> {
+              Log.d(
+                "GIGA NetworkTestService",
+                "Speed Test Data Published Successfully"
+              )
+              measurementsItem.uploaded = true
+              val updateSpeedTestData = GigaUtil.addJsonItem(
+                existingSpeedTestData,
+                Gson().toJson(measurementsItem)
+              )
+              Log.d(
+                "GIGA NetworkTestService",
+                "Updated Speed Test Data $updateSpeedTestData"
+              )
+              prefs.oldSpeedTestData = updateSpeedTestData
+              GigaAppPlugin.sendSpeedTestCompleted(
+                speedTestResultRequestEntity,
+                measurementsItem
+              )
+              Sentry.captureMessage("Synced speed test data successfully", SentryLevel.INFO)
+            }
+          }
+        }
+      } else {
+        updateNotification("Speed Test Failed")
+        GigaAppPlugin.sendSpeedTestCompletedWithError()
       }
     }
   }
