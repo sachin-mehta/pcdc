@@ -21,6 +21,7 @@ import { TranslateService } from '@ngx-translate/core';
 import { StorageService } from '../services/storage.service';
 import SpeedTest from '@cloudflare/speedtest';
 import type { Results } from '@cloudflare/speedtest';
+import { buildScaledMeasurements } from '../utils/cloudflare.utils';
 
 @Component({
   selector: 'app-starttest',
@@ -193,17 +194,47 @@ export class StarttestPage implements OnInit {
   }
 
   getCloudFlareResults() {
-    const speedTest = new SpeedTest({});
+    const fast = buildScaledMeasurements({
+      budgetBytes: 100e6, // 10 MB
+      bytesScale: 0.7, // reduce tamaños
+      countScale: 1, // reduce número de requests
+      latencyScale: 1.0, // latencia suficiente
+    });
+    const medium = buildScaledMeasurements({
+      budgetBytes: 500e6, // 500 MB
+      bytesScale: 1.0,
+      countScale: 1.0,
+      latencyScale: 2.0, // un poco más de paquetes de latency para estabilidad
+    });
+
+    const speedTest = new SpeedTest({
+      // measurements: [
+      //   { type: 'latency', numPackets: 15 }, // latencia base suficiente
+      //   { type: 'download', bytes: 1e6, count: 3, bypassMinDuration: true }, // ~3 MB
+      //   { type: 'upload', bytes: 1e6, count: 3, bypassMinDuration: true }, // ~3 MB
+      //   // Packet loss moderado; si no configuras TURN, sáltalo o no esperes datos fiables
+      //   {
+      //     type: 'packetLoss',
+      //     numPackets: 100,
+      //     batchSize: 10,
+      //     responsesWaitTime: 3000,
+      //   },
+      // ],
+      measurements: fast,
+    });
     speedTest.onRunningChange = (isRunning: boolean) => {
       console.log('CloudFlare SpeedTest running status: ', isRunning);
     };
     speedTest.onResultsChange = (param: { type: string; results: any }) => {
-      console.log('CloudFlare SpeedTest results changed: ', param);
-      console.log('CloudFlare SpeedTest summary: ', speedTest.results.getSummary());
+      console.log(
+        'CloudFlare SpeedTest results changed: ',
+        speedTest.results.getSummary()
+      );
+      // this.logResults(speedTest.results);
     };
     speedTest.onFinish = (results: Results) => {
-      console.log('CloudFlare SpeedTest Summary: ', results.getSummary());
-      console.log('CloudFlare SpeedTest Download: ', results.getScores());
+      console.log('CloudFlare SpeedTest finished!');
+      this.logResults(speedTest.results);
     };
   }
 
@@ -218,7 +249,7 @@ export class StarttestPage implements OnInit {
       }
     });
     console.log('Starting Cloudflare test...');
-    this.getCloudFlareResults();
+    // this.getCloudFlareResults();
   }
 
   refreshHistory() {
@@ -249,6 +280,7 @@ export class StarttestPage implements OnInit {
       this.uploadStatus = undefined;
       this.connectionStatus = '';
       this.measurementClientService.runTest();
+      // this.getCloudFlareResults();
     } catch (e) {
       console.log(e);
     }
@@ -360,5 +392,49 @@ export class StarttestPage implements OnInit {
 
   gaugeError() {
     this.progressGaugeState.current = this.progressGaugeState.maximum;
+  }
+  logResults(results: Results) {
+    if (!results) {
+      console.log('No results to log');
+      return;
+    }
+    const data = {
+      isFinished: results.isFinished,
+
+      summary: results.getSummary(),
+
+      unloadedLatency: {
+        latency: results.getUnloadedLatency(),
+        jitter: results.getUnloadedJitter(),
+        latencyPoints: results.getUnloadedLatencyPoints(),
+      },
+
+      downloadedLatency: {
+        latency: results.getDownLoadedLatency(),
+        jitter: results.getDownLoadedJitter(),
+        latencyPoints: results.getDownLoadedLatencyPoints(),
+      },
+
+      uploadedLatency: {
+        latency: results.getUpLoadedLatency(),
+        jitter: results.getUpLoadedJitter(),
+        latencyPoints: results.getUpLoadedLatencyPoints(),
+      },
+
+      bandwidth: {
+        download: results.getDownloadBandwidth(),
+        upload: results.getUploadBandwidth(),
+      },
+
+      packetLoss: {
+        value: results.getPacketLoss(),
+        details: results.getPacketLossDetails(),
+      },
+
+      scores: results.getScores(),
+    };
+
+    console.log('📊 Results object:', data);
+    return data;
   }
 }
