@@ -1,0 +1,48 @@
+# Dockerfile for Sentry 9.1.2
+# This Dockerfile sets up a complete Sentry instance with all required services
+
+FROM sentry:9.1.2
+
+# Set environment variables
+ENV SENTRY_SECRET_KEY="your-secret-key-here"
+ENV SENTRY_POSTGRES_HOST="postgres"
+ENV SENTRY_POSTGRES_PORT="5432"
+ENV SENTRY_DB_NAME="sentry"
+ENV SENTRY_DB_USER="sentry"
+ENV SENTRY_DB_PASSWORD="sentry"
+ENV SENTRY_REDIS_HOST="redis"
+ENV SENTRY_REDIS_PORT="6379"
+ENV SENTRY_REDIS_DB="0"
+ENV SENTRY_MAIL_HOST="smtp"
+ENV SENTRY_MAIL_PORT="587"
+ENV SENTRY_MAIL_USERNAME=""
+ENV SENTRY_MAIL_PASSWORD=""
+ENV SENTRY_MAIL_USE_TLS="true"
+ENV SENTRY_SERVER_EMAIL="sentry@localhost"
+ENV SENTRY_EMAIL_SUBJECT_PREFIX="[Sentry]"
+ENV SENTRY_EMAIL_FROM="sentry@localhost"
+ENV SENTRY_SINGLE_ORGANIZATION="true"
+ENV SENTRY_USE_SSL="false"
+ENV SENTRY_WEB_HOST="0.0.0.0"
+ENV SENTRY_WEB_PORT="9000"
+ENV SENTRY_WEB_OPTIONS="--workers 3 --worker-class gevent --worker-connections 1000 --max-requests 1000 --max-requests-jitter 50 --preload-app"
+
+# Install additional dependencies if needed
+RUN apt-get update && apt-get install -y \
+    postgresql-client \
+    redis-tools \
+    && rm -rf /var/lib/apt/lists/*
+
+# Create sentry user and directories
+RUN groupadd -r sentry && useradd -r -g sentry sentry
+RUN mkdir -p /var/lib/sentry/files && chown -R sentry:sentry /var/lib/sentry
+
+# Expose ports
+EXPOSE 9000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
+    CMD curl -f http://localhost:9000/_health/ || exit 1
+
+# Default command
+CMD ["sentry", "run", "web"]
