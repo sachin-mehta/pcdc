@@ -50,7 +50,7 @@ class BootBroadCastReceiver : BroadcastReceiver() {
         }
       }
     } catch (e: Exception) {
-      Sentry.captureException(e)
+      Sentry.capture(e)
     }
   }
 

@@ -247,6 +247,10 @@ export class StarttestPage implements OnInit, OnDestroy {
             );
             if (data.measurementsItem) {
               this.historyService.add(data.measurementsItem);
+              this.sharedService.broadcast(
+                'history:measurement:change',
+                'history:measurement:change'
+              );
             }
             this.ref.markForCheck();
             this.refreshHistory();

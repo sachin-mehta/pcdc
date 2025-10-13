@@ -1,7 +1,7 @@
 <app-pcdc-header></app-pcdc-header>
 <ion-content>
   <div class="container" [ngClass]="{'privacy_height': isLast}">
-    <ion-button class="button_disable_hover" fill="clear" (click)="handleBackClick()">
+    <ion-button class="isNativeApp() ? button_disable_hover_native : button_disable_hover" fill="clear" (click)="handleBackClick()">
       <ion-img src="assets/images/back_button.svg" name="arrow-back-outline" class="backIcon"></ion-img>
     </ion-button>
     <ion-slides (ionSlideDidChange)="checkCurrentSlide()" (ionSlideWillChange)="checkCurrentSlide()"

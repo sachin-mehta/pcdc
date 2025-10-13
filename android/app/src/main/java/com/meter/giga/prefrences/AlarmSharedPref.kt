@@ -9,6 +9,7 @@ import com.meter.giga.utils.Constants.KEY_COUNTRY_CODE
 import com.meter.giga.utils.Constants.KEY_FIRST_15_EXECUTED_TIME
 import com.meter.giga.utils.Constants.KEY_FIRST_15_SCHEDULED_TIME
 import com.meter.giga.utils.Constants.KEY_GIGA_SCHOOL_ID
+import com.meter.giga.utils.Constants.KEY_HISTORY_DATA_INDEX
 import com.meter.giga.utils.Constants.KEY_IP_ADDRESS
 import com.meter.giga.utils.Constants.KEY_LAST_EXECUTION_DAY
 import com.meter.giga.utils.Constants.KEY_LAST_SLOT_EXECUTION_HOUR
@@ -62,8 +63,12 @@ class AlarmSharedPref(context: Context) {
    * speed test executed else 0
    */
   var historyDataIndex: Int
-    get() = prefs.getInt(KEY_LAST_SLOT_EXECUTION_HOUR, 0)
-    set(value) = prefs.edit() { putInt(KEY_LAST_SLOT_EXECUTION_HOUR, value) }
+    get() = prefs.getInt(KEY_HISTORY_DATA_INDEX, 0)
+    set(value) = prefs.edit() {
+      putInt(
+        KEY_HISTORY_DATA_INDEX, value
+      )
+    }
 
 
   /**
