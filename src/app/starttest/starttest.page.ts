@@ -184,6 +184,8 @@ export class StarttestPage implements OnInit, OnDestroy {
         this.connectionStatus = 'error';
         this.currentRate = 'error';
         this.isErrorClosed = false;
+        // Hide registration banners if an error is shown during first test
+        this.showRegistrationBanner = false;
       },
       false
     );
@@ -220,6 +222,33 @@ export class StarttestPage implements OnInit, OnDestroy {
 
     // Set up listener for registration completion events
     this.setupRegistrationListener();
+  }
+
+  ionViewWillEnter() {
+    // Reset error state when returning to the page to prevent stale error states
+    this.resetErrorStateIfNeeded();
+
+    // Refresh the latest measurement data in case it was updated while away
+    this.loadLatestMeasurement();
+    this.loadLatestPingResult();
+  }
+
+  private resetErrorStateIfNeeded() {
+    // If we're in an error state but not currently running a test, reset to normal state
+    if (
+      this.connectionStatus === 'error' &&
+      this.currentState === undefined &&
+      this.onlineStatus
+    ) {
+      console.log('Resetting stale error state on page return');
+      this.connectionStatus = '';
+      this.currentRate = undefined;
+      this.isErrorClosed = false;
+      this.progress = 0;
+
+      // Force change detection to update the UI
+      this.ref.detectChanges();
+    }
   }
 
   /**
@@ -519,6 +548,20 @@ export class StarttestPage implements OnInit, OnDestroy {
     this.isErrorClosed = true;
   }
 
+  getStatusMessage(): string | null {
+    // Show status message only during loading states (not during download/upload)
+    if (this.currentState && !this.downloadStarted && !this.uploadStarted) {
+      // Don't show status message for "Starting" or "Completed" states
+      if (
+        this.currentState !== 'Starting' &&
+        this.currentState !== 'Completed'
+      ) {
+        return this.currentState;
+      }
+    }
+    return null;
+  }
+
   showTestResult() {
     this.router.navigate(['connectivitytest']);
   }
@@ -543,7 +586,9 @@ export class StarttestPage implements OnInit, OnDestroy {
       this.currentState = 'Starting';
       this.uploadStatus = undefined;
       this.latency = undefined;
-      this.connectionStatus = '';
+      this.connectionStatus = ''; // Reset connection status
+      this.currentRate = undefined; // Reset current rate
+      this.isErrorClosed = false; // Reset error closed state
       this.uploadProgressStarted = false;
       this.measurementClientService.runTest(notes);
     } catch (e) {
@@ -615,6 +660,10 @@ export class StarttestPage implements OnInit, OnDestroy {
       if (data.testStatus === 'error') {
         this.connectionStatus = 'error';
         this.currentRate = 'error';
+        this.currentState = undefined;
+        this.progress = 0; // Reset progress to allow clicking
+        // Hide registration banners if an error is shown during first test
+        this.showRegistrationBanner = false;
       }
       if (data.testStatus === 'onstart') {
         this.currentState = 'Starting';
@@ -622,6 +671,20 @@ export class StarttestPage implements OnInit, OnDestroy {
         this.currentRateUpload = undefined;
         this.currentRateDownload = undefined;
         this.progress = 0;
+      } else if (data.testStatus === 'server_discovery') {
+        this.currentState = this.translate.instant(
+          'startTest.discoveringServers'
+        );
+        this.progress = 0.1;
+      } else if (data.testStatus === 'server_chosen') {
+        this.currentState = this.translate.instant('startTest.serverSelected');
+        this.progress = 0.2;
+      } else if (data.testStatus === 'retrying') {
+        this.currentState = this.translate.instant('startTest.retrying', {
+          attempt: data.attempt,
+          maxRetries: data.maxRetries,
+        });
+        this.progress = 0.05;
       } else if (data.testStatus === 'interval_c2s') {
         console.log('Running Test (Upload)');
         this.currentState = 'Running Test (Upload)';
@@ -692,6 +755,8 @@ export class StarttestPage implements OnInit, OnDestroy {
         this.currentState = undefined;
         this.currentRate = undefined;
         this.ref.markForCheck();
+        // Hide registration banners if an error is shown during first test
+        this.showRegistrationBanner = false;
       }
       if (data.testStatus !== 'complete') {
         this.progressGaugeState.current = data.progress;
