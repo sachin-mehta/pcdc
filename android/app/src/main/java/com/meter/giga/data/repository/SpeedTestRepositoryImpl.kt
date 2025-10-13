@@ -128,14 +128,15 @@ class SpeedTestRepositoryImpl : SpeedTestRepository {
       body = speedTestData.toModel(),
       authorization = "Bearer $uploadKey"
     )
+    Log.d("GIGA SpeedTestRepositoryImpl Response", "$response")
     if (response.isSuccessful) {
       Log.d("GIGA SpeedTestRepositoryImpl Success", "$response")
-      if (response.body() != null) {
-        return ResultState.Success(
+      return if (response.body() != null) {
+        ResultState.Success(
           response.body()!!
         )
       } else {
-        return ResultState.Failure(ErrorHandlerImpl().getError(response.errorBody()))
+        ResultState.Failure(ErrorHandlerImpl().getError(response.errorBody()))
       }
     } else {
       delay(500)
@@ -146,7 +147,7 @@ class SpeedTestRepositoryImpl : SpeedTestRepository {
         Log.d("GIGA SpeedTestRepositoryImpl Failed with attempt No: ", "$retryAttemptCount")
       } else {
         Log.d("GIGA SpeedTestRepositoryImpl Failed after no of attempts", "$retryAttemptCount")
-        Sentry.capture("Sync data failed after  : $retryAttemptCount")
+        Sentry.capture("Sync retry failed with $response")
       }
     }
     return ResultState.Failure(
