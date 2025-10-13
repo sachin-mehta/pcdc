@@ -101,7 +101,6 @@ class NetworkTestService : LifecycleService() {
       )
       GigaAppPlugin.sendSpeedTestStarted()
       client.startTest(NDTTest.TestType.DOWNLOAD_AND_UPLOAD)
-      throw RuntimeException("Test crash inside ForegroundService")
     } catch (e: Exception) {
       Sentry.capture(e)
     }
