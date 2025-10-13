@@ -1,7 +1,7 @@
 version: '3.8'
 
 services:
-  # PostgreSQL database
+  # PostgreSQL database - Windows optimized
   postgres:
     image: postgres:13-alpine
     environment:
@@ -9,25 +9,32 @@ services:
       POSTGRES_USER: sentry
       POSTGRES_PASSWORD: sentry
       POSTGRES_INITDB_ARGS: "--encoding=UTF-8 --lc-collate=C --lc-ctype=C"
+      POSTGRES_HOST_AUTH_METHOD: trust
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"  # Expose port for debugging
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U sentry -d sentry"]
       interval: 10s
       timeout: 5s
       retries: 10
       start_period: 30s
+    restart: unless-stopped
 
   # Redis cache
   redis:
     image: redis:6-alpine
     volumes:
       - redis_data:/data
+    ports:
+      - "6379:6379"  # Expose port for debugging
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 10s
       timeout: 5s
       retries: 5
+    restart: unless-stopped
 
   # Sentry web service
   sentry-web:
@@ -44,11 +51,12 @@ services:
       SENTRY_REDIS_HOST: redis
       SENTRY_REDIS_PORT: 6379
       SENTRY_REDIS_DB: 0
-      SENTRY_SECRET_KEY: "89vQjnB1aXkaPR9nND4v6fr-iS7BllgtxNoDuMgvYwcPeHkMQty8K43dAXMznug3GjM"
+      SENTRY_SECRET_KEY: "your-secret-key-change-this-in-production"
       SENTRY_SINGLE_ORGANIZATION: "true"
       SENTRY_USE_SSL: "false"
       SENTRY_WEB_HOST: "0.0.0.0"
       SENTRY_WEB_PORT: 9000
+      SENTRY_DEBUG: "false"
     depends_on:
       postgres:
         condition: service_healthy
@@ -56,6 +64,7 @@ services:
         condition: service_healthy
     volumes:
       - sentry_data:/var/lib/sentry/files
+    restart: unless-stopped
 
   # Sentry worker for background tasks
   sentry-worker:
@@ -71,9 +80,10 @@ services:
       SENTRY_REDIS_HOST: redis
       SENTRY_REDIS_PORT: 6379
       SENTRY_REDIS_DB: 0
-      SENTRY_SECRET_KEY: "89vQjnB1aXkaPR9nND4v6fr-iS7BllgtxNoDuMgvYwcPeHkMQty8K43dAXMznug3GjM"
+      SENTRY_SECRET_KEY: "your-secret-key-change-this-in-production"
       SENTRY_SINGLE_ORGANIZATION: "true"
       SENTRY_USE_SSL: "false"
+      SENTRY_DEBUG: "false"
     depends_on:
       postgres:
         condition: service_healthy
@@ -81,6 +91,7 @@ services:
         condition: service_healthy
     volumes:
       - sentry_data:/var/lib/sentry/files
+    restart: unless-stopped
 
   # Sentry cron for scheduled tasks
   sentry-cron:
@@ -96,9 +107,10 @@ services:
       SENTRY_REDIS_HOST: redis
       SENTRY_REDIS_PORT: 6379
       SENTRY_REDIS_DB: 0
-      SENTRY_SECRET_KEY: "89vQjnB1aXkaPR9nND4v6fr-iS7BllgtxNoDuMgvYwcPeHkMQty8K43dAXMznug3GjM"
+      SENTRY_SECRET_KEY: "your-secret-key-change-this-in-production"
       SENTRY_SINGLE_ORGANIZATION: "true"
       SENTRY_USE_SSL: "false"
+      SENTRY_DEBUG: "false"
     depends_on:
       postgres:
         condition: service_healthy
@@ -106,6 +118,7 @@ services:
         condition: service_healthy
     volumes:
       - sentry_data:/var/lib/sentry/files
+    restart: unless-stopped
 
 volumes:
   postgres_data:
