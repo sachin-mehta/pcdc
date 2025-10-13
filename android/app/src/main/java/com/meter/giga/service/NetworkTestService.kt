@@ -32,7 +32,6 @@ import com.meter.giga.utils.Constants.SCHEDULE_TYPE_DAILY
 import com.meter.giga.utils.GigaUtil
 import com.meter.giga.utils.ResultState
 import io.sentry.Sentry
-import io.sentry.SentryLevel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -85,7 +84,7 @@ class NetworkTestService : LifecycleService() {
     startForeground(NOTIFICATION_ID, createNotification("Starting speed test..."))
     try {
       // Example logging
-      Sentry.captureMessage("Foreground Service started", SentryLevel.INFO)
+      Sentry.capture("Foreground Service started")
       val prefs = AlarmSharedPref(this)
       secureDataStore = SecureDataStore(this)
       val scheduleType = intent?.getStringExtra(SCHEDULE_TYPE) ?: SCHEDULE_TYPE_DAILY
@@ -104,7 +103,7 @@ class NetworkTestService : LifecycleService() {
       client.startTest(NDTTest.TestType.DOWNLOAD_AND_UPLOAD)
       throw RuntimeException("Test crash inside ForegroundService")
     } catch (e: Exception) {
-      Sentry.captureException(e)
+      Sentry.capture(e)
     }
     return START_STICKY
   }
@@ -312,7 +311,7 @@ class NetworkTestService : LifecycleService() {
           allDoneInvoked = 0
         }
       } catch (e: Exception) {
-        Sentry.captureException(e)
+        Sentry.capture(e)
       }
     }
 
@@ -385,7 +384,7 @@ class NetworkTestService : LifecycleService() {
                   "GIGA NetworkTestService",
                   "Get Client Info API Failed: ${clientInfo.error}"
                 )
-                Sentry.captureMessage("Client Info Fetch Failed", SentryLevel.INFO)
+                Sentry.capture("Client Info Fetch Failed")
               }
 
               ResultState.Loading -> {
@@ -418,7 +417,7 @@ class NetworkTestService : LifecycleService() {
                   "GIGA NetworkTestService",
                   "Get Client Info API Failed: ${serverInfo.error}"
                 )
-                Sentry.captureMessage("Server Info Fetch Failed", SentryLevel.INFO)
+                Sentry.capture("Server Info Fetch Failed")
               }
 
               ResultState.Loading -> {
@@ -446,7 +445,7 @@ class NetworkTestService : LifecycleService() {
               null
             )
           } else {
-            Sentry.captureException(e)
+            Sentry.capture(e)
             updateNotification("Speed Test Failed")
             Log.e("GIGA NetworkTestService", "Error: ${e.message}")
             GigaAppPlugin.sendSpeedTestCompletedWithError()
@@ -527,7 +526,7 @@ class NetworkTestService : LifecycleService() {
                 "Updated Speed Test Data $updateSpeedTestData"
               )
               prefs.oldSpeedTestData = updateSpeedTestData
-              Sentry.captureMessage("Failed to sync speed test data", SentryLevel.INFO)
+              Sentry.capture("Failed to sync speed test data")
             }
 
             ResultState.Loading -> {
@@ -556,7 +555,7 @@ class NetworkTestService : LifecycleService() {
                 speedTestResultRequestEntity,
                 measurementsItem
               )
-              Sentry.captureMessage("Synced speed test data successfully", SentryLevel.INFO)
+              Sentry.capture("Synced speed test data successfully")
             }
           }
         }

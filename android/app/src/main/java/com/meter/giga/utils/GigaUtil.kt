@@ -18,7 +18,6 @@ import com.meter.giga.domain.entity.response.ClientInfoResponseEntity
 import com.meter.giga.domain.entity.response.ServerInfoResponseEntity
 import com.meter.giga.utils.Constants.M_D_YYYY_H_MM_SS_A
 import io.sentry.Sentry
-import io.sentry.SentryLevel
 import net.measurementlab.ndt7.android.models.AppInfo
 import net.measurementlab.ndt7.android.models.BBRInfo
 import net.measurementlab.ndt7.android.models.ClientResponse
@@ -202,8 +201,8 @@ object GigaUtil {
 //      id = null
       )
     } catch (e: Exception) {
-      Sentry.captureMessage("Failed to create speedtest request payload", SentryLevel.INFO)
-      Sentry.captureException(e)
+      Sentry.capture("Failed to create speedtest request payload")
+      Sentry.capture(e)
       return null;
     }
   }
@@ -245,7 +244,7 @@ object GigaUtil {
         total = totalBytes,
       )
     } catch (e: Exception) {
-      Sentry.captureException(e)
+      Sentry.capture(e)
       return DataUsage(
         download = 0,
         upload = 0,

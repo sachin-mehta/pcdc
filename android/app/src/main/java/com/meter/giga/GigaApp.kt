@@ -2,7 +2,7 @@ package com.meter.giga
 
 import android.app.Application
 import io.sentry.Sentry
-import io.sentry.android.core.SentryAndroid
+import io.sentry.android.AndroidSentryClientFactory
 
 /**
  * Giga App Application class
@@ -21,26 +21,38 @@ class GigaApp : Application() {
    * logs
    */
   private fun initSentry() {
-    SentryAndroid.init(this) { options ->
-      options.dsn = getString(R.string.sentry_dsn)
-      options.isDebug = BuildConfig.DEBUG
-      when (BuildConfig.FLAVOR) {
-        "dev" -> {
-          options.environment =
-            "development"
-        }
 
-        "staging" -> {
-          options.environment = "staging"
-        }
 
-        "prod" -> {
-          options.environment =
-            "production"
-        }
-      }
-      options.connectionTimeoutMillis = 10000 // 10 seconds
-      options.readTimeoutMillis = 10000
+    // Initialize Sentry with legacy Android factory
+    Sentry.init(
+      getString(R.string.sentry_dsn),
+      AndroidSentryClientFactory(applicationContext)
+    )
+    // Add global context data
+    Sentry.getContext().apply {
+
+      // 🏷️ Add custom tags (key-value)
+      addTag("environment", getEnvironment())
+    }
+  }
+
+  private fun getEnvironment(): String {
+    when (BuildConfig.FLAVOR) {
+      "dev" ->
+        return "development"
+
+
+      "staging" ->
+        return "staging"
+
+
+      "prod" ->
+        return "production"
+
+
+      else ->
+        return "development"
+
     }
   }
 }
