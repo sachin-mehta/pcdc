@@ -7,12 +7,13 @@ import { TranslateService } from '@ngx-translate/core';
 import { SettingsService } from '../services/settings.service';
 import { environment } from 'src/environments/environment';
 import { MeasurementClientService } from '../services/measurement-client.service';
+import { Capacitor } from '@capacitor/core';
 
 @Component({
-    selector: 'app-schoolsuccess',
-    templateUrl: 'schoolsuccess.page.html',
-    styleUrls: ['schoolsuccess.page.scss'],
-    standalone: false
+  selector: 'app-schoolsuccess',
+  templateUrl: 'schoolsuccess.page.html',
+  styleUrls: ['schoolsuccess.page.scss'],
+  standalone: false,
 })
 export class SchoolsuccessPage {
   @ViewChild(IonAccordionGroup, { static: true })
@@ -25,12 +26,13 @@ export class SchoolsuccessPage {
     speed: 400,
     pagination: {
       el: '.swiper-pagination', // target class for bullets
-      clickable: true
-    }
-  
+      clickable: true,
+    },
   };
   isLast = false;
   appName = environment.appName;
+  isNative: boolean;
+
   constructor(
     public loading: LoadingService,
     private router: Router,
@@ -40,12 +42,17 @@ export class SchoolsuccessPage {
   ) {
     const appLang = this.settingsService.get('applicationLanguage');
     this.translate.use(appLang.code);
+    this.isNative = Capacitor.isNativePlatform();
   }
   swipeNext() {
     this.slides.slideNext();
   }
   reachedEnd() {
     this.isLast = true;
+  }
+
+  isNativeApp(): boolean {
+    return this.isNative;
   }
 
   async checkCurrentSlide() {

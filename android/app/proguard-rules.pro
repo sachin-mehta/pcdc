@@ -37,3 +37,7 @@
     public static int w(...);
     public static int e(...);
 }
+
+-keepattributes LineNumberTable,SourceFile
+-keep class io.sentry.** { *; }
+-keep class org.jetbrains.annotations.** { *; }

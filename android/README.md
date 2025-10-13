@@ -271,6 +271,8 @@ android {
   - `./gradlew bundleStagingRelease`
   - `./gradlew bundleReleaseRelease`
 
+## 9. Special Note : Existing Sentry version is 9.x where as android latest sentry sdk support 10.x sentry servers. Do not upgrade the android sdk until sentry server migrated to 10.x version,otherwise it will block the sentry logging.
+
 ---
 
 ✅ You now have a Capacitor Android app configured with **dev, staging, and production flavors** along with **debug/release build types**.

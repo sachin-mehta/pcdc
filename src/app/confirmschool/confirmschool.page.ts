@@ -64,6 +64,9 @@ export class ConfirmschoolPage {
     });
   }
 
+  isNativeApp(): boolean {
+    return this.isNative;
+  }
   confirmSchool() {
     /* Store school id and giga id inside storage */
     let schoolData = {};
