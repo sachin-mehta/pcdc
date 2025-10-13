@@ -6,17 +6,27 @@ This directory contains all the necessary files to run Sentry version 9.1.2 usin
 
 - `Dockerfile.sentry` - Dockerfile for Sentry 9.1.2
 - `docker-compose.sentry.yml` - Docker Compose configuration with PostgreSQL and Redis
-- `setup-sentry.sh` - Automated setup script with superuser creation
+- `setup-sentry.sh` - Automated setup script for Unix/Linux/macOS
+- `setup-sentry.py` - Python setup script (cross-platform)
 
 ## Quick Start
 
-### 1. Run the Setup Script
+### For Unix/Linux/macOS:
 
 ```bash
 cd sentry
 chmod +x setup-sentry.sh
 ./setup-sentry.sh
 ```
+
+### For Windows:
+
+#### Python Script 
+```cmd
+cd sentry
+python setup-sentry.py
+```
+
 
 This script will:
 - Generate a secure secret key
@@ -103,6 +113,18 @@ docker-compose -f docker-compose.sentry.yml exec sentry-web sentry upgrade --noi
 1. **Platform compatibility**: The setup uses `platform: linux/amd64` for Apple Silicon compatibility
 2. **Memory requirements**: Ensure you have at least 2GB RAM available for Docker
 3. **Port conflicts**: Make sure port 9000 is not in use
+
+### Windows-Specific Issues
+
+
+1. **Python not found**: Make sure Python is installed and in your PATH:
+   ```cmd
+   python --version
+   ```
+   
+2. **Docker Desktop not running**: Ensure Docker Desktop is installed and running before running the setup scripts.
+
+3. **File path issues**: If you encounter path-related errors, try running the scripts from the exact directory where the `docker-compose.sentry.yml` file is located.
 
 ### Reset Everything
 
