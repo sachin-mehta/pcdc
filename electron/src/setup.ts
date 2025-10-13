@@ -29,11 +29,20 @@ import { Console } from 'console';
 var AutoLaunch = require('auto-launch');
 var isQuiting = false;
 
+// Export functions to control quitting state
+export function setIsQuiting(quitting: boolean) {
+  isQuiting = quitting;
+}
+
+export function getIsQuiting(): boolean {
+  return isQuiting;
+}
+
 // Enhanced Sentry configuration
 Sentry.init({
   dsn: 'https://e52e97fc558344bc80a218fc22a9a6a9@excubo.unicef.io/47',
   environment: 'production',
-  beforeSend: (event)=> {
+  beforeSend: (event) => {
     // Add app version to help with debugging
     event.extra = {
       ...event.extra,
@@ -120,9 +129,9 @@ export class ElectronCapacitorApp {
     new MenuItem({
       label: 'Quit App',
       click: function () {
-        isQuiting = true;
+        setIsQuiting(true);
+        // Note: cleanup will be handled by the before-quit event
         app.quit();
-        this.MainWindow.close();
       },
     }),
   ];
@@ -174,6 +183,14 @@ export class ElectronCapacitorApp {
     return this.customScheme;
   }
 
+  // Cleanup method to properly destroy tray icon
+  cleanup(): void {
+    if (this.TrayIcon && !this.TrayIcon.isDestroyed()) {
+      this.TrayIcon.destroy();
+      this.TrayIcon = null;
+    }
+  }
+
   async init(): Promise<void> {
     const icon = nativeImage.createFromPath(
       join(
@@ -200,7 +217,7 @@ export class ElectronCapacitorApp {
       minimizable: false,
       resizable: false,
       frame: true,
-      useContentSize: true,    //Make content area exactly 390x700
+      useContentSize: true, //Make content area exactly 390x700
       transparent: false,
       webPreferences: {
         nodeIntegration: true,
@@ -212,20 +229,23 @@ export class ElectronCapacitorApp {
     });
 
     // Add error tracking for renderer process
-    this.MainWindow?.webContents?.on('render-process-gone', (event, details) => {
-      const crashData = {
-        reason: details?.reason,
-        exitCode: details?.exitCode,
-        processType: 'renderer',
-      };
-      Sentry.captureException(new Error('Renderer Process Gone'), {
-        extra: crashData,
-      });
-    });
+    this.MainWindow?.webContents?.on(
+      'render-process-gone',
+      (event, details) => {
+        const crashData = {
+          reason: details?.reason,
+          exitCode: details?.exitCode,
+          processType: 'renderer',
+        };
+        Sentry.captureException(new Error('Renderer Process Gone'), {
+          extra: crashData,
+        });
+      }
+    );
 
     this.MainWindow?.on('unresponsive', () => {
       Sentry.captureMessage('Window became unresponsive', {
-        level: 'error',
+        level: Sentry.Severity.Error,
         extra: {
           windowId: this.MainWindow?.id,
         },
@@ -256,6 +276,15 @@ export class ElectronCapacitorApp {
       );
     }
 
+    // Handle native close button to minimize to tray instead of closing
+    this.MainWindow?.on('close', (event) => {
+      if (!isQuiting) {
+        event.preventDefault();
+        this.MainWindow?.hide();
+        return false;
+      }
+    });
+
     // If we close the main window with the splashscreen enabled we need to destory the ref.
     this.MainWindow?.on('closed', () => {
       if (
@@ -267,6 +296,10 @@ export class ElectronCapacitorApp {
     });
     // When the tray icon is enabled, setup the options.
     if (this.CapacitorFileConfig?.electron?.trayIconAndMenuEnabled) {
+      // Cleanup existing tray icon to prevent duplicates
+      if (this.TrayIcon && !this.TrayIcon.isDestroyed()) {
+        this.TrayIcon.destroy();
+      }
       this.TrayIcon = new Tray(icon);
       this.TrayIcon?.on('double-click', () => {
         if (this.MainWindow) {
@@ -295,8 +328,12 @@ export class ElectronCapacitorApp {
     }
 
     // Setup the main manu bar at the top of our window.
-    if ((this.CapacitorFileConfig.electron as any)?.appMenuBarMenuTemplateEnabled) {
-      Menu.setApplicationMenu(Menu.buildFromTemplate(this.AppMenuBarMenuTemplate));
+    if (
+      (this.CapacitorFileConfig.electron as any)?.appMenuBarMenuTemplateEnabled
+    ) {
+      Menu.setApplicationMenu(
+        Menu.buildFromTemplate(this.AppMenuBarMenuTemplate)
+      );
     } else {
       Menu.setApplicationMenu(new Menu());
     }
@@ -326,7 +363,9 @@ export class ElectronCapacitorApp {
       }
     });
     this.MainWindow?.webContents?.on('will-navigate', (event, _newURL) => {
-      if (!this.MainWindow?.webContents?.getURL()?.includes(this.customScheme)) {
+      if (
+        !this.MainWindow?.webContents?.getURL()?.includes(this.customScheme)
+      ) {
         event.preventDefault();
       }
     });

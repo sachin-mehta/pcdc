@@ -192,7 +192,7 @@ ion-content {
   border-radius: 10px !important;
   max-width: 700px;
   margin: 0 0;
-  background-color: #fe2762;
+  background-color: #ffffff;
   color: $light-text2;
   max-height: 840px;
 }
@@ -201,7 +201,7 @@ ion-content {
   // min-height: 88%;
   background-color: #ffffff;
   background-size: 100% 100%;
-  border-radius: 0px 0px 10px 10px;
+  border-radius: 10px 10px 10px 10px;
 }
 .swiper-pagination-bullet.swiper-pagination-bullet-active {
   width: 12px !important;
@@ -422,3 +422,51 @@ ion-breadcrumb::part(native) {
 .loading-spinner.sc-ion-loading-md+.loading-content.sc-ion-loading-md {
   margin-inline-start: 0px !important
 }
+
+/* First Test Success Modal Styles */
+.first-test-success-modal {
+  --width: auto;
+  --height: auto;
+  --min-width: 320px;
+  --max-width: 350px;
+  --border-radius: 16px;
+  --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  --backdrop-opacity: 0.5;
+}
+
+.first-test-success-modal ion-backdrop {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.first-test-success-modal .modal-wrapper {
+  background: white;
+  border-radius: 16px;
+  margin: 0;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+/* What's New Modal Styles */
+.whats-new-modal {
+  --width: auto;
+  --height: auto;
+  --min-width: 320px;
+  --max-width: 350px;
+  --border-radius: 16px;
+  --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  --backdrop-opacity: 0.5;
+}
+
+.whats-new-modal ion-backdrop {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.whats-new-modal .modal-wrapper {
+  background: white;
+  border-radius: 16px;
+  margin: 0;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+/* Canvas Confetti is handled by the library - no custom CSS needed */

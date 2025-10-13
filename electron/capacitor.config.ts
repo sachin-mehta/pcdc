@@ -14,7 +14,7 @@ const config: ExtendedCapacitorConfig = {
   bundledWebRuntime: false,
   electron: {
     trayIconAndMenuEnabled: true,
-    electronIsDev: true
+    electronIsDev: false
   }
 };
 

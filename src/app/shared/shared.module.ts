@@ -1,6 +1,7 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { RouterModule } from '@angular/router';
 import { NgPipesModule } from 'ngx-pipes';
 import { TruncatePipe } from './pipes/truncate.pipe';
 import { MeasurePipePipe } from './pipes/measure-pipe.pipe';
@@ -40,6 +41,7 @@ export const createTranslateLoader = (http: HttpClient) =>
   ],
   imports: [
     CommonModule,
+    RouterModule,
     NgPipesModule,
     // NgxElectronModule,
     TranslateModule.forRoot({
@@ -53,6 +55,7 @@ export const createTranslateLoader = (http: HttpClient) =>
   ],
   exports: [
     TranslateModule,
+    RouterModule,
     MeasurePipePipe,
     FormatThroughputMeasurementPipe,
     FormatThroughputDisplayPipe,
@@ -76,7 +79,7 @@ export const createTranslateLoader = (http: HttpClient) =>
     CapitalizePipe,
     TruncatePipe,
     Network,
-    DatePipe
+    DatePipe,
   ],
 })
 export class SharedModule {}

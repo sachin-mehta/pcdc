@@ -118,9 +118,11 @@ export class PingService {
 
       if (!this.storage.get('schoolId')) {
         console.log('No schoolId found, skipping Ping service');
-      } else if (!featureFlags?.pingService) {
-        console.log('Ping service disabled by feature flags');
-      } else {
+      } 
+      // else if (!featureFlags?.pingService) {
+      //   console.log('Ping service disabled by feature flags');
+      // } 
+      else {
         const result = await this.performCheck();
         if (result) {
           console.log('Ping result:', result);
