@@ -142,7 +142,7 @@ object GigaUtil {
       val currentTime = getCurrentFormattedTime()
       var meanUploadClientMbps: Double? = null
       lastUploadResponse?.appInfo?.let {
-        meanUploadClientMbps = if (it.elapsedTime == 0L) {
+        meanUploadClientMbps = if (it.elapsedTime == 0L || it.numBytes.toInt() == 0) {
           0.0
         } else {
           (it.numBytes / (it.elapsedTime / 1000)) * 0.008
@@ -150,7 +150,7 @@ object GigaUtil {
       }
       var meanDownloadClientMbps: Double? = null
       lastDownloadResponse?.appInfo?.let {
-        meanDownloadClientMbps = if (it.elapsedTime == 0L) {
+        meanDownloadClientMbps = if (it.elapsedTime == 0L || it.numBytes.toInt() == 0) {
           0.0
         } else {
           (it.numBytes / (it.elapsedTime / 1000)) * 0.008
@@ -173,17 +173,17 @@ object GigaUtil {
         results = ResultsRequestEntity(
           ndtResultC2S = SpeedTestMeasurementRequestEntity(
             lastClientMeasurement = LastClientMeasurementRequestEntity(
-              elapsedTime = lastUploadResponse?.appInfo?.elapsedTime?.toDouble(),
+              elapsedTime = (lastUploadResponse?.appInfo?.elapsedTime ?: 0).toDouble(),
               meanClientMbps = meanUploadClientMbps,
-              numBytes = lastUploadResponse?.appInfo?.numBytes?.toInt()
+              numBytes = (lastUploadResponse?.appInfo?.numBytes ?: 0).toInt()
             ),
             lastServerMeasurement = uploadMeasurement?.toEntity()
           ),
           ndtResultS2C = SpeedTestMeasurementRequestEntity(
             lastClientMeasurement = LastClientMeasurementRequestEntity(
-              elapsedTime = lastDownloadResponse?.appInfo?.elapsedTime?.toDouble(),
+              elapsedTime = (lastDownloadResponse?.appInfo?.elapsedTime ?: 0).toDouble(),
               meanClientMbps = meanDownloadClientMbps,
-              numBytes = lastDownloadResponse?.appInfo?.numBytes?.toInt()
+              numBytes = (lastDownloadResponse?.appInfo?.numBytes ?: 0).toInt()
             ),
             lastServerMeasurement = downloadMeasurement?.toEntity()
           )

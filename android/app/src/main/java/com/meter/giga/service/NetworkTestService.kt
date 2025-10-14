@@ -507,60 +507,70 @@ class NetworkTestService : LifecycleService() {
         val postSpeedTestUseCase = PostSpeedTestUseCase()
         val uploadKey = secureDataStore.getMlabUploadKey()
         if (speedTestResultRequestEntity != null) {
-          val postSpeedTestResultState =
-            postSpeedTestUseCase.invoke(speedTestResultRequestEntity, uploadKey)
-          when (postSpeedTestResultState) {
-            is ResultState.Failure -> {
-              Log.d(
-                "GIGA NetworkTestService",
-                "Speed Test Not Published Successfully Due to ${postSpeedTestResultState.error}"
-              )
-              measurementsItem.uploaded = false
-              val updateSpeedTestData = GigaUtil.addJsonItem(
-                existingSpeedTestData,
-                Gson().toJson(measurementsItem)
-              )
-              Log.d(
-                "GIGA NetworkTestService",
-                "Updated Speed Test Data $updateSpeedTestData"
-              )
-              prefs.oldSpeedTestData = updateSpeedTestData
-              Sentry.capture("Failed to sync speed test data")
-            }
+          try {
+            val postSpeedTestResultState =
+              postSpeedTestUseCase.invoke(speedTestResultRequestEntity, uploadKey)
+            when (postSpeedTestResultState) {
+              is ResultState.Failure -> {
+                Log.d(
+                  "GIGA NetworkTestService",
+                  "Speed Test Not Published Successfully Due to ${postSpeedTestResultState.error}"
+                )
+                measurementsItem.uploaded = false
+                val updateSpeedTestData = GigaUtil.addJsonItem(
+                  existingSpeedTestData,
+                  Gson().toJson(measurementsItem)
+                )
+                Log.d(
+                  "GIGA NetworkTestService",
+                  "Updated Speed Test Data $updateSpeedTestData"
+                )
+                prefs.oldSpeedTestData = updateSpeedTestData
+                Sentry.capture("Failed to sync speed test data")
+                stopForeground(STOP_FOREGROUND_DETACH)
+                stopSelf()
+              }
 
-            ResultState.Loading -> {
-              Log.d(
-                "GIGA NetworkTestService",
-                "Uploading Speed Test Data"
-              )
-            }
+              ResultState.Loading -> {
+                Log.d(
+                  "GIGA NetworkTestService",
+                  "Uploading Speed Test Data"
+                )
+              }
 
-            is ResultState.Success<*> -> {
-              Log.d(
-                "GIGA NetworkTestService",
-                "Speed Test Data Published Successfully"
-              )
-              measurementsItem.uploaded = true
-              val updateSpeedTestData = GigaUtil.addJsonItem(
-                existingSpeedTestData,
-                Gson().toJson(measurementsItem)
-              )
-              Log.d(
-                "GIGA NetworkTestService",
-                "Updated Speed Test Data $updateSpeedTestData"
-              )
-              prefs.oldSpeedTestData = updateSpeedTestData
-              GigaAppPlugin.sendSpeedTestCompleted(
-                speedTestResultRequestEntity,
-                measurementsItem
-              )
-              Sentry.capture("Synced speed test data successfully")
+              is ResultState.Success<*> -> {
+                Log.d(
+                  "GIGA NetworkTestService",
+                  "Speed Test Data Published Successfully"
+                )
+                measurementsItem.uploaded = true
+                val updateSpeedTestData = GigaUtil.addJsonItem(
+                  existingSpeedTestData,
+                  Gson().toJson(measurementsItem)
+                )
+                Log.d(
+                  "GIGA NetworkTestService",
+                  "Updated Speed Test Data $updateSpeedTestData"
+                )
+                prefs.oldSpeedTestData = updateSpeedTestData
+                GigaAppPlugin.sendSpeedTestCompleted(
+                  speedTestResultRequestEntity,
+                  measurementsItem
+                )
+                stopForeground(STOP_FOREGROUND_DETACH)
+                stopSelf()
+                Sentry.capture("Synced speed test data successfully")
+              }
             }
+          } catch (e: Exception) {
+            Sentry.capture(e)
           }
         }
       } else {
         updateNotification("Speed Test Failed")
         GigaAppPlugin.sendSpeedTestCompletedWithError()
+        stopForeground(STOP_FOREGROUND_DETACH)
+        stopSelf()
       }
     }
   }
