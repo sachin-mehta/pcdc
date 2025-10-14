@@ -41,3 +41,6 @@
 -keepattributes LineNumberTable,SourceFile
 -keep class io.sentry.** { *; }
 -keep class org.jetbrains.annotations.** { *; }
+-dontwarn javax.naming.**
+-dontwarn javax.servlet.**
+-dontwarn org.slf4j.impl.**
