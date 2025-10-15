@@ -38,13 +38,15 @@
 
           <div class="search-label-error" [translate]="'searchCountry.not-available'"
             [translateParams]="{ appName, appNameSuffix }">
-          </div>
+          </div>  
+
         </span>
+        <div *ngIf="this.isPcdcCountry === false" [routerLink]="['/contact-us']" class="request-access">Request Access</div>
         <span class="error_message"
           *ngIf="this.selectedCountry !=='' && this.selectedCountry !== this.detectedCountry && this.isPcdcCountry !== false">
           <ion-img class="error_icon" src="assets/images/Warning.svg"></ion-img>
           <div class="search-label-error" [translate]="'searchCountry.country-not-accurate'"></div>
-        </span>
+        </span> 
         <div *ngIf="this.selectedCountry !=='' && this.selectedCountry !== this.detectedCountry" class="search-label"
           [translate]="'searchCountry.please-double-check'"></div>
 

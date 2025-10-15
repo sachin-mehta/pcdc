@@ -1,0 +1,61 @@
+<app-pcdc-header></app-pcdc-header>
+
+<ion-content class="ion-padding font_open_sans content_paddding">
+  <div class="container">
+    <form [formGroup]="contactForm">
+      <!-- Name -->
+      <ion-item lines="none" class="label_top">
+        <ion-label class="font_size">Name</ion-label>
+      </ion-item>
+      <ion-input fill="solid" type="text" formControlName="name" placeholder="Enter your name"
+        class="custom-gray-item"></ion-input>
+      <div class="error-msg" *ngIf="contactForm.get('name')?.touched && contactForm.get('name')?.invalid">
+        <span *ngIf="contactForm.get('name')?.errors?.['required']">Name is required.</span>
+        <span *ngIf="contactForm.get('name')?.errors?.['minlength']">Minimum 2 characters required.</span>
+      </div>
+
+      <!-- Email -->
+      <ion-item lines="none" class="label_top">
+        <ion-label class="font_size">Email</ion-label>
+      </ion-item>
+      <ion-input fill="solid" type="email" formControlName="email" placeholder="e.g. info@example.com"
+        class="custom-gray-item"></ion-input>
+      <div class="error-msg" *ngIf="contactForm.get('email')?.touched && contactForm.get('email')?.invalid">
+        <span *ngIf="contactForm.get('email')?.errors?.['required']">Email is required.</span>
+        <span *ngIf="contactForm.get('email')?.errors?.['email']">Enter a valid email address.</span>
+      </div>
+
+      <!-- Organization -->
+      <ion-item lines="none" class="label_top">
+        <ion-label class="font_size">Organization</ion-label>
+      </ion-item>
+      <ion-input fill="solid" type="text" formControlName="organization" placeholder="Enter your organization name"
+        class="custom-gray-item"></ion-input>
+      <div class="error-msg"
+        *ngIf="contactForm.get('organization')?.touched && contactForm.get('organization')?.invalid">
+        <span>Organization name is required.</span>
+      </div>
+
+      <!-- Message -->
+      <ion-item lines="none" class="label_top">
+        <ion-label class="font_size">Your Message</ion-label>
+      </ion-item>
+      <ion-textarea fill="solid" autoGrow="true" formControlName="message" placeholder="Write your message here..."
+        class="custom-gray-item"></ion-textarea>
+      <div class="error-msg" *ngIf="contactForm.get('message')?.touched && contactForm.get('message')?.invalid">
+        <span *ngIf="contactForm.get('message')?.errors?.['required']">Message is required.</span>
+        <span *ngIf="contactForm.get('message')?.errors?.['minlength']">Minimum 10 characters required.</span>
+      </div>
+    </form>
+  </div>
+</ion-content>
+
+<ion-footer class="ion-no-border">
+  <ion-toolbar class="ion-padding footer_button">
+    <div class="btn-holder" style="margin-bottom: 14px;">
+      <ion-button block class="yesbtn" (click)="onSubmit()" [disabled]="contactForm.invalid">
+        Submit
+      </ion-button>
+    </div>
+  </ion-toolbar>
+</ion-footer>
