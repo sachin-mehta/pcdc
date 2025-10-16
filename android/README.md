@@ -299,7 +299,7 @@ Navigate to android drectory in project and run below commands to create builds
 
   - `./gradlew bundleRelease`
 
-## 9. Special Note : Existing Sentry version is 9.x where as android latest sentry sdk support 10.x sentry servers. Do not upgrade the android sdk until sentry server migrated to 10.x version,otherwise it will block the sentry logging.
+## 10. Special Note : Existing Sentry version is 9.x where as android latest sentry sdk support 10.x sentry servers. Do not upgrade the android sdk until sentry server migrated to 10.x version,otherwise it will block the sentry logging.
 
 ---
 
