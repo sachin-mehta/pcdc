@@ -17,3 +17,11 @@ contextBridge.exposeInMainWorld("ipcRenderer", {
 });
 
 contextBridge.exposeInMainWorld("shell", {shell});
+
+// Expose hardware ID API
+contextBridge.exposeInMainWorld("electronAPI", {
+  getHardwareId: () => ipcRenderer.invoke('get-hardware-id'),
+  onHardwareId: (callback: (data: any) => void) => {
+    ipcRenderer.on('system-hardware-id', (event, data) => callback(data));
+  }
+});
