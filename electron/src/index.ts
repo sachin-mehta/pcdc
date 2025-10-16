@@ -132,7 +132,7 @@ if (!gotTheLock) {
       const hardwareId =
         systemData.uuid || systemData.serial || 'NO_UUID_AVAILABLE';
       console.log('\n🔑 PRIMARY HARDWARE ID (use this):', hardwareId);
-      
+
       // Send hardware ID to renderer process when ready
       if (mainWindow && mainWindow.webContents) {
         mainWindow.webContents.once('did-finish-load', () => {
@@ -303,8 +303,9 @@ ipcMain.handle('get-hardware-id', async () => {
   try {
     const systemData = await si.system();
     const osData = await si.osInfo();
-    const hardwareId = systemData.uuid || systemData.serial || 'NO_UUID_AVAILABLE';
-    
+    const hardwareId =
+      systemData.uuid || systemData.serial || 'NO_UUID_AVAILABLE';
+
     const hardwareData = {
       hardwareId,
       uuid: systemData.uuid,
@@ -315,7 +316,7 @@ ipcMain.handle('get-hardware-id', async () => {
       osSerial: osData.serial,
       timestamp: new Date().toISOString(),
     };
-    
+
     console.log('📤 Hardware ID requested via IPC');
     return hardwareData;
   } catch (error) {

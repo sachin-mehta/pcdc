@@ -26,7 +26,6 @@ import windowStateKeeper from 'electron-window-state';
 import { join } from 'path';
 import * as Sentry from '@sentry/node';
 import { Console } from 'console';
-var AutoLaunch = require('auto-launch');
 var isQuiting = false;
 
 // Export functions to control quitting state
@@ -245,7 +244,7 @@ export class ElectronCapacitorApp {
 
     this.MainWindow?.on('unresponsive', () => {
       Sentry.captureMessage('Window became unresponsive', {
-        level: Sentry.Severity.Error,
+        level: 'error',
         extra: {
           windowId: this.MainWindow?.id,
         },
@@ -424,26 +423,32 @@ export class ElectronCapacitorApp {
       });
     }
 
-    // Auto lunching code added by Kajal
-    var measureAppAutoLuncher = new AutoLaunch({
-      name: 'Unicef PDCA',
-    });
-
-    measureAppAutoLuncher?.enable();
-    measureAppAutoLuncher
-      ?.isEnabled()
-      .then(function (isEnabled) {
-        if (isEnabled) {
-          return;
-        }
-        measureAppAutoLuncher?.enable();
-      })
-      .catch(function (err) {
-        // handle error
-        Sentry.captureException(err);
-        console.log(err);
+    // Auto-launch configuration using Electron's native API
+    // This ensures the app starts on system boot for all users when installed per-machine
+    try {
+      app.setLoginItemSettings({
+        openAtLogin: true,
+        openAsHidden: false,
+        path: process.execPath,
+        args: [],
       });
-    // End of Auto lunching code
+
+      // Verify it was set correctly
+      const loginItemSettings = app.getLoginItemSettings();
+      console.log('✅ Auto-launch enabled:', loginItemSettings.openAtLogin);
+
+      if (!loginItemSettings.openAtLogin) {
+        console.warn('⚠️ Auto-launch could not be enabled');
+        Sentry.captureMessage('Auto-launch setting failed to enable', {
+          level: 'warning',
+          extra: { loginItemSettings },
+        });
+      }
+    } catch (err) {
+      console.error('❌ Error setting auto-launch:', err);
+      Sentry.captureException(err);
+    }
+    // End of Auto-launch code
   }
 }
 
