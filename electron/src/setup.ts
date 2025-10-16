@@ -244,7 +244,7 @@ export class ElectronCapacitorApp {
 
     this.MainWindow?.on('unresponsive', () => {
       Sentry.captureMessage('Window became unresponsive', {
-        level: 'error',
+        level: Sentry.Severity.Error,
         extra: {
           windowId: this.MainWindow?.id,
         },
@@ -440,7 +440,7 @@ export class ElectronCapacitorApp {
       if (!loginItemSettings.openAtLogin) {
         console.warn('⚠️ Auto-launch could not be enabled');
         Sentry.captureMessage('Auto-launch setting failed to enable', {
-          level: 'warning',
+          level: Sentry.Severity.Warning,
           extra: { loginItemSettings },
         });
       }
