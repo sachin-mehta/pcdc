@@ -28,7 +28,7 @@ This guide provides step-by-step setup and build instructions for a **Capacitor-
    - Install [Android Studio](https://developer.android.com/studio).
    - Install SDK, build tools, and emulator images.
 
-4. **Java JDK 11/17**
+4. **Java JDK 11/17/21**
 
    ```bash
    java -version
@@ -43,10 +43,17 @@ This guide provides step-by-step setup and build instructions for a **Capacitor-
    PATH += $ANDROID_HOME/tools/bin
    ```
 
+6. **Add google-service.json**
+
+   ```bash
+     Add google-service.json file before building the project in android/app directory
+   ```
+
 ---
 
 ## 2. Add Android Platform
 
+This is already there in unicef giga meter, it will require to create the new android app, for giga meter need to skip.
 Inside your Capacitor project root:
 
 ```bash
@@ -57,6 +64,42 @@ npx cap open android
 ---
 
 ## 3. Configure Flavors
+
+In Giga Meter android app environment configuration driven via \_production.prod_ts file params and passed to native layer via Capacitor Plugin. In Giga Meter app/build.gradle will be having below code
+
+```gradle
+android {
+    ...
+
+  signingConfigs {
+    release {
+      storeFile file(KEYSTORE_PATH)
+      storePassword KEYSTORE_PASSWORD
+      keyAlias KEY_ALIAS
+      keyPassword KEY_PASSWORD
+    }
+  }
+  buildTypes {
+    debug {
+      debuggable true
+      minifyEnabled false
+      applicationIdSuffix ".debug"
+      versionNameSuffix
+    }
+    release {
+      debuggable false
+      minifyEnabled true
+      shrinkResources true
+      applicationIdSuffix
+      proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+      signingConfig signingConfigs.release
+    }
+  }
+
+}
+```
+
+This is required if we are configuring the android build via gradle script and need to use below configuration.
 
 In `android/app/build.gradle`, add product flavors:
 
@@ -93,14 +136,12 @@ android {
   }
   buildTypes {
     debug {
-      buildConfigField "String", "CLIENT_INFO_TOKEN", "\"${CLIENT_INFO_API_TOKEN}\""
       debuggable true
       minifyEnabled false
       applicationIdSuffix ".debug"
       versionNameSuffix
     }
     release {
-      buildConfigField "String", "CLIENT_INFO_TOKEN", "\"${CLIENT_INFO_API_TOKEN}\""
       debuggable false
       minifyEnabled true
       shrinkResources true
@@ -115,71 +156,21 @@ android {
 
 ---
 
-## 4. Build Commands
+## 4. Running app using Capacitor Commands via terminal
 
-### Debug Variants
+### Select Mode in \_environment.prod.ts as dev/stg/prod
 
-- **Dev Debug**
-
-  ```bash
-  ./gradlew assembleDevDebug
-  ```
-
-- **Staging Debug**
+- Run below command
 
   ```bash
-  ./gradlew assembleStagingDebug
-  ```
-
-- **Release Debug (rarely used)**
-
-  ```bash
-  ./gradlew assembleReleaseDebug
-  ```
-
-### Release Variants (Signed)
-
-- **Dev Release**
-
-  ```bash
-  ./gradlew assembleDevRelease
-  ```
-
-- **Staging Release**
-
-  ```bash
-  ./gradlew assembleStagingRelease
-  ```
-
-- **Production Release**
-
-  ```bash
-  ./gradlew assembleReleaseRelease
-  ```
-
-### Bundles (AAB for Play Store)
-
-- **Dev**
-
-  ```bash
-  ./gradlew bundleDevRelease
-  ```
-
-- **Staging**
-
-  ```bash
-  ./gradlew bundleStagingRelease
-  ```
-
-- **Prod**
-
-  ```bash
-  ./gradlew bundleReleaseRelease
+  ionic build
+  npx cap sync android
+  npx cap run android
   ```
 
 ---
 
-## 5. Running App
+## 5. Running app using Android Studio IDE
 
 - Run directly on device/emulator with live reload:
 
@@ -193,9 +184,52 @@ android {
   adb install -r app/build/outputs/apk/dev/release/app-dev-release.apk
   ```
 
+- Or Use Android Studio shortcuts
+  Select the build variant debug/release as shown in image :
+  ![alt text](image-1.png)
+
+-Use run icon to run the app
+![alt text](image.png)
+
 ---
 
-## 6. Debugging
+## 6. Build Commands via Android Studio/VS Code/Terminal
+
+Navigate to android drectory in project and run below commands to create builds
+
+### Debug Variants
+
+- **Build Debug**
+
+  ```bash
+  ./gradlew assembleDebug
+  ```
+
+### Release Variants (Signed)
+
+- **Build Release**
+
+  ```bash
+  ./gradlew assembleRelease
+  ```
+
+### Bundles (AAB for Play Store)
+
+- **Debug**
+
+  ```bash
+  ./gradlew bundleRelease
+  ```
+
+- **Release**
+
+  ```bash
+  ./gradlew bundleReleaseRelease
+  ```
+
+---
+
+## 7. Debugging
 
 - Inspect logs:
 
@@ -212,7 +246,7 @@ android {
 
 ---
 
-## 7. Signing Release Builds
+## 8. Signing Release Builds
 
 1. Generate keystore:
 
@@ -251,25 +285,19 @@ android {
 
 ---
 
-## 8. Summary
+## 9. Summary
 
 - **Debug Builds**
 
-  - `./gradlew assembleDevDebug`
-  - `./gradlew assembleStagingDebug`
-  - `./gradlew assembleReleaseDebug`
+  - `./gradlew assembleDebug`
 
 - **Release Builds**
 
-  - `./gradlew assembleDevRelease`
-  - `./gradlew assembleStagingRelease`
-  - `./gradlew assembleReleaseRelease`
+  - `./gradlew assembleRelease`
 
 - **Play Store Bundles**
 
-  - `./gradlew bundleDevRelease`
-  - `./gradlew bundleStagingRelease`
-  - `./gradlew bundleReleaseRelease`
+  - `./gradlew bundleRelease`
 
 ## 9. Special Note : Existing Sentry version is 9.x where as android latest sentry sdk support 10.x sentry servers. Do not upgrade the android sdk until sentry server migrated to 10.x version,otherwise it will block the sentry logging.
 
