@@ -244,7 +244,11 @@ class NetworkTestService : LifecycleService() {
         meanDownloadClientMbps = if (it.elapsedTime == 0L) {
           0.0
         } else {
-          (it.numBytes / (it.elapsedTime / 1000)) * 0.008
+          if ((it.numBytes / (it.elapsedTime / 1000)).isInfinite()) {
+            0.0
+          } else {
+            (it.numBytes / (it.elapsedTime / 1000)) * 0.008
+          }
         }
       }
       meanDownloadClientMbps?.let {
@@ -273,7 +277,11 @@ class NetworkTestService : LifecycleService() {
         meanUploadClientMbps = if (it.elapsedTime == 0L) {
           0.0
         } else {
-          (it.numBytes / (it.elapsedTime / 1000)) * 0.008
+          if ((it.numBytes / (it.elapsedTime / 1000)).isInfinite()) {
+            0.0
+          } else {
+            (it.numBytes / (it.elapsedTime / 1000)) * 0.008
+          }
         }
       }
       meanUploadClientMbps?.let {
@@ -543,7 +551,13 @@ class NetworkTestService : LifecycleService() {
                   "GIGA NetworkTestService",
                   "Speed Test Data Published Successfully"
                 )
+                Log.d(
+                  "GIGA NetworkTestService",
+                  "Measurement Instance : ${measurementsItem}"
+                )
                 measurementsItem.uploaded = true
+                Sentry.capture("Measurement Options :  ${measurementsItem}")
+
                 val updateSpeedTestData = GigaUtil.addJsonItem(
                   existingSpeedTestData,
                   Gson().toJson(measurementsItem)
