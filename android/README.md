@@ -303,4 +303,4 @@ Navigate to android drectory in project and run below commands to create builds
 
 ---
 
-✅ You now have a Capacitor Android app configured with **dev, staging, and production flavors** along with **debug/release build types**.
+✅ You now have a Capacitor Android app configured with **dev, staging, and production flavors driven by mode defined in \_environment.prod.ts** along with **debug/release build types**.
