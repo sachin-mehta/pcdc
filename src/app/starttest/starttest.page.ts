@@ -16,6 +16,7 @@ import { NetworkService } from '../services/network.service';
 import { SettingsService } from '../services/settings.service';
 import { MlabService } from '../services/mlab.service';
 import { MeasurementClientService } from '../services/measurement-client.service';
+import { CloudflareMeasurementService } from '../services/measurment-cloudflare-client.service';
 import { SharedService } from '../services/shared-service.service';
 import { HistoryService } from '../services/history.service';
 import { TranslateService } from '@ngx-translate/core';
@@ -25,10 +26,10 @@ import { CountryService } from '../services/country.service';
 import { mlabInformation, accessInformation } from '../models/models';
 
 @Component({
-    selector: 'app-starttest',
-    templateUrl: 'starttest.page.html',
-    styleUrls: ['starttest.page.scss'],
-    standalone: false
+  selector: 'app-starttest',
+  templateUrl: 'starttest.page.html',
+  styleUrls: ['starttest.page.scss'],
+  standalone: false,
 })
 export class StarttestPage implements OnInit, OnDestroy {
   @ViewChild(IonAccordionGroup, { static: true })
@@ -98,6 +99,15 @@ export class StarttestPage implements OnInit, OnDestroy {
   private uploadSub!: Subscription;
   private downloadStartedSub!: Subscription;
   private uploadStartedSub!: Subscription;
+  private cloudflareDownloadSub?: Subscription;
+  private cloudflareUploadSub?: Subscription;
+  private cloudflareDownloadStartedSub?: Subscription;
+  private cloudflareUploadStartedSub?: Subscription;
+  private cloudflareProgressInterval: any;
+  private cloudflareProgressStart = 0;
+  private cloudflareProgressValue = 0;
+  private isCloudflareProgressActive = false;
+  private readonly TIME_FOR_CLOUDFLARE_TEST = 30; // seconds
 
   downloadTimer: any;
   uploadTimer: any;
@@ -116,6 +126,7 @@ export class StarttestPage implements OnInit, OnDestroy {
     private settingsService: SettingsService,
     private mlabService: MlabService,
     private measurementClientService: MeasurementClientService,
+    private cloudflareMeasurementService: CloudflareMeasurementService,
     private sharedService: SharedService,
     private historyService: HistoryService,
     public translate: TranslateService,
@@ -125,7 +136,6 @@ export class StarttestPage implements OnInit, OnDestroy {
   ) {
     if (this.storage.get('schoolId')) {
       this.school = JSON.parse(this.storage.get('schoolInfo'));
-      console.log(this.school, 'heheh')
     }
     this.onlineStatus = navigator.onLine;
     this.route.params.subscribe((params) => {
@@ -186,15 +196,15 @@ export class StarttestPage implements OnInit, OnDestroy {
   }
   ngOnInit() {
     this.schoolId = this.storage.get('schoolId');
-    this.downloadSub = this.measurementClientService.downloadComplete$.subscribe(data => {
-      this.downloadStarted = false;
-      if (this.downloadTimer) {
-        clearInterval(this.downloadTimer);
-      }
-      this.progress = 50;
-      this.ref.markForCheck();
-
-    });
+    this.downloadSub =
+      this.measurementClientService.downloadComplete$.subscribe((data) => {
+        this.downloadStarted = false;
+        if (this.downloadTimer) {
+          clearInterval(this.downloadTimer);
+        }
+        this.progress = 50;
+        this.ref.markForCheck();
+      });
 
     this.countryService.getPcdcCountryByCode(this.school.country).subscribe(
       (response) => {
@@ -203,26 +213,61 @@ export class StarttestPage implements OnInit, OnDestroy {
       (err) => {
         console.log('ERROR: ' + err);
         this.loading.dismiss();
-      })
-
-    this.downloadStartedSub = this.measurementClientService.downloadStarted$.subscribe(data => {
-      this.downloadStarted = true;
-      this.uploadStarted = false;
-    });
-     this.uploadStartedSub = this.measurementClientService.uploadStarted$.subscribe(data => {
-      this.uploadStarted = true;
-      this.downloadStarted = false
-    });
-
-    this.uploadSub = this.measurementClientService.uploadComplete$.subscribe(data => {
-      this.uploadStarted = false;
-      if (this.uploadTimer) {
-        clearInterval(this.uploadTimer);
       }
-      this.progress = 100;
-      this.ref.markForCheck();
+    );
 
-    });
+    this.downloadStartedSub =
+      this.measurementClientService.downloadStarted$.subscribe((data) => {
+        this.downloadStarted = true;
+        this.uploadStarted = false;
+      });
+    this.uploadStartedSub =
+      this.measurementClientService.uploadStarted$.subscribe((data) => {
+        this.uploadStarted = true;
+        this.downloadStarted = false;
+      });
+
+    this.uploadSub = this.measurementClientService.uploadComplete$.subscribe(
+      (data) => {
+        this.uploadStarted = false;
+        if (this.uploadTimer) {
+          clearInterval(this.uploadTimer);
+        }
+        console.log('Upload complete received');
+        this.progress = 100;
+        this.ref.markForCheck();
+      }
+    );
+
+    this.cloudflareDownloadSub =
+      this.cloudflareMeasurementService.downloadComplete$.subscribe(() => {
+        this.downloadStarted = false;
+        if (this.downloadTimer) {
+          clearInterval(this.downloadTimer);
+        }
+        this.ref.markForCheck();
+      });
+
+    this.cloudflareUploadSub =
+      this.cloudflareMeasurementService.uploadComplete$.subscribe(() => {
+        this.uploadStarted = false;
+        if (this.uploadTimer) {
+          clearInterval(this.uploadTimer);
+        }
+        this.ref.markForCheck();
+      });
+
+    this.cloudflareDownloadStartedSub =
+      this.cloudflareMeasurementService.downloadStarted$.subscribe(() => {
+        this.downloadStarted = true;
+        this.uploadStarted = false;
+      });
+
+    this.cloudflareUploadStartedSub =
+      this.cloudflareMeasurementService.uploadStarted$.subscribe(() => {
+        this.uploadStarted = true;
+        this.downloadStarted = false;
+      });
     window.addEventListener(
       'online',
       () => {
@@ -238,7 +283,11 @@ export class StarttestPage implements OnInit, OnDestroy {
       },
       false
     );
-    this.sharedService.on('measurement:status', this.driveGauge.bind(this));
+    this.sharedService.on('measurement:status', this.driveGaugeNdt7.bind(this));
+    this.sharedService.on(
+      'measurement:status',
+      this.driveGaugeCloadflare.bind(this)
+    );
     this.sharedService.on(
       'history:measurement:change',
       this.refreshHistory.bind(this)
@@ -259,26 +308,25 @@ export class StarttestPage implements OnInit, OnDestroy {
   tryConnectivity() {
     const translatedText = this.translate.instant('searchCountry.loading');
 
-   this.translate.get('searchCountry.loading').subscribe((translatedText) => {
-    const loadingMsg = `
+    this.translate.get('searchCountry.loading').subscribe((translatedText) => {
+      const loadingMsg = `
       <div class="loadContent">
         <ion-img src="assets/loader/new_loader.gif" class="loaderGif"></ion-img>
         <p class="green_loader">${translatedText}</p>
       </div>`;
-  
-    this.loading.present(loadingMsg, 15000, 'pdcaLoaderClass', 'null');
-    this.networkService.getNetInfo().then((res) => {
-      this.connectionStatus = 'success';
-      if (this.loading.isStillLoading()) {
-        this.loading.dismiss();
-      }
-      if (res) {
-        this.accessInformation = res;
-        console.log(this.accessInformation)
-      }
+
+      this.loading.present(loadingMsg, 15000, 'pdcaLoaderClass', 'null');
+      this.networkService.getNetInfo().then((res) => {
+        this.connectionStatus = 'success';
+        if (this.loading.isStillLoading()) {
+          this.loading.dismiss();
+        }
+        if (res) {
+          this.accessInformation = res;
+          console.log(this.accessInformation);
+        }
+      });
     });
-  });
-    
   }
 
   refreshHistory() {
@@ -303,7 +351,97 @@ export class StarttestPage implements OnInit, OnDestroy {
     this.router.navigate(['connectivitytest']);
   }
 
- 
+  startMeasurement() {
+    let provider: 'cloudflare' | 'ndt7' ; // This can be dynamic based on feature flags 
+    provider = 'cloudflare'; // For example, hardcoded to 'cloudflare' for now
+    switch (provider) {
+      // @ts-ignore
+      case 'cloudflare':
+          this.startCloudflare();
+        break;
+      // @ts-ignore
+      case 'ndt7':
+        this.startNDT();
+        break;
+    }
+  }
+
+  private beginCloudflareProgressSimulation(): void {
+    this.stopCloudflareProgressSimulation();
+    this.isCloudflareProgressActive = true;
+    this.cloudflareProgressStart = Date.now();
+    this.cloudflareProgressValue = 0;
+    this.updateCloudflareProgress(0, true);
+
+    this.cloudflareProgressInterval = setInterval(() => {
+      if (!this.isCloudflareProgressActive) {
+        this.stopCloudflareProgressSimulation();
+        return;
+      }
+
+      const elapsed = Date.now() - this.cloudflareProgressStart;
+      const elapsedSeconds = elapsed / 1000;
+      const simulated = Math.min(0.95, elapsedSeconds / this.TIME_FOR_CLOUDFLARE_TEST);
+
+      this.updateCloudflareProgress(simulated);
+    }, 100);
+  }
+
+  private stopCloudflareProgressSimulation(finalProgress?: number): void {
+    if (this.cloudflareProgressInterval) {
+      clearInterval(this.cloudflareProgressInterval);
+      this.cloudflareProgressInterval = null;
+    }
+    this.isCloudflareProgressActive = false;
+
+    if (typeof finalProgress === 'number') {
+      this.updateCloudflareProgress(finalProgress, true);
+    }
+  }
+
+  private updateCloudflareProgress(value: number, force = false): void {
+    const bounded = Math.min(1, value);
+    if (!force && bounded <= this.cloudflareProgressValue) {
+      return;
+    }
+
+    this.cloudflareProgressValue = bounded;
+    this.progressGaugeState.current = bounded;
+    this.progress = Math.floor(bounded * 100);
+    this.ref.markForCheck();
+  }
+
+  startCloudflare() {
+    try {
+      this.uploadProgressStarted = false;
+      this.downloadStarted = false;
+      this.uploadStarted = false;
+      this.measurementnetworkServer = '';
+      this.measurementISP = '';
+      this.progress = 0;
+      this.progressGaugeState.current = this.progressGaugeState.minimum;
+
+      if (this.downloadTimer) {
+        clearInterval(this.downloadTimer);
+        this.downloadTimer = null;
+      }
+      if (this.uploadTimer) {
+        clearInterval(this.uploadTimer);
+        this.uploadTimer = null;
+      }
+
+      this.currentState = 'Starting';
+      this.uploadStatus = undefined;
+      this.latency = undefined;
+      this.connectionStatus = '';
+      this.uploadProgressStarted = false;
+      this.beginCloudflareProgressSimulation();
+      this.cloudflareMeasurementService.runTest();
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
   startNDT() {
     try {
       this.uploadProgressStarted = false;
@@ -312,7 +450,7 @@ export class StarttestPage implements OnInit, OnDestroy {
       this.measurementnetworkServer = '';
       this.measurementISP = '';
       this.progress = 0;
-  
+
       // Clear any ongoing timers
       if (this.downloadTimer) {
         clearInterval(this.downloadTimer);
@@ -322,12 +460,13 @@ export class StarttestPage implements OnInit, OnDestroy {
         clearInterval(this.uploadTimer);
         this.uploadTimer = null;
       }
-  
+
       this.currentState = 'Starting';
       this.uploadStatus = undefined;
       this.latency = undefined;
       this.connectionStatus = '';
       this.uploadProgressStarted = false;
+      this.stopCloudflareProgressSimulation();
       this.measurementClientService.runTest();
     } catch (e) {
       console.log(e);
@@ -340,31 +479,31 @@ export class StarttestPage implements OnInit, OnDestroy {
     const interval = 200; // update every 200ms
     const steps = duration / interval;
     const stepSize = (target - this.progress) / steps;
-  
+
     // Clear existing timer
     if (this.downloadTimer) {
       clearInterval(this.downloadTimer);
       this.downloadTimer = null;
     }
-  
+
     // Reset progress if needed
     if (this.progress > target) {
       this.progress = 0;
     }
-  
+
     let elapsedSteps = 0;
-  
+
     this.downloadTimer = setInterval(() => {
       if (this.downloadStarted && this.progress < target) {
         this.progress += stepSize;
         elapsedSteps++;
-  
+
         if (this.progress >= target || elapsedSteps >= steps) {
           this.progress = target;
           clearInterval(this.downloadTimer);
           this.downloadTimer = null;
         }
-  
+
         this.ref.detectChanges(); // trigger UI update
       } else {
         clearInterval(this.downloadTimer);
@@ -372,9 +511,7 @@ export class StarttestPage implements OnInit, OnDestroy {
       }
     }, interval);
   }
-  
-  
-  
+
   // Animate progress from 50 to 100
   startUploadProgress() {
     const target = 100;
@@ -393,11 +530,135 @@ export class StarttestPage implements OnInit, OnDestroy {
     }, interval);
   }
 
+  driveGaugeCloadflare(event, data) {
+    if (event !== 'measurement:status') {
+      return;
+    }
 
-  driveGauge(event, data) {
+    if (!data || data.provider !== 'cloudflare') {
+      return;
+    }
+
+    const testStatus = data.testStatus;
+    const toFixedOrDefault = (value: number | undefined, digits = 2) => {
+      if (value === undefined || !Number.isFinite(value)) {
+        return '0.00';
+      }
+      return (value/ 1000000).toFixed(digits);
+    };
+
+    switch (testStatus) {
+      case 'cf_error':
+        // this.stopCloudflareProgressSimulation();
+        this.connectionStatus = 'error';
+        this.currentRate = 'error';
+        this.downloadStarted = false;
+        this.uploadStarted = false;
+        this.gaugeError();
+        console.log('Cloudflare test error');
+        // this.progress = 100;
+        // if (this.downloadTimer) {
+        //   clearInterval(this.downloadTimer);
+        //   this.downloadTimer = null;
+        // }
+        // if (this.uploadTimer) {
+        //   clearInterval(this.uploadTimer);
+        //   this.uploadTimer = null;
+        // }
+        this.ref.markForCheck();
+        return;
+
+      case 'cf_onstart':
+        if (!this.isCloudflareProgressActive) {
+          this.beginCloudflareProgressSimulation();
+        }
+        this.currentState = 'Starting';
+        this.currentRate = undefined;
+        this.currentRateUpload = undefined;
+        this.currentRateDownload = undefined;
+        this.latency = undefined;
+        this.updateCloudflareProgress(0, true);
+        this.ref.markForCheck();
+        return;
+
+      case 'cf_interval_download': {
+        const downloadMbps = Number(data.downloadCurrentSpeed ?? 0);
+        this.currentState = 'Running Test (Download)';
+        this.currentRate = toFixedOrDefault(downloadMbps);
+        this.currentRateDownload = this.currentRate;
+        this.ref.markForCheck();
+        return;
+      }
+
+      case 'cf_interval_upload': {
+        const uploadMbps = Number(data.uploadCurrentSpeed ?? 0);
+        this.currentState = 'Running Test (Upload)';
+        this.currentRate = toFixedOrDefault(uploadMbps);
+        this.currentRateUpload = this.currentRate;
+        this.ref.markForCheck();
+        return;
+      }
+
+      case 'cf_complete': {
+        this.stopCloudflareProgressSimulation(1);
+        const results = data.passedResults || {};
+        const summary = results?.summary ?? {};
+        const downloadSummary = Number(
+          summary.download ?? data.downloadCurrentSpeed ?? 0
+        );
+        const uploadSummary = Number(
+          summary.upload ?? data.uploadCurrentSpeed ?? 0
+        );
+        const latencySummary = Number(
+          summary.latency ?? results?.unloadedLatency?.latency ?? 0
+        );
+
+        this.currentState = 'Completed';
+        this.currentDate = new Date();
+        this.currentRate = toFixedOrDefault(downloadSummary);
+        this.currentRateDownload = toFixedOrDefault(downloadSummary);
+        this.currentRateUpload = toFixedOrDefault(uploadSummary);
+        this.latency = Number.isFinite(latencySummary)
+          ? latencySummary.toFixed(0)
+          : undefined;
+        console.log("On complete data:", data);
+        this.progress = 100;
+        this.progressGaugeState.current = this.progressGaugeState.maximum;
+        this.connectionStatus = 'success';
+        this.downloadStarted = false;
+        this.uploadStarted = false;
+        this.uploadProgressStarted = false;
+
+        const historicalData = this.historyService.get();
+        const cloudflareMeasurements = historicalData?.measurements;
+        const lastMeasurement =
+          Array.isArray(cloudflareMeasurements) &&
+          cloudflareMeasurements.length > 0
+            ? cloudflareMeasurements[cloudflareMeasurements.length - 1]
+            : undefined;
+        if (lastMeasurement) {
+          this.measurementnetworkServer =
+            lastMeasurement?.mlabInformation?.city || '';
+          this.measurementISP = lastMeasurement?.accessInformation?.org || '';
+        }
+
+        this.ref.markForCheck();
+        this.refreshHistory();
+        return;
+      }
+
+      default:
+        this.ref.markForCheck();
+    }
+  }
+
+  driveGaugeNdt7(event, data) {
     if (event === 'measurement:status') {
+      if (!data || data.provider === 'cloudflare') {
+        return;
+      }
       console.log({ data });
-      if(data.testStatus === 'error') {
+      if (data.testStatus === 'error') {
         this.connectionStatus = 'error';
         this.currentRate = 'error';
       }
@@ -411,7 +672,8 @@ export class StarttestPage implements OnInit, OnDestroy {
         console.log('Running Test (Upload)');
         this.currentState = 'Running Test (Upload)';
         this.currentRate = (
-          (data.passedResults.Data.TCPInfo.BytesReceived / data.passedResults.Data.TCPInfo.ElapsedTime) *
+          (data.passedResults.Data.TCPInfo.BytesReceived /
+            data.passedResults.Data.TCPInfo.ElapsedTime) *
           8
         ).toFixed(2);
         this.currentRateUpload = this.currentRate;
@@ -419,28 +681,45 @@ export class StarttestPage implements OnInit, OnDestroy {
           this.uploadProgressStarted = true;
           this.startUploadProgress();
         }
-
       } else if (data.testStatus === 'interval_s2c') {
         this.currentState = 'Running Test (Download)';
         this.currentRate = data.passedResults.Data.MeanClientMbps?.toFixed(2);
-        this.currentRateDownload = data.passedResults.Data.MeanClientMbps?.toFixed(2);
-        if(this.downloadStarted) {
+        this.currentRateDownload =
+          data.passedResults.Data.MeanClientMbps?.toFixed(2);
+        if (this.downloadStarted) {
           this.startDownloadProgress();
-
         }
       } else if (data.testStatus === 'complete') {
         this.currentState = 'Completed';
         this.currentDate = new Date();
-        this.currentRate = data.passedResults['NDTResult.S2C'].LastClientMeasurement.MeanClientMbps?.toFixed(2);
-        this.currentRateUpload = data.passedResults['NDTResult.C2S'].LastClientMeasurement.MeanClientMbps?.toFixed(2);
-        this.currentRateDownload = data.passedResults['NDTResult.S2C'].LastClientMeasurement.MeanClientMbps?.toFixed(2);
+        this.currentRate =
+          data.passedResults[
+            'NDTResult.S2C'
+          ].LastClientMeasurement.MeanClientMbps?.toFixed(2);
+        this.currentRateUpload =
+          data.passedResults[
+            'NDTResult.C2S'
+          ].LastClientMeasurement.MeanClientMbps?.toFixed(2);
+        this.currentRateDownload =
+          data.passedResults[
+            'NDTResult.S2C'
+          ].LastClientMeasurement.MeanClientMbps?.toFixed(2);
         this.progressGaugeState.current = this.progressGaugeState.maximum;
-        this.latency = ((data.passedResults['NDTResult.S2C'].LastServerMeasurement.BBRInfo.MinRTT +
-          data.passedResults['NDTResult.C2S'].LastServerMeasurement.BBRInfo.MinRTT) / 2 / 1000).toFixed(0);
-        let historicalData = this.historyService.get();
-        if (historicalData !== null && historicalData !== undefined && historicalData.measurements.length) {
-          this.measurementnetworkServer = historicalData.measurements[historicalData.measurements.length - 1].mlabInformation.city;
-          this.measurementISP = historicalData.measurements[historicalData.measurements.length - 1].accessInformation.org;
+        this.latency = (
+          (data.passedResults['NDTResult.S2C'].LastServerMeasurement.BBRInfo
+            .MinRTT +
+            data.passedResults['NDTResult.C2S'].LastServerMeasurement.BBRInfo
+              .MinRTT) /
+          2 /
+          1000
+        ).toFixed(0);
+        const historicalData = this.historyService.get();
+        const measurements = historicalData?.measurements;
+        if (Array.isArray(measurements) && measurements.length) {
+          const lastMeasurement = measurements[measurements.length - 1];
+          this.measurementnetworkServer =
+            lastMeasurement?.mlabInformation?.city || '';
+          this.measurementISP = lastMeasurement?.accessInformation?.org || '';
         }
         this.ref.markForCheck();
         this.refreshHistory();
@@ -450,7 +729,7 @@ export class StarttestPage implements OnInit, OnDestroy {
         this.currentRate = undefined;
         this.ref.markForCheck();
       }
-      if (data.testStatus !== 'complete') {
+      if (data.testStatus !== 'complete' && typeof data.progress === 'number') {
         this.progressGaugeState.current = data.progress;
       }
     }
@@ -468,7 +747,7 @@ export class StarttestPage implements OnInit, OnDestroy {
       buttons: [
         {
           text: 'Okay',
-          handler: () => { },
+          handler: () => {},
         },
       ],
     });
@@ -488,7 +767,7 @@ export class StarttestPage implements OnInit, OnDestroy {
       buttons: [
         {
           text: 'Okay',
-          handler: () => { },
+          handler: () => {},
         },
       ],
     });
@@ -503,5 +782,10 @@ export class StarttestPage implements OnInit, OnDestroy {
     this.uploadSub.unsubscribe();
     this.downloadStartedSub.unsubscribe();
     this.uploadStartedSub.unsubscribe();
-  } 
+    this.cloudflareDownloadSub?.unsubscribe();
+    this.cloudflareUploadSub?.unsubscribe();
+    this.cloudflareDownloadStartedSub?.unsubscribe();
+    this.cloudflareUploadStartedSub?.unsubscribe();
+    this.stopCloudflareProgressSimulation();
+  }
 }
