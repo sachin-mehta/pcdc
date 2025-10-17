@@ -198,6 +198,8 @@ class NetworkTestService : LifecycleService() {
     var browserId = prefs.browserId
     var ipAddress = prefs.ipAddress
     var countryCode = prefs.countryCode
+    var baseUrl = prefs.baseUrl
+    var ipInfoToken = prefs.ipInfoToken
     val s2cRate = arrayListOf<Double>()
     val c2sRate = arrayListOf<Double>()
 
@@ -245,6 +247,7 @@ class NetworkTestService : LifecycleService() {
           0.0
         } else {
           if ((it.numBytes / (it.elapsedTime / 1000)).isInfinite()) {
+            Log.d("GIGA", "Got infinite value")
             0.0
           } else {
             (it.numBytes / (it.elapsedTime / 1000)) * 0.008
@@ -278,6 +281,7 @@ class NetworkTestService : LifecycleService() {
           0.0
         } else {
           if ((it.numBytes / (it.elapsedTime / 1000)).isInfinite()) {
+            Log.d("GIGA", "Got infinite value")
             0.0
           } else {
             (it.numBytes / (it.elapsedTime / 1000)) * 0.008
@@ -304,8 +308,6 @@ class NetworkTestService : LifecycleService() {
       super.onFinished(clientResponse, error, testType)
       try {
         val speed = clientResponse?.let { DataConverter.convertToMbps(it) }
-        println(error)
-        error?.printStackTrace()
         Log.d("GIGA NetworkTestService", "ALL DONE: $speed ")
         allDoneInvoked = allDoneInvoked + 1
         Log.d("GIGA NetworkTestService", "ALL DONE: $allDoneInvoked ")
@@ -345,7 +347,7 @@ class NetworkTestService : LifecycleService() {
           val getClientInfoUseCase = GetClientInfoUseCase()
           val clientInfoState = serviceScope.async {
             runCatching {
-              getClientInfoUseCase.invoke()
+              getClientInfoUseCase.invoke(ipInfoToken)
             }.getOrNull()
           }
           val getServerInfoUseCase = GetServerInfoUseCase()
@@ -517,7 +519,7 @@ class NetworkTestService : LifecycleService() {
         if (speedTestResultRequestEntity != null) {
           try {
             val postSpeedTestResultState =
-              postSpeedTestUseCase.invoke(speedTestResultRequestEntity, uploadKey)
+              postSpeedTestUseCase.invoke(speedTestResultRequestEntity, uploadKey, baseUrl)
             when (postSpeedTestResultState) {
               is ResultState.Failure -> {
                 Log.d(
@@ -578,6 +580,8 @@ class NetworkTestService : LifecycleService() {
             }
           } catch (e: Exception) {
             Sentry.capture(e)
+            stopForeground(STOP_FOREGROUND_DETACH)
+            stopSelf()
           }
         }
       } else {

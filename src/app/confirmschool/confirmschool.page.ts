@@ -116,13 +116,17 @@ export class ConfirmschoolPage {
                 //This we need to pass to native background servie to execute the
                 // api calls to publish speed test data
                 const apiKey = environment.token;
+                const baseUrl = environment.restAPI;
+                const clientInfoToken = environment.ipInfoToken;
                 this.storeRegistrationDataAndScheduleSpeedTest(
                   response,
                   this.school.school_id,
                   this.school.giga_id_school,
                   this.selectedCountry,
                   c?.ip,
-                  apiKey
+                  apiKey,
+                  baseUrl,
+                  clientInfoToken
                 );
               }
               this.loading.dismiss();
@@ -215,7 +219,9 @@ export class ConfirmschoolPage {
     gigaSchoolId: String,
     countryCode: String,
     ipAddress: String,
-    apiKey: String
+    apiKey: String,
+    baseUrl: String,
+    ipInfoToken: String
   ) {
     console.log('GIGA GigaAppPlugin : Schedule Speed Test ');
     console.log('GIGA Params : browserId : ', browserId);
@@ -224,6 +230,8 @@ export class ConfirmschoolPage {
     console.log('GIGA Params : countryCode : ', countryCode);
     console.log('GIGA Params : ipAddress : ', ipAddress);
     console.log('GIGA Params : uploadKey : ', apiKey);
+    console.log('GIGA Params : baseUrl : ', baseUrl);
+    console.log('GIGA Params : ipInfoToken : ', ipInfoToken);
     const result = await this.gigaAppPlugin.storeAndScheduleSpeedTest({
       browser_id: browserId || '',
       school_id: schoolId || '',
@@ -231,6 +239,8 @@ export class ConfirmschoolPage {
       country_code: countryCode || '',
       ip_address: ipAddress || '',
       mlab_uploadKey: apiKey || '',
+      base_url: baseUrl || '',
+      ip_info_token: ipInfoToken || '',
     });
     console.log('GIGA Plugin Call Result : ', result);
   }

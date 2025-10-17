@@ -1,7 +1,6 @@
 package com.meter.giga.data.repository
 
 import android.util.Log
-import com.meter.giga.BuildConfig
 import com.meter.giga.domain.entity.request.SpeedTestResultRequestEntity
 import com.meter.giga.domain.entity.response.ClientInfoResponseEntity
 import com.meter.giga.domain.entity.response.ServerInfoResponseEntity
@@ -28,10 +27,10 @@ class SpeedTestRepositoryImpl : SpeedTestRepository {
    * as Success as ClientInfoResponseEntity instance
    * as Failure as String Message with failure message
    */
-  override suspend fun getClientInfoData(): ResultState<ClientInfoResponseEntity?> {
+  override suspend fun getClientInfoData(ipInfoToken: String): ResultState<ClientInfoResponseEntity?> {
     try {
       Log.d("GIGA SpeedTestRepositoryImpl", "getClientInfoData Invoked")
-      val response = RetrofitInstanceBuilder.clintInfoApi.getClientInfo()
+      val response = RetrofitInstanceBuilder.clintInfoApi.getClientInfo(ipInfoToken)
       Log.d("GIGA SpeedTestRepositoryImpl", "response $response")
       if (response.isSuccessful) {
         if (response.body() != null) {
@@ -104,10 +103,11 @@ class SpeedTestRepositoryImpl : SpeedTestRepository {
    */
   override suspend fun publishSpeedTestData(
     speedTestData: SpeedTestResultRequestEntity,
-    uploadKey: String
+    uploadKey: String,
+    baseUrl: String
   ): ResultState<Unit?> {
     var retryAttemptCount = 0;
-    return syncSpeedTestData(speedTestData, uploadKey, retryAttemptCount)
+    return syncSpeedTestData(speedTestData, uploadKey, baseUrl, retryAttemptCount)
   }
 
   /**
@@ -122,9 +122,10 @@ class SpeedTestRepositoryImpl : SpeedTestRepository {
   private suspend fun syncSpeedTestData(
     speedTestData: SpeedTestResultRequestEntity,
     uploadKey: String,
+    baseUrl: String,
     retryAttemptCount: Int
   ): ResultState<Unit> {
-    val response = RetrofitInstanceBuilder.speedTestApi.postSpeedTestData(
+    val response = RetrofitInstanceBuilder.getSpeedTestApi(baseUrl).postSpeedTestData(
       body = speedTestData.toModel(),
       authorization = "Bearer $uploadKey"
     )
@@ -143,7 +144,7 @@ class SpeedTestRepositoryImpl : SpeedTestRepository {
       if (retryAttemptCount < 4) {
         val attemptNo = retryAttemptCount + 1;
         Sentry.capture("Sync data re attempt count : $attemptNo")
-        syncSpeedTestData(speedTestData, uploadKey, attemptNo)
+        syncSpeedTestData(speedTestData, uploadKey, baseUrl, attemptNo)
         Log.d("GIGA SpeedTestRepositoryImpl Failed with attempt No: ", "$retryAttemptCount")
       } else {
         Log.d("GIGA SpeedTestRepositoryImpl Failed after no of attempts", "$retryAttemptCount")

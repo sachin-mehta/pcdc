@@ -37,21 +37,17 @@ class GigaApp : Application() {
   }
 
   private fun getEnvironment(): String {
-    when (BuildConfig.FLAVOR) {
-      "dev" ->
-        return "development"
+    when (BuildConfig.BUILD_TYPE) {
+      "debug" ->
+        return "debug"
 
 
-      "staging" ->
-        return "staging"
-
-
-      "prod" ->
-        return "production"
+      "release" ->
+        return "release"
 
 
       else ->
-        return "development"
+        return "debug"
 
     }
   }

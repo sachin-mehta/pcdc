@@ -4,6 +4,7 @@ package com.meter.giga.prefrences
 import android.content.Context
 import androidx.core.content.edit
 import com.meter.giga.utils.Constants.GIGA_APP_PREFERENCES
+import com.meter.giga.utils.Constants.KEY_BASE_URL
 import com.meter.giga.utils.Constants.KEY_BROWSER_ID
 import com.meter.giga.utils.Constants.KEY_COUNTRY_CODE
 import com.meter.giga.utils.Constants.KEY_FIRST_15_EXECUTED_TIME
@@ -11,6 +12,7 @@ import com.meter.giga.utils.Constants.KEY_FIRST_15_SCHEDULED_TIME
 import com.meter.giga.utils.Constants.KEY_GIGA_SCHOOL_ID
 import com.meter.giga.utils.Constants.KEY_HISTORY_DATA_INDEX
 import com.meter.giga.utils.Constants.KEY_IP_ADDRESS
+import com.meter.giga.utils.Constants.KEY_IP_INFO_TOKEN
 import com.meter.giga.utils.Constants.KEY_LAST_EXECUTION_DAY
 import com.meter.giga.utils.Constants.KEY_LAST_SLOT_EXECUTION_HOUR
 import com.meter.giga.utils.Constants.KEY_MLAB_UPLOAD_KEY
@@ -102,6 +104,22 @@ class AlarmSharedPref(context: Context) {
   var browserId: String
     get() = prefs.getString(KEY_BROWSER_ID, null).toString()
     set(value) = prefs.edit() { putString(KEY_BROWSER_ID, value) }
+
+  /**
+   * This provides ip base url which
+   * passed from FE env file
+   */
+  var baseUrl: String
+    get() = prefs.getString(KEY_BASE_URL, null).toString()
+    set(value) = prefs.edit() { putString(KEY_BASE_URL, value) }
+
+  /**
+   * This provides ip info token which
+   * passed from FE env file
+   */
+  var ipInfoToken: String
+    get() = prefs.getString(KEY_IP_INFO_TOKEN, null).toString()
+    set(value) = prefs.edit() { putString(KEY_IP_INFO_TOKEN, value) }
 
   /**
    * This provides ip address which

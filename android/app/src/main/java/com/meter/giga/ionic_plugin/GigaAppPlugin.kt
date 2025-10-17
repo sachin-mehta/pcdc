@@ -21,6 +21,8 @@ import com.meter.giga.domain.entity.request.SpeedTestResultRequestEntity
 import com.meter.giga.prefrences.AlarmSharedPref
 import com.meter.giga.prefrences.SecureDataStore
 import com.meter.giga.service.NetworkTestService
+import com.meter.giga.utils.Constants.BASE_URL
+import com.meter.giga.utils.Constants.IP_INFO_TOKEN
 import com.meter.giga.utils.Constants.MLAB_UPLOAD_KEY
 import com.meter.giga.utils.Constants.REGISTRATION_BROWSER_ID
 import com.meter.giga.utils.Constants.REGISTRATION_COUNTRY_CODE
@@ -187,6 +189,8 @@ class GigaAppPlugin : Plugin() {
     val countryCode = call.getString(REGISTRATION_COUNTRY_CODE)
     val ipAddress = call.getString(REGISTRATION_IP_ADDRESS)
     val mlabUploadKey = call.getString(MLAB_UPLOAD_KEY)
+    val baseUrl = call.getString(BASE_URL)
+    val ipInfoToken = call.getString(IP_INFO_TOKEN)
     Log.d("GIGA GigaAppPlugin mlabUploadKey", "$mlabUploadKey")
     val alarmPrefs = AlarmSharedPref(context)
     //Reset the existing stored data from shared preferences
@@ -196,6 +200,8 @@ class GigaAppPlugin : Plugin() {
     alarmPrefs.schoolId = schoolId ?: ""
     alarmPrefs.gigaSchoolId = gigaSchoolId ?: ""
     alarmPrefs.ipAddress = ipAddress ?: ""
+    alarmPrefs.baseUrl = baseUrl ?: ""
+    alarmPrefs.ipInfoToken = ipInfoToken ?: " "
     alarmPrefs.browserId = browserId ?: ""
     CoroutineScope(Dispatchers.IO).launch {
       val secureDataStore = SecureDataStore(context)

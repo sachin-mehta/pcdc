@@ -20,9 +20,14 @@ class PostSpeedTestUseCase() {
    */
   suspend fun invoke(
     speedTestResultRequestEntity: SpeedTestResultRequestEntity,
-    uploadKey: String
+    uploadKey: String,
+    baseUrl: String
   ): ResultState<Any?> {
     val speedTestRepository = SpeedTestRepositoryImpl()
-    return speedTestRepository.publishSpeedTestData(speedTestResultRequestEntity, uploadKey)
+    return speedTestRepository.publishSpeedTestData(
+      speedTestResultRequestEntity,
+      uploadKey,
+      baseUrl
+    )
   }
 }

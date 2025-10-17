@@ -1,6 +1,5 @@
 package com.meter.giga.network.api
 
-import com.meter.giga.BuildConfig
 import com.meter.giga.data.models.requests.SpeedTestResultRequestModel
 import com.meter.giga.data.models.responses.ClientInfoFallbackResponseModel
 import com.meter.giga.data.models.responses.ClientInfoResponseModel
@@ -27,7 +26,7 @@ interface ApiService {
    */
   @GET("json")
   suspend fun getClientInfo(
-    @Query("token") token: String = BuildConfig.CLIENT_INFO_TOKEN
+    @Query("token") token: String
   ): Response<ClientInfoResponseModel>
 
   /**

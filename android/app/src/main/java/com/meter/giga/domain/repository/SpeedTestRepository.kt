@@ -19,7 +19,7 @@ interface SpeedTestRepository {
    * as Success as ClientInfoResponseEntity instance
    * as Failure as String Message with failure message
    */
-  suspend fun getClientInfoData(): ResultState<ClientInfoResponseEntity?>
+  suspend fun getClientInfoData(ipInfoToken: String): ResultState<ClientInfoResponseEntity?>
 
   /**
    * This function provides getServerInfoData abstract definition
@@ -40,5 +40,9 @@ interface SpeedTestRepository {
    *   as Success if posted the data successfully
    *   as Failure if post request failed with message
    */
-  suspend fun publishSpeedTestData(speedTestData: SpeedTestResultRequestEntity,  uploadKey: String): ResultState<Unit?>
+  suspend fun publishSpeedTestData(
+    speedTestData: SpeedTestResultRequestEntity,
+    uploadKey: String,
+    baseUrl: String
+  ): ResultState<Unit?>
 }

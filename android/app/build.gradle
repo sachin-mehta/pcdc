@@ -31,14 +31,12 @@ android {
   }
   buildTypes {
     debug {
-      buildConfigField "String", "CLIENT_INFO_TOKEN", "\"${CLIENT_INFO_API_TOKEN}\""
       debuggable true
       minifyEnabled false
       applicationIdSuffix ".debug"
       versionNameSuffix
     }
     release {
-      buildConfigField "String", "CLIENT_INFO_TOKEN", "\"${CLIENT_INFO_API_TOKEN}\""
       debuggable false
       minifyEnabled true
       shrinkResources true
@@ -49,24 +47,24 @@ android {
   }
 
 
-  flavorDimensions "environment"
-
-  productFlavors {
-    dev {
-      dimension "environment"
-      buildConfigField "String", "BASE_URL", "\"${BASE_URL_DEVELOPMENT}\""
-
-    }
-    staging {
-      dimension "environment"
-      buildConfigField "String", "BASE_URL", "\"${BASE_URL_STAGING}\""
-
-    }
-    prod {
-      dimension "environment"
-      buildConfigField "String", "BASE_URL", "\"${BASE_URL_PRODUCTION}\""
-    }
-  }
+//  flavorDimensions "environment"
+//
+//  productFlavors {
+//    dev {
+//      dimension "environment"
+//      buildConfigField "String", "BASE_URL", "\"${BASE_URL_DEVELOPMENT}\""
+//
+//    }
+//    staging {
+//      dimension "environment"
+//      buildConfigField "String", "BASE_URL", "\"${BASE_URL_STAGING}\""
+//
+//    }
+//    prod {
+//      dimension "environment"
+//      buildConfigField "String", "BASE_URL", "\"${BASE_URL_PRODUCTION}\""
+//    }
+//  }
   buildFeatures {
     buildConfig true
   }
