@@ -1,21 +1,28 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpRequest, HttpParams } from '@angular/common/http';
+import {
+  HttpClient,
+} from '@angular/common/http';
 import { catchError, map, tap } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
-import { Observable, throwError } from 'rxjs';
+import { Observable, of, throwError } from 'rxjs';
 import { SettingsService } from '../services/settings.service';
 import { StorageService } from './storage.service';
+import { MeasurementRecord } from './measurement.types';
 
 @Injectable({
   providedIn: 'root',
 })
 export class UploadService {
   ts: any;
+  apiV2Url: string;
   constructor(
     private http: HttpClient,
     private settingService: SettingsService,
     private storage: StorageService
-  ) { }
+  ) {
+    this.apiV2Url = environment.restAPI.replace(/\/api\/v1\/$/, '/api/v2/') + 'measurements';
+
+  }
 
   /**
    * Return all network related information
@@ -27,10 +34,19 @@ export class UploadService {
     this.ts = new Date(record.timestamp);
     let measurement = {
       UUID: record.uuid,
-      Download: record.results["NDTResult.S2C"].LastClientMeasurement.MeanClientMbps * 1000,
-      Upload: record.results["NDTResult.C2S"].LastClientMeasurement.MeanClientMbps * 1000,
-      Latency: ((record.results['NDTResult.S2C'].LastServerMeasurement.BBRInfo.MinRTT +
-        record.results['NDTResult.C2S'].LastServerMeasurement.BBRInfo.MinRTT) / 2 / 1000).toFixed(0),
+      Download:
+        record.results['NDTResult.S2C'].LastClientMeasurement.MeanClientMbps *
+        1000,
+      Upload:
+        record.results['NDTResult.C2S'].LastClientMeasurement.MeanClientMbps *
+        1000,
+      Latency: (
+        (record.results['NDTResult.S2C'].LastServerMeasurement.BBRInfo.MinRTT +
+          record.results['NDTResult.C2S'].LastServerMeasurement.BBRInfo
+            .MinRTT) /
+        2 /
+        1000
+      ).toFixed(0),
       // TODO: Uncomment when new backend is ready
       // DataUsage: record.dataUsage.total,
       // DataUploaded: record.dataUsage.upload,
@@ -123,12 +139,12 @@ export class UploadService {
     let measurement = this.makeMeasurement(record);
 
     this.storage.get('country_code') === '' ||
-      this.storage.get('country_code') === null
+    this.storage.get('country_code') === null
       ? (measurement.country_code = measurement.ClientInfo.Country)
       : (measurement.country_code = this.storage.get('country_code'));
 
     this.storage.get('ip_address') === '' ||
-      this.storage.get('ip_address') === null
+    this.storage.get('ip_address') === null
       ? (measurement.ip_address = measurement.ClientInfo.IP)
       : (measurement.ip_address = this.storage.get('ip_address'));
     measurement.country_code = measurement.ClientInfo.Country;
@@ -157,7 +173,52 @@ export class UploadService {
     ); // ...errors if any
   }
 
+  uploadCloudflareMeasurement(record: MeasurementRecord): Observable<any> {
+    if (!this.settingService.currentSettings.uploadEnabled) {
+      return of(null);
+    }
+
+    let uploadURL = this.apiV2Url;
+
+    const payload = {
+      uuid: record.uuid,
+      version: record.version,
+      provider: record.provider ?? 'cloudflare',
+      notes: record.Notes,
+      timestamp: record.timestamp,
+      appVersion: environment.app_version,
+      dataUsage: record.dataUsage,
+      accessInformation: record.accessInformation,
+      results: record.results,
+      browserID: this.storage.get('schoolUserId') || '',
+      deviceType: 'windows',
+      schoolID: this.storage.get('schoolId') || '',
+      gigaIDSchool: this.storage.get('gigaId') || '',
+      ipAddress: record.accessInformation?.ip || '',
+      countryCode: record.accessInformation?.country || '',
+    };
+    console.log('Uploading Cloudflare measurement', payload);
+    return this.http.post(uploadURL, payload).pipe(
+      map((res: any) => res),
+      tap((data) => data),
+      catchError((error) => {console.error('Upload error', error); return this.handleError(error); })
+    );
+  }
+
   private handleError(error: Response) {
     return throwError(error);
+  }
+
+  private toMegabytes(dataUsage?: { download?: number; upload?: number; total?: number }) {
+    const base = dataUsage ?? { download: 0, upload: 0, total: 0 };
+    const toMb = (value?: number) => {
+      const bytes = Number(value ?? 0);
+      return Number((bytes / (1024 * 1024)).toFixed(4));
+    };
+    return {
+      download: toMb(base.download),
+      upload: toMb(base.upload),
+      total: toMb(base.total),
+    };
   }
 }
