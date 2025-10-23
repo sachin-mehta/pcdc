@@ -167,7 +167,7 @@ object GigaUtil {
         upload = (meanUploadClientMbps ?: 0.0) * 1000,
         gigaIdSchool = gigaSchoolId,
         ipAddress = if (ipAddress == "") clientInfoRequestEntity?.ip else ipAddress,
-        latency = (if (uploadMeasurement?.tcpInfo?.minRtt != null) uploadMeasurement.tcpInfo!!.minRtt!! / 1000 else 0.0).toInt()
+        latency = (uploadMeasurement?.tcpInfo?.minRtt?.let { it / 1000 } ?: 0.0).toInt()
           .toString(),
         notes = scheduleType,
         results = ResultsRequestEntity(

@@ -1,5 +1,6 @@
 package com.meter.giga.network
 
+import com.meter.giga.BuildConfig
 import com.meter.giga.network.api.ApiService
 import com.meter.giga.utils.Constants.CLIENT_INFO_END_URL
 import com.meter.giga.utils.Constants.CLIENT_INFO_FALLBACK_END_URL
@@ -55,8 +56,22 @@ object RetrofitInstanceBuilder {
    * post the speed test data
    */
   fun getSpeedTestApi(baseUrl: String): ApiService {
+    android.util.Log.d("GIGA RetrofitInstanceBuilder", "Original baseUrl: '$baseUrl'")
+    android.util.Log.d("GIGA RetrofitInstanceBuilder", "BuildConfig.BASE_URL: '${BuildConfig.BASE_URL}'")
+    
+    // Ensure baseUrl has proper scheme
+    val validBaseUrl = if (baseUrl.isNotEmpty() && !baseUrl.startsWith("http://") && !baseUrl.startsWith("https://")) {
+      "https://$baseUrl"
+    } else if (baseUrl.isEmpty()) {
+      BuildConfig.BASE_URL 
+    } else {
+      baseUrl
+    }
+    
+    android.util.Log.d("GIGA RetrofitInstanceBuilder", "Valid baseUrl: '$validBaseUrl'")
+    
     return Retrofit.Builder()
-      .baseUrl(baseUrl)
+      .baseUrl(validBaseUrl)
       .addConverterFactory(GsonConverterFactory.create())
       .build()
       .create(ApiService::class.java)

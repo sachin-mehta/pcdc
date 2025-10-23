@@ -312,12 +312,14 @@ class NetworkTestService : LifecycleService() {
         allDoneInvoked = allDoneInvoked + 1
         Log.d("GIGA NetworkTestService", "ALL DONE: $allDoneInvoked ")
         if (allDoneInvoked == 2) {
+          Log.d("GIGA NetworkTestService", "Starting publishSpeedTestData")
           publishSpeedTestData(
             scheduleType,
             appVersion,
             isRunningOnChromebook,
           )
           allDoneInvoked = 0
+          Log.d("GIGA NetworkTestService", "Completed publishSpeedTestData")
         }
       } catch (e: Exception) {
         Sentry.capture(e)
@@ -394,6 +396,32 @@ class NetworkTestService : LifecycleService() {
                   "Get Client Info API Failed: ${clientInfo.error}"
                 )
                 Sentry.capture("Client Info Fetch Failed")
+                // Create a basic client info response with fallback data
+                clientInfoResponse = ClientInfoResponseEntity(
+                  ip = "Unknown",
+                  city = "Unknown",
+                  region = "Unknown",
+                  country = "Unknown",
+                  loc = "0,0",
+                  org = "Unknown ISP",
+                  postal = "",
+                  timezone = "UTC",
+                  isp = "Unknown ISP",
+                  asn = "Unknown"
+                )
+                clientInfoRequest = ClientInfoRequestEntity(
+                  asn = "Unknown",
+                  city = "Unknown",
+                  country = "Unknown",
+                  hostname = "Unknown",
+                  ip = "Unknown",
+                  isp = "Unknown ISP",
+                  latitude = 0.0,
+                  longitude = 0.0,
+                  postal = "",
+                  region = "Unknown",
+                  timezone = "UTC"
+                )
               }
 
               ResultState.Loading -> {
@@ -403,6 +431,33 @@ class NetworkTestService : LifecycleService() {
                 )
               }
             }
+          } else {
+            // Create fallback client info when clientInfo is null
+            clientInfoResponse = ClientInfoResponseEntity(
+              ip = "Unknown",
+              city = "Unknown",
+              region = "Unknown",
+              country = "Unknown",
+              loc = "0,0",
+              org = "Unknown ISP",
+              postal = "",
+              timezone = "UTC",
+              isp = "Unknown ISP",
+              asn = "Unknown"
+            )
+            clientInfoRequest = ClientInfoRequestEntity(
+              asn = "Unknown",
+              city = "Unknown",
+              country = "Unknown",
+              hostname = "Unknown",
+              ip = "Unknown",
+              isp = "Unknown ISP",
+              latitude = 0.0,
+              longitude = 0.0,
+              postal = "",
+              region = "Unknown",
+              timezone = "UTC"
+            )
           }
           if (serverInfo != null) {
             when (serverInfo) {
@@ -424,9 +479,32 @@ class NetworkTestService : LifecycleService() {
               is ResultState.Failure -> {
                 Log.d(
                   "GIGA NetworkTestService",
-                  "Get Client Info API Failed: ${serverInfo.error}"
+                  "Get Server Info API Failed: ${serverInfo.error}"
                 )
                 Sentry.capture("Server Info Fetch Failed")
+                // Create fallback server info
+                serverInfoResponse = ServerInfoResponseEntity(
+                  city = "Unknown",
+                  country = "Unknown",
+                  fqdn = "Unknown",
+                  ipv4 = "Unknown",
+                  ipv6 = "Unknown",
+                  label = "Unknown Server",
+                  metro = "Unknown",
+                  site = "Unknown",
+                  url = "Unknown"
+                )
+                serverInfoRequest = ServerInfoRequestEntity(
+                  city = "Unknown",
+                  country = "Unknown",
+                  fQDN = "Unknown",
+                  iPv4 = "Unknown",
+                  iPv6 = "Unknown",
+                  label = "Unknown Server",
+                  metro = "Unknown",
+                  site = "Unknown",
+                  uRL = "Unknown"
+                )
               }
 
               ResultState.Loading -> {
@@ -436,6 +514,30 @@ class NetworkTestService : LifecycleService() {
                 )
               }
             }
+          } else {
+            // Create fallback server info when serverInfo is null
+            serverInfoResponse = ServerInfoResponseEntity(
+              city = "Unknown",
+              country = "Unknown",
+              fqdn = "Unknown",
+              ipv4 = "Unknown",
+              ipv6 = "Unknown",
+              label = "Unknown Server",
+              metro = "Unknown",
+              site = "Unknown",
+              url = "Unknown"
+            )
+            serverInfoRequest = ServerInfoRequestEntity(
+              city = "Unknown",
+              country = "Unknown",
+              fQDN = "Unknown",
+              iPv4 = "Unknown",
+              iPv6 = "Unknown",
+              label = "Unknown Server",
+              metro = "Unknown",
+              site = "Unknown",
+              uRL = "Unknown"
+            )
           }
           uploadSpeedTestData(
             clientInfoRequest,
@@ -516,6 +618,9 @@ class NetworkTestService : LifecycleService() {
         )
         val postSpeedTestUseCase = PostSpeedTestUseCase()
         val uploadKey = secureDataStore.getMlabUploadKey()
+        Log.d("GIGA NetworkTestService", "baseUrl for posting: '$baseUrl'")
+        Log.d("GIGA NetworkTestService", "uploadKey length: ${uploadKey?.length ?: 0}")
+        
         if (speedTestResultRequestEntity != null) {
           try {
             val postSpeedTestResultState =
@@ -527,10 +632,22 @@ class NetworkTestService : LifecycleService() {
                   "Speed Test Not Published Successfully Due to ${postSpeedTestResultState.error}"
                 )
                 measurementsItem.uploaded = false
-                val updateSpeedTestData = GigaUtil.addJsonItem(
-                  existingSpeedTestData,
-                  Gson().toJson(measurementsItem)
-                )
+                val updateSpeedTestData = try {
+                  GigaUtil.addJsonItem(
+                    existingSpeedTestData,
+                    Gson().toJson(measurementsItem)
+                  )
+                } catch (e: Exception) {
+                  Log.e("GIGA NetworkTestService", "Serialization error for storage: ${e.message}", e)
+                  // Create a simplified measurement item for storage
+                  val simplifiedMeasurement = measurementsItem.copy(
+                    results = null // Remove potentially problematic results
+                  )
+                  GigaUtil.addJsonItem(
+                    existingSpeedTestData,
+                    Gson().toJson(simplifiedMeasurement)
+                  )
+                }
                 Log.d(
                   "GIGA NetworkTestService",
                   "Updated Speed Test Data $updateSpeedTestData"
@@ -560,26 +677,49 @@ class NetworkTestService : LifecycleService() {
                 measurementsItem.uploaded = true
                 Sentry.capture("Measurement Options :  ${measurementsItem}")
 
-                val updateSpeedTestData = GigaUtil.addJsonItem(
-                  existingSpeedTestData,
-                  Gson().toJson(measurementsItem)
-                )
+                val updateSpeedTestData = try {
+                  GigaUtil.addJsonItem(
+                    existingSpeedTestData,
+                    Gson().toJson(measurementsItem)
+                  )
+                } catch (e: Exception) {
+                  Log.e("GIGA NetworkTestService", "Serialization error for storage: ${e.message}", e)
+                  // Create a simplified measurement item for storage
+                  val simplifiedMeasurement = measurementsItem.copy(
+                    results = null // Remove potentially problematic results
+                  )
+                  GigaUtil.addJsonItem(
+                    existingSpeedTestData,
+                    Gson().toJson(simplifiedMeasurement)
+                  )
+                }
                 Log.d(
                   "GIGA NetworkTestService",
                   "Updated Speed Test Data $updateSpeedTestData"
                 )
                 prefs.oldSpeedTestData = updateSpeedTestData
+                Log.d("GIGA NetworkTestService", "Sending speed test completed notification")
                 GigaAppPlugin.sendSpeedTestCompleted(
                   speedTestResultRequestEntity,
                   measurementsItem
                 )
+                Log.d("GIGA NetworkTestService", "Speed test completed notification sent")
                 stopForeground(STOP_FOREGROUND_DETACH)
                 stopSelf()
                 Sentry.capture("Synced speed test data successfully")
               }
             }
           } catch (e: Exception) {
+            Log.e("GIGA NetworkTestService", "Error posting speed test data: ${e.message}", e)
             Sentry.capture(e)
+            
+            // Still send completion notification even if posting fails
+            Log.d("GIGA NetworkTestService", "Sending speed test completed notification despite posting error")
+            GigaAppPlugin.sendSpeedTestCompleted(
+              speedTestResultRequestEntity,
+              measurementsItem
+            )
+            
             stopForeground(STOP_FOREGROUND_DETACH)
             stopSelf()
           }

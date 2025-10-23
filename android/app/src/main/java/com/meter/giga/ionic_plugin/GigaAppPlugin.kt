@@ -81,12 +81,24 @@ class GigaAppPlugin : Plugin() {
           testStatus = "complete",
           measurementsItem = measurementsItem
         )
-        val jsonString = GsonBuilder()
-          .serializeNulls()
-          .create().toJson(speedTestResultEntity)
-        val data = JSObject(jsonString)
-        Log.d("GIGA NetworkTestService", "sendSpeedTestCompleted $data")
-        it.notifyListeners("speedTestUpdate", data as JSObject?)
+        try {
+          val jsonString = GsonBuilder()
+            .serializeNulls()
+            .create().toJson(speedTestResultEntity)
+          val data = JSObject(jsonString)
+          Log.d("GIGA NetworkTestService", "sendSpeedTestCompleted $data")
+          it.notifyListeners("speedTestUpdate", data as JSObject?)
+        } catch (e: Exception) {
+          Log.e("GIGA NetworkTestService", "Serialization error: ${e.message}", e)
+          // Send a simplified version without potentially problematic data
+          val simplifiedData = JSObject().apply {
+            put("testStatus", "complete")
+            put("downloadSpeed", speedTestData.results?.ndtResultS2C?.lastClientMeasurement?.meanClientMbps ?: 0.0)
+            put("uploadSpeed", speedTestData.results?.ndtResultC2S?.lastClientMeasurement?.meanClientMbps ?: 0.0)
+            put("latency", speedTestData.latency ?: "0")
+          }
+          it.notifyListeners("speedTestUpdate", simplifiedData)
+        }
       }
     }
 

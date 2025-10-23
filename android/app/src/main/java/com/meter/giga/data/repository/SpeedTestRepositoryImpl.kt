@@ -38,16 +38,31 @@ class SpeedTestRepositoryImpl : SpeedTestRepository {
             response.body()!!.toEntity()
           )
         } else {
+          // Try fallback API
           val fallbackResponse =
             RetrofitInstanceBuilder.clintInfoFallbackApi.getClientInfoFallback()
           if (fallbackResponse.isSuccessful) {
             return if (fallbackResponse.body() != null) {
               ResultState.Success(
-                response.body()!!.toEntity()
+                fallbackResponse.body()!!.toEntity()
               )
             } else {
-              ResultState.Failure(ErrorHandlerImpl().getError(response.errorBody()))
+              ResultState.Failure(ErrorHandlerImpl().getError(fallbackResponse.errorBody()))
             }
+          }
+        }
+      } else {
+        // If main API failed (403, etc.), try fallback
+        Log.d("GIGA SpeedTestRepositoryImpl", "Main API failed with code: ${response.code()}, trying fallback")
+        val fallbackResponse =
+          RetrofitInstanceBuilder.clintInfoFallbackApi.getClientInfoFallback()
+        if (fallbackResponse.isSuccessful) {
+          return if (fallbackResponse.body() != null) {
+            ResultState.Success(
+              fallbackResponse.body()!!.toEntity()
+            )
+          } else {
+            ResultState.Failure(ErrorHandlerImpl().getError(fallbackResponse.errorBody()))
           }
         }
       }

@@ -240,6 +240,14 @@ export class StarttestPage implements OnInit, OnDestroy {
               this.measurementnetworkServer =
                 data.speedTestData.ClientInfo.City;
               this.measurementISP = data.speedTestData.ClientInfo.ISP;
+            } else {
+              // Fallback to access information if ClientInfo is not available
+              if (this.accessInformation && this.accessInformation.org) {
+                this.measurementISP = this.accessInformation.org;
+              }
+              if (this.accessInformation && this.accessInformation.city) {
+                this.measurementnetworkServer = this.accessInformation.city;
+              }
             }
             console.log(
               'GIGA',

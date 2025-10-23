@@ -43,8 +43,12 @@ public class MainActivity extends BridgeActivity {
   protected void onCreate(Bundle savedInstanceState) {
     registerPlugin(GigaAppPlugin.class);
     super.onCreate(savedInstanceState);
-    WindowCompat.setDecorFitsSystemWindows(getWindow(), true);
-    checkStoragePermission(this);
+    try {
+      WindowCompat.setDecorFitsSystemWindows(getWindow(), true);
+      checkStoragePermission(this);
+    } catch (Exception e) {
+      Log.e("GIGA MainActivity", "Error in onCreate: " + e.getMessage(), e);
+    }
   }
 
   private void showPermissionDialog() {
@@ -150,7 +154,40 @@ public class MainActivity extends BridgeActivity {
     if (code == REQ_STORAGE_PERMISSION) {
       checkStoragePermission(this);            // continue chain
     } else if (code == REQ_NOTIF_PERMISSION) {
-      checkNotificationPermission(this);
+      // Check if permission was granted, if not, just continue to avoid infinite loop
+      if (res.length > 0 && res[0] == PackageManager.PERMISSION_GRANTED) {
+        checkAlarmPermission(); // Only continue if permission was granted
+      } else {
+        // Permission denied, but don't request again to avoid infinite loop
+        checkAlarmPermission();
+      }
+    }
+  }
+
+  @Override
+  public void onPause() {
+    try {
+      super.onPause();
+    } catch (Exception e) {
+      Log.e("GIGA MainActivity", "Error in onPause: " + e.getMessage(), e);
+    }
+  }
+
+  @Override
+  public void onResume() {
+    try {
+      super.onResume();
+    } catch (Exception e) {
+      Log.e("GIGA MainActivity", "Error in onResume: " + e.getMessage(), e);
+    }
+  }
+
+  @Override
+  public void onDestroy() {
+    try {
+      super.onDestroy();
+    } catch (Exception e) {
+      Log.e("GIGA MainActivity", "Error in onDestroy: " + e.getMessage(), e);
     }
   }
 }
