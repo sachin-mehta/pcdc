@@ -308,6 +308,13 @@ export class ScheduleService {
     ).getTime();
     console.log('Last startup test:', lastStartupTest);
 
+    // Only run startup test if scheduled testing is enabled
+    const scheduledTesting = await this.settingsService.get('scheduledTesting');
+    if (!scheduledTesting) {
+      console.log('Scheduled testing disabled, skipping startup test.');
+      return;
+    }
+
     if (!lastStartupTest || parseInt(lastStartupTest, 10) < today) {
       const startupDelay = Math.floor(Math.random() * this.STARTUP_TEST_DELAY);
       const scheduledTime = new Date(Date.now() + startupDelay);
@@ -325,6 +332,13 @@ export class ScheduleService {
     const networkInfo = await this.networkService.getNetInfo();
     if (!networkInfo) {
       console.log('Network not available for startup test, skipping.');
+      return;
+    }
+
+    // Check if a manual test is already in progress
+    const isManualTestInProgress = await this.storageService.get('manualTestInProgress');
+    if (isManualTestInProgress) {
+      console.log('Manual test in progress, skipping startup test.');
       return;
     }
 

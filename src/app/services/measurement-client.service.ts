@@ -8,6 +8,7 @@ import { MlabService } from './mlab.service';
 import { NetworkService } from './network.service';
 import { UploadService } from './upload.service';
 import { SharedService } from './shared-service.service';
+import { StorageService } from './storage.service';
 
 @Injectable({
   providedIn: 'root',
@@ -18,6 +19,8 @@ export class MeasurementClientService {
   public uploadComplete$ = new Subject<any>();
   public downloadStarted$ = new Subject<any>();
   public uploadStarted$ = new Subject<any>();
+  
+  private isTestRunning = false;
 
   private TIME_EXPECTED = 10;
   private readonly measurementNotificationActivity = new BehaviorSubject<any>(
@@ -76,10 +79,21 @@ export class MeasurementClientService {
     private mlabService: MlabService,
     private networkService: NetworkService,
     private uploadService: UploadService,
-    private sharedService: SharedService
+    private sharedService: SharedService,
+    private storageService: StorageService
   ) {}
 
   async runTest(notes = 'manual'): Promise<void> {
+    console.log('MeasurementClientService.runTest() called at:', new Date().toISOString());
+    console.log('Notes:', notes);
+    console.log('Is test already running?', this.isTestRunning);
+    
+    if (this.isTestRunning) {
+      console.log('Test is already running, skipping duplicate call');
+      return;
+    }
+    
+    this.isTestRunning = true;
     console.log('Starting ndt7 test', ndt7);
     this.broadcastMeasurementStatus('onstart', {});
     const measurementRecord = this.initializeMeasurementRecord(notes);
@@ -98,6 +112,10 @@ export class MeasurementClientService {
     } catch (error) {
       console.error('Error running ndt7 test:', error);
       this.broadcastMeasurementStatus('onError', { error: error.message });
+      // Clear manual test flag on error
+      this.storageService.set('manualTestInProgress', 'false');
+    } finally {
+      this.isTestRunning = false;
     }
   }
 
@@ -249,6 +267,9 @@ export class MeasurementClientService {
       running: false,
       progress: 1,
     });
+    
+    // Clear manual test in progress flag when test completes
+    this.storageService.set('manualTestInProgress', 'false');
   }
 
   private calculateDataUsage(passedResults: any): {

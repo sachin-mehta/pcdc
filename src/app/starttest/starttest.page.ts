@@ -107,6 +107,7 @@ export class StarttestPage implements OnInit, OnDestroy {
   uploadTimer: any;
   uploadProgressStarted = false; // To ensure we start upload animation only once
   school: any;
+  private isTestInProgress = false;
 
   isNative: boolean;
   gigaAppPlugin: any;
@@ -470,6 +471,18 @@ export class StarttestPage implements OnInit, OnDestroy {
   }
 
   startNDT() {
+    console.log('startNDT() called at:', new Date().toISOString());
+    console.log('Current state:', this.currentState);
+    console.log('Progress:', this.progress);
+    console.log('Is test in progress?', this.isTestInProgress);
+    
+    if (this.isTestInProgress) {
+      console.log('Test is already in progress, skipping duplicate call');
+      return;
+    }
+    
+    this.isTestInProgress = true;
+    
     try {
       this.uploadProgressStarted = false;
       this.downloadStarted = false;
@@ -493,13 +506,23 @@ export class StarttestPage implements OnInit, OnDestroy {
       this.latency = undefined;
       this.connectionStatus = '';
       this.uploadProgressStarted = false;
+      
+      // Set manual test in progress flag
+      this.storage.set('manualTestInProgress', 'true');
+      
       if (this.isNative) {
+        console.log('Executing native speed test');
         this.gigaAppPlugin.executeManualSpeedTest();
       } else {
+        console.log('Executing web speed test');
         this.measurementClientService.runTest();
       }
     } catch (e) {
       console.log(e);
+      // Clear manual test flag on error
+      this.storage.set('manualTestInProgress', 'false');
+    } finally {
+      this.isTestInProgress = false;
     }
   }
 
