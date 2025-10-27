@@ -1,8 +1,11 @@
 package com.meter.giga
 
 import android.app.Application
+import android.util.Log
+import com.meter.giga.prefrences.AlarmSharedPref
 import io.sentry.Sentry
 import io.sentry.android.AndroidSentryClientFactory
+import java.util.Properties
 
 /**
  * Giga App Application class
@@ -22,32 +25,43 @@ class GigaApp : Application() {
    */
   private fun initSentry() {
 
-
+    // Access capacitor config
+    val props = Properties()
+    try {
+      val inputStream = assets.open("env.properties")
+      props.load(inputStream)
+    } catch (e: Exception) {
+      e.printStackTrace()
+    }
+    // Add global context data
+    val alarmPrefs = AlarmSharedPref(this.applicationContext)
+    val environment = props.getProperty("ENVIRONMENT", "development")
+    alarmPrefs.environment = environment
+    Log.d("GIGA App environment : ", environment)
     // Initialize Sentry with legacy Android factory
     Sentry.init(
       getString(R.string.sentry_dsn),
       AndroidSentryClientFactory(applicationContext)
     )
-    // Add global context data
     Sentry.getContext().apply {
 
       // 🏷️ Add custom tags (key-value)
-      addTag("environment", getEnvironment())
+      addTag("environment", getEnvironment(environment))
     }
   }
 
-  private fun getEnvironment(): String {
-    when (BuildConfig.BUILD_TYPE) {
-      "debug" ->
-        return "debug"
+  private fun getEnvironment(env: String): String {
+    when (env) {
+      "stg" ->
+        return "staging"
 
 
-      "release" ->
-        return "release"
+      "prod" ->
+        return "production"
 
 
       else ->
-        return "debug"
+        return "development"
 
     }
   }

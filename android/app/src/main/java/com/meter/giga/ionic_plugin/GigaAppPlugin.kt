@@ -22,6 +22,7 @@ import com.meter.giga.prefrences.AlarmSharedPref
 import com.meter.giga.prefrences.SecureDataStore
 import com.meter.giga.service.NetworkTestService
 import com.meter.giga.utils.Constants.BASE_URL
+import com.meter.giga.utils.Constants.ENV_TYPE
 import com.meter.giga.utils.Constants.IP_INFO_TOKEN
 import com.meter.giga.utils.Constants.MLAB_UPLOAD_KEY
 import com.meter.giga.utils.Constants.REGISTRATION_BROWSER_ID
@@ -208,6 +209,23 @@ class GigaAppPlugin : Plugin() {
       secureDataStore.setMlabUploadKey(mlabUploadKey ?: "")
     }
     scheduleAlarm(context, alarmPrefs)
+    call.resolve()
+  }
+
+  /**
+   * This function is invoked from ionic app UI
+   * to pass the data from UI to Android Native
+   * Components
+   * @param call : This contains all the passed params
+   * as key value pair
+   */
+  @PluginMethod
+  fun storeEnvironment(call: PluginCall) {
+    Log.d("GIGA GigaAppPlugin", "Start Command Via Plugin")
+    val context = bridge.context
+    val env = call.getString(ENV_TYPE)
+    val alarmPrefs = AlarmSharedPref(context)
+    alarmPrefs.environment = env ?: "development"
     call.resolve()
   }
 

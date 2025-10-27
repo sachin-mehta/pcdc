@@ -164,6 +164,8 @@ android {
 
   ```bash
   ionic build
+  node scripts/generate-native-env.js ## Need to run this command to generate env propertirs file in android folder to get environment details
+  ionic serve ## Run this command so that latest angular changes always gets effect, sometimes angular changes doesn't get executed due to caching, to reset cache use ionic serve. It reflect the latest changes.
   npx cap sync android
   npx cap run android
   ```
@@ -257,10 +259,10 @@ Navigate to android drectory in project and run below commands to create builds
 2. Add to `gradle.properties`:
 
    ```
-   MYAPP_UPLOAD_STORE_FILE=release-key.jks
-   MYAPP_UPLOAD_KEY_ALIAS=release
-   MYAPP_UPLOAD_STORE_PASSWORD=your-password
-   MYAPP_UPLOAD_KEY_PASSWORD=your-password
+   KEYSTORE_PATH=release-key.jks
+   KEY_ALIAS=release
+   KEYSTORE_PASSWORD=your-password
+   KEY_PASSWORD=your-password
    ```
 
 3. Link in `app/build.gradle`:
@@ -268,10 +270,10 @@ Navigate to android drectory in project and run below commands to create builds
    ```gradle
    signingConfigs {
        release {
-           storeFile file(MYAPP_UPLOAD_STORE_FILE)
-           storePassword MYAPP_UPLOAD_STORE_PASSWORD
-           keyAlias MYAPP_UPLOAD_KEY_ALIAS
-           keyPassword MYAPP_UPLOAD_KEY_PASSWORD
+           storeFile file(KEYSTORE_PATH)
+           storePassword KEYSTORE_PASSWORD
+           keyAlias KEY_ALIAS
+           keyPassword KEY_PASSWORD
        }
    }
    buildTypes {

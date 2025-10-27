@@ -3,6 +3,7 @@ package com.meter.giga.prefrences
 
 import android.content.Context
 import androidx.core.content.edit
+import com.meter.giga.utils.Constants.ENVIRONMENT
 import com.meter.giga.utils.Constants.GIGA_APP_PREFERENCES
 import com.meter.giga.utils.Constants.KEY_BASE_URL
 import com.meter.giga.utils.Constants.KEY_BROWSER_ID
@@ -146,6 +147,13 @@ class AlarmSharedPref(context: Context) {
     val today = Calendar.getInstance().get(Calendar.DAY_OF_YEAR)
     return today != lastExecutionDay
   }
+
+  /**
+   * This provides environment
+   */
+  var environment: String
+    get() = prefs.getString(ENVIRONMENT, "development").toString()
+    set(value) = prefs.edit() { putString(ENVIRONMENT, value) }
 
   /**
    * This resets data if scheduling the speed

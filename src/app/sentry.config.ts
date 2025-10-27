@@ -1,7 +1,7 @@
 /* eslint-disable prefer-arrow/prefer-arrow-functions */
 import * as Sentry from '@sentry/browser';
 import { environment } from '../environments/environment'; // './esrc/environments/environment';
-import { Capacitor } from '@capacitor/core';
+import { Capacitor, registerPlugin } from '@capacitor/core';
 
 export function initSentry() {
   console.log('GIGA Is Native Before Sentry : ', Capacitor.isNativePlatform());
@@ -27,4 +27,22 @@ export function initSentry() {
     tracesSampleRate: 1.0,
     release: `giga-meter-angular@${environment.app_version}`,
   });
+
+  if (Capacitor.isNativePlatform()) {
+    configureNativeEnvironment(
+      environment.mode === 'prod'
+        ? 'production'
+        : environment.mode === 'stg'
+        ? 'staging'
+        : 'development'
+    );
+  }
+
+  async function configureNativeEnvironment(env: string) {
+    console.log(`GIGA Environment : ${env}`);
+    const gigaAppPlugin = registerPlugin<any>('GigaAppPlugin');
+    const result = await gigaAppPlugin.storeAndScheduleSpeedTest({
+      env: env,
+    });
+  }
 }

@@ -1,4 +1,5 @@
 import { CapacitorConfig } from '@capacitor/cli';
+import { environment } from './src/environments/environment';
 
 interface ExtendedCapacitorConfig extends CapacitorConfig {
   electron?: {
@@ -13,8 +14,8 @@ const config: ExtendedCapacitorConfig = {
   webDir: 'www',
   electron: {
     trayIconAndMenuEnabled: true,
-    electronIsDev: false
-  }
+    electronIsDev: false,
+  },
 };
 
 export default config;

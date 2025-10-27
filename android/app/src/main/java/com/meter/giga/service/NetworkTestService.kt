@@ -558,7 +558,6 @@ class NetworkTestService : LifecycleService() {
                   "Measurement Instance : ${measurementsItem}"
                 )
                 measurementsItem.uploaded = true
-                Sentry.capture("Measurement Options :  ${measurementsItem}")
 
                 val updateSpeedTestData = GigaUtil.addJsonItem(
                   existingSpeedTestData,
