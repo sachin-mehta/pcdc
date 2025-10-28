@@ -15,12 +15,20 @@
 **New Implementation:**
 
 ```typescript
+// 1. Clean up old registry entries (migration)
+execSync('reg delete "HKCU\\...\\Run" /v "Unicef PDCA" /f');
+
+// 2. Set up new auto-launch
 app.setLoginItemSettings({
   openAtLogin: true,
   openAsHidden: false,
   path: process.execPath,
   args: [],
 });
+
+// 3. Verify it worked
+const settings = app.getLoginItemSettings();
+console.log('✅ Auto-launch enabled:', settings.openAtLogin);
 ```
 
 **Benefits:**
@@ -30,6 +38,8 @@ app.setLoginItemSettings({
 - ✅ Works correctly with "Install for all users" option
 - ✅ Includes verification and error logging
 - ✅ Integrated with Sentry for monitoring
+- ✅ **Automatic migration from old system** (no breaking changes)
+- ✅ **Prevents duplicate launches** for existing users
 
 ### 2. Removed Dependency
 
@@ -73,12 +83,18 @@ Value: "C:\Program Files\Giga Meter\Giga Meter.exe"
 
 When the app starts, you'll see console output:
 
+**New Installation:**
 ```
 ✅ Auto-launch enabled: true
 ```
 
-If there's an issue:
+**Updating from Old Version (First Launch):**
+```
+🧹 Cleaned up old auto-launch entry: Unicef PDCA
+✅ Auto-launch enabled: true
+```
 
+**If there's an issue:**
 ```
 ⚠️ Auto-launch could not be enabled
 ❌ Error setting auto-launch: [error details]
@@ -176,11 +192,17 @@ Returns current auto-start settings:
 
 1. **Build and test** the new implementation
 2. **Verify** auto-start works for all user scenarios
-3. **Monitor** Sentry for any auto-launch errors
-4. **Optional:** Remove auto-launch from node_modules
+3. **Test migration** by updating from old version
+4. **Monitor** Sentry for any auto-launch errors
+5. **Optional:** Remove auto-launch from node_modules
    ```bash
    cd electron && npm uninstall auto-launch
    ```
+
+## 📚 Additional Documentation
+
+- **MIGRATION_GUIDE_AUTO_START.md** - Detailed migration scenarios and troubleshooting
+- **HARDWARE_ID_USAGE.md** - How to use hardware ID in your Angular app
 
 ## 📝 Notes
 

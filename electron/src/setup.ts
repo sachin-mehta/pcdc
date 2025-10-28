@@ -426,6 +426,32 @@ export class ElectronCapacitorApp {
     // Auto-launch configuration using Electron's native API
     // This ensures the app starts on system boot for all users when installed per-machine
     try {
+      // MIGRATION: Clean up old auto-launch registry entries to prevent duplicates
+      if (process.platform === 'win32') {
+        try {
+          const { execSync } = require('child_process');
+          // Remove old auto-launch entry with the old app name
+          const oldAppNames = ['Unicef PDCA', 'unicef-pdca'];
+          
+          oldAppNames.forEach(oldName => {
+            try {
+              execSync(
+                `reg delete "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run" /v "${oldName}" /f`,
+                { stdio: 'ignore' }
+              );
+              console.log(`🧹 Cleaned up old auto-launch entry: ${oldName}`);
+            } catch (err) {
+              // Entry doesn't exist or already removed - this is fine
+              // Don't log to avoid noise
+            }
+          });
+        } catch (cleanupErr) {
+          // Cleanup is best-effort, don't fail if it doesn't work
+          console.log('ℹ️ Old auto-launch cleanup skipped (not critical)');
+        }
+      }
+
+      // Set up auto-launch with Electron's native API
       app.setLoginItemSettings({
         openAtLogin: true,
         openAsHidden: false,
@@ -440,7 +466,7 @@ export class ElectronCapacitorApp {
       if (!loginItemSettings.openAtLogin) {
         console.warn('⚠️ Auto-launch could not be enabled');
         Sentry.captureMessage('Auto-launch setting failed to enable', {
-          level: Sentry.Severity.Warning,
+          level: 'warning' as any,
           extra: { loginItemSettings },
         });
       }
