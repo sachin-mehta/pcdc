@@ -204,10 +204,7 @@ class GigaAppPlugin : Plugin() {
     alarmPrefs.baseUrl = baseUrl ?: ""
     alarmPrefs.ipInfoToken = ipInfoToken ?: " "
     alarmPrefs.browserId = browserId ?: ""
-    CoroutineScope(Dispatchers.IO).launch {
-      val secureDataStore = SecureDataStore(context)
-      secureDataStore.setMlabUploadKey(mlabUploadKey ?: "")
-    }
+    alarmPrefs.mlabUploadKey = mlabUploadKey ?: ""
     scheduleAlarm(context, alarmPrefs)
     call.resolve()
   }

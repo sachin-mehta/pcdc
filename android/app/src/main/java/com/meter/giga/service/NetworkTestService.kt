@@ -515,7 +515,7 @@ class NetworkTestService : LifecycleService() {
           "Existing Speed Test Data $existingSpeedTestData"
         )
         val postSpeedTestUseCase = PostSpeedTestUseCase()
-        val uploadKey = secureDataStore.getMlabUploadKey()
+        val uploadKey = prefs.mlabUploadKey
         if (speedTestResultRequestEntity != null) {
           try {
             val postSpeedTestResultState =

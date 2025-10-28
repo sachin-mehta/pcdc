@@ -91,6 +91,13 @@ class AlarmSharedPref(context: Context) {
     set(value) = prefs.edit() { putString(KEY_SCHOOL_ID, value) }
 
   /**
+   * This provides mlab upload key which
+   */
+  var mlabUploadKey: String
+    get() = prefs.getString(KEY_MLAB_UPLOAD_KEY, "").toString()
+    set(value) = prefs.edit() { putString(KEY_MLAB_UPLOAD_KEY, value) }
+
+  /**
    * This provides school giga id which
    * user has registered
    */
