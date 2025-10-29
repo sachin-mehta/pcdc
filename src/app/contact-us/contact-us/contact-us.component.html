@@ -1,61 +1,75 @@
 <app-pcdc-header></app-pcdc-header>
 
-<ion-content class="ion-padding font_open_sans content_paddding">
+<ion-content class="font_open_sans contact-page">
+  <ion-button class="button_disable_hover" fill="clear" [routerLink]="['/searchcountry']">
+    <ion-img src="assets/images/back_button.svg" name="arrow-back-outline" class="backIcon"></ion-img>
+  </ion-button>
+
   <div class="container">
-    <form [formGroup]="contactForm">
-      <!-- Name -->
-      <ion-item lines="none" class="label_top">
-        <ion-label class="font_size">Name</ion-label>
-      </ion-item>
-      <ion-input fill="solid" type="text" formControlName="name" placeholder="Enter your name"
-        class="custom-gray-item"></ion-input>
-      <div class="error-msg" *ngIf="contactForm.get('name')?.touched && contactForm.get('name')?.invalid">
-        <span *ngIf="contactForm.get('name')?.errors?.['required']">Name is required.</span>
-        <span *ngIf="contactForm.get('name')?.errors?.['minlength']">Minimum 2 characters required.</span>
-      </div>
+    <!-- <ion-item lines="none" class="label_top">
+      <ion-label class="font_size">Request Country Whitelist</ion-label>
+    </ion-item> -->
 
-      <!-- Email -->
-      <ion-item lines="none" class="label_top">
-        <ion-label class="font_size">Email</ion-label>
-      </ion-item>
-      <ion-input fill="solid" type="email" formControlName="email" placeholder="e.g. info@example.com"
-        class="custom-gray-item"></ion-input>
-      <div class="error-msg" *ngIf="contactForm.get('email')?.touched && contactForm.get('email')?.invalid">
-        <span *ngIf="contactForm.get('email')?.errors?.['required']">Email is required.</span>
-        <span *ngIf="contactForm.get('email')?.errors?.['email']">Enter a valid email address.</span>
-      </div>
+    <div class="contact-bg">
+      <form [formGroup]="contactForm">
 
-      <!-- Organization -->
-      <ion-item lines="none" class="label_top">
-        <ion-label class="font_size">Organization</ion-label>
-      </ion-item>
-      <ion-input fill="solid" type="text" formControlName="organization" placeholder="Enter your organization name"
-        class="custom-gray-item"></ion-input>
-      <div class="error-msg"
-        *ngIf="contactForm.get('organization')?.touched && contactForm.get('organization')?.invalid">
-        <span>Organization name is required.</span>
-      </div>
+        <!-- Full Name -->
+        <div class="input_box top_box">
+          <label class="field-label">Full Name</label>
+          <ion-item lines="none" class="backend-item">
+            <ion-input fill="solid" type="text" formControlName="name" placeholder="Enter Full Name">
+            </ion-input>
+          </ion-item>
+          <div class="error-msg" *ngIf="contactForm.get('name')?.touched && contactForm.get('name')?.invalid">
+            <span *ngIf="contactForm.get('name')?.errors?.['required']">Full name is required.</span>
+            <span *ngIf="contactForm.get('name')?.errors?.['minlength']">Minimum 2 characters required.</span>
+          </div>
+        </div>
+        <div class="input_box">
+          <!-- Email -->
+          <label class="field-label">Email Address</label>
+          <ion-item lines="none" class="backend-item">
+            <ion-input fill="solid" type="email" formControlName="email" placeholder="Enter Email Address">
+            </ion-input>
+          </ion-item>
+          <div class="error-msg" *ngIf="contactForm.get('email')?.touched && contactForm.get('email')?.invalid">
+            <span *ngIf="contactForm.get('email')?.errors?.['required']">Email is required.</span>
+            <span *ngIf="contactForm.get('email')?.errors?.['invalidEmail']">Enter a valid email address.</span>
+          </div>
+        </div>
+        <!-- Organization -->
+        <div class="input_box">
+          <label class="field-label">Organisation</label>
+          <ion-item lines="none" class="backend-item">
+            <ion-input fill="solid" type="text" formControlName="organization" placeholder="Enter Organisation Name">
+            </ion-input> 
+          </ion-item>
+          <div class="error-msg"
+            *ngIf="contactForm.get('organization')?.touched && contactForm.get('organization')?.invalid">
+            <span>Organisation name is required.</span>
+          </div>
+        </div>
+        <div class="input_box">
+          <!-- Message -->
+          <label class="field-label">Message</label>
+          <ion-item lines="none" class="backend-item textarea-item">
+            <ion-textarea fill="solid" autoGrow="true" formControlName="message" placeholder="Your Message">
+            </ion-textarea>
+          </ion-item>
+          <div class="error-msg" *ngIf="contactForm.get('message')?.touched && contactForm.get('message')?.invalid">
+            <span *ngIf="contactForm.get('message')?.errors?.['required']">Message is required.</span>
+            <span *ngIf="contactForm.get('message')?.errors?.['minlength']">Minimum 10 characters required.</span>
+            <span *ngIf="contactForm.get('message')?.errors?.['maxlength']">Maximum 100 characters allowed.</span>
+          </div>
+        </div>
+      </form>
 
-      <!-- Message -->
-      <ion-item lines="none" class="label_top">
-        <ion-label class="font_size">Your Message</ion-label>
-      </ion-item>
-      <ion-textarea fill="solid" autoGrow="true" formControlName="message" placeholder="Write your message here..."
-        class="custom-gray-item"></ion-textarea>
-      <div class="error-msg" *ngIf="contactForm.get('message')?.touched && contactForm.get('message')?.invalid">
-        <span *ngIf="contactForm.get('message')?.errors?.['required']">Message is required.</span>
-        <span *ngIf="contactForm.get('message')?.errors?.['minlength']">Minimum 10 characters required.</span>
+      <div class="bottom-layout">
+        <ion-button color="primary" appEnterKeyClick (click)="onSubmit()" [disabled]="contactForm.invalid" block
+          class="dailycheck_btn">
+          <span class="submit_button_size">Submit</span>
+        </ion-button>
       </div>
-    </form>
+    </div>
   </div>
 </ion-content>
-
-<ion-footer class="ion-no-border">
-  <ion-toolbar class="ion-padding footer_button">
-    <div class="btn-holder" style="margin-bottom: 14px;">
-      <ion-button block class="yesbtn" (click)="onSubmit()" [disabled]="contactForm.invalid">
-        Submit
-      </ion-button>
-    </div>
-  </ion-toolbar>
-</ion-footer>

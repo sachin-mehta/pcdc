@@ -32,11 +32,11 @@
         <div *ngIf="automaticSearched" class="search-label change-country" [translate]="'searchCountry.change-country'">
         </div>
         <span class="error_message" *ngIf="this.isPcdcCountry === false">
-          <ion-img *ngIf="this.isPcdcCountry === false" class="error_icon"
-            src="assets/images/error_country.svg"></ion-img>
+          <!-- <ion-img *ngIf="this.isPcdcCountry === false" class="error_icon"
+            src="assets/images/error_country.svg"></ion-img> -->
 
 
-          <div class="search-label-error" [translate]="'searchCountry.not-available'"
+          <div class="search-label-error no-padding" [translate]="'searchCountry.not-available'"
             [translateParams]="{ appName, appNameSuffix }">
           </div>  
 

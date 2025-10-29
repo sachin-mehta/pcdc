@@ -1,56 +1,114 @@
 @import '../../../theme/variables.scss';
 
-.btn-holder {
+.contact-page {
+  height: 700px;
+  background: #fff;
   display: flex;
-  justify-content: center;
-  margin-top: 20px;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
-.yesbtn {
-  height: 40px;
-  border: 0;
+.container {
+  max-width: 690px;
+  margin: 0 auto;
+  width: 100%;
   display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 400 !important;
-  font-size: 14px !important;
-  border-radius: 40px !important;
-  overflow: hidden;
-  color: #fff !important;
-  background: var(--ion-color-primary);
+  flex-direction: column;
 }
 
-.font_size {
+.contact-bg {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+/* Labels for input fields */
+.field-label {
   font-size: 16px;
-  font-weight: 500;
-  margin-bottom: 0;
+  font-weight: 400;
+  color: #222;
+  padding-bottom: 12px;
+  padding-top: 20px;
+  font-weight: 400;
+  line-height: 24px;
 }
 
+/* Backend style similar to searchCountry */
+.backend-item {
+  width: 100%;
+  border-bottom: 1px solid #6F6F6F;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  --background: #E5E5E5;
+  --inner-padding-end: 0;
+  --inner-padding-start: 0;
+  --min-height: 48px;
+  font-size: 15px;
+  font-weight: 400;
+  color: #000;
+  margin-top: 6px;
+
+  ion-input,
+  ion-textarea {
+    font-size: 15px;
+    padding-left: 4px;
+  }
+}
+
+
+/* For larger text area */
+.textarea-item {
+  ion-textarea {
+    min-height: 80px;
+    line-height: 20px;
+  }
+}
+
+/* Error text */
 .error-msg {
-  color: red;
+  color: #F94B4B;
   font-size: 13px;
   margin-top: 4px;
+  margin-left: 4px;
 }
 
-.footer_button {
-  padding-inline-start: 0;
-  padding-inline-end: 0;
-  --padding-end: 0;
-  --padding-start: 0;
+/* Scroll styling if needed */
+ion-content {
+  --background: #fff;
 }
 
+.bottom-layout {
+  position: absolute;
+  padding: 0;
+  width: 100%;
+  text-align: center;
+}
+
+.dailycheck_btn {
+  width: 100%;
+  margin-bottom: 4px;
+  margin-inline-end: 0;
+  margin-inline-start: 0;
+
+  .span {
+    letter-spacing: 1px;
+  }
+}
 .label_top {
-  --padding-start: 0;
-  margin-top: 12px;
+    --padding-start: 0;
+}
+.font_size {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 0;
 }
 
-.custom-gray-item {
-  --background: #E5E5E5;
-  display: flex;
-  height: 48px;
-  padding: 15px 16px;
-  align-items: flex-start;
-  gap: 16px;
-  align-self: stretch;
-  border-bottom: 1px solid #6F6F6F;
+.input_box {
+  margin-bottom: 10px;
+}
+
+.top_box {
+  margin-top: 16px;
 }

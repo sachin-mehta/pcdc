@@ -66,5 +66,4 @@ export class CountryService {
   private handleError(error: Response) {
     return throwError(error);
   }
-
 }

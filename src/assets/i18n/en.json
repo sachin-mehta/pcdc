@@ -78,7 +78,7 @@
         "country": "Country",
         "country-not-accurate": "It looks like the country you selected may not be accurate to your location.",
         "please-double-check": "Are you sure you want to continue?",
-        "not-available": "{{appName}} {{appNameSuffix}}  is not available in this country. Please choose another country.",
+        "not-available": "The country you chose isn't whitelisted for Giga Meter yet. Click below to request access.",
         "change-country": "If the above selection is not correct, select your country from dropdown box"
     },
     "searchSchool": {

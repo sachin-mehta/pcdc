@@ -68,7 +68,7 @@ export class AppComponent {
     const appLang = this.settingsService.get('applicationLanguage') ?? {
       code: 'en',
     };
-    this.translate.use(appLang.code);
+    this.translate.use(appLang?.code);
     this.app_version = environment.app_version;
     this.device_id = this.storage.get('schoolUserId') || 'unknown-device';
     this.device_id_short = this.device_id.substring(0, 16) + '...';
