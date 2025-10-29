@@ -19,6 +19,7 @@ import com.meter.giga.domain.usecases.GetClientInfoUseCase
 import com.meter.giga.domain.usecases.GetServerInfoUseCase
 import com.meter.giga.domain.usecases.PostSpeedTestUseCase
 import com.meter.giga.ionic_plugin.GigaAppPlugin
+import com.meter.giga.network.util.NetworkCheckerImpl
 import com.meter.giga.prefrences.AlarmSharedPref
 // import com.meter.giga.prefrences.AlarmSharedPref
 import com.meter.giga.prefrences.SecureDataStore
@@ -82,27 +83,36 @@ class NetworkTestService : LifecycleService() {
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
     super.onStartCommand(intent, flags, startId)
     startForeground(NOTIFICATION_ID, createNotification("Starting speed test..."))
-    try {
-      // Example logging
-      Sentry.capture("Foreground Service started")
-      val prefs = AlarmSharedPref(this)
-      secureDataStore = SecureDataStore(this)
-      val scheduleType = intent?.getStringExtra(SCHEDULE_TYPE) ?: SCHEDULE_TYPE_DAILY
-      Log.d("GIGA NetworkTestService SCHEDULE_TYPE", scheduleType)
-      val appVersion = GigaUtil.getAppVersionName(this)
-      val isRunningOnChromebook = GigaUtil.isRunningOnChromebook(this)
-      val client = NDTTestImpl(
-        createHttpClient(),
-        scheduleType,
-        appVersion,
-        isRunningOnChromebook,
-        prefs,
-        secureDataStore
-      )
-      GigaAppPlugin.sendSpeedTestStarted()
-      client.startTest(NDTTest.TestType.DOWNLOAD_AND_UPLOAD)
-    } catch (e: Exception) {
-      Sentry.capture(e)
+    val networkChecker = NetworkCheckerImpl(this)
+    if (networkChecker.isNetworkAvailable()) {
+      Log.d("GIGA NetworkTestService ", "Device is online")
+
+      try {
+        // Example logging
+        Sentry.capture("Foreground Service started")
+        val prefs = AlarmSharedPref(this)
+        secureDataStore = SecureDataStore(this)
+        val scheduleType = intent?.getStringExtra(SCHEDULE_TYPE) ?: SCHEDULE_TYPE_DAILY
+        Log.d("GIGA NetworkTestService SCHEDULE_TYPE", scheduleType)
+        val appVersion = GigaUtil.getAppVersionName(this)
+        val isRunningOnChromebook = GigaUtil.isRunningOnChromebook(this)
+        val client = NDTTestImpl(
+          createHttpClient(),
+          scheduleType,
+          appVersion,
+          isRunningOnChromebook,
+          prefs,
+          secureDataStore
+        )
+        GigaAppPlugin.sendSpeedTestStarted()
+        client.startTest(NDTTest.TestType.DOWNLOAD_AND_UPLOAD)
+      } catch (e: Exception) {
+        Sentry.capture(e)
+      }
+    } else {
+      Log.d("GIGA NetworkTestService ", "Device is offline")
+      Sentry.capture("Device is offline, speed test skipped")
+      updateNotification("Device is offline, please check internet connectivity")
     }
     return START_STICKY
   }
