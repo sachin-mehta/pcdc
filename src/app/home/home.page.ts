@@ -116,13 +116,14 @@ export class HomePage {
         .checkRegistrationByHardwareId(hardwareId)
         .toPromise();
 
-      // Backend returns: { success: true, data: {...}, timestamp, message }
-      if (response?.success && response?.data) {
+      // Backend returns: { success: true, data: { exists: true/false, ... }, timestamp, message }
+      if (response?.success && response?.data?.exists === true) {
         // Found existing registration - populate localStorage
         console.log('✅ Found existing registration for this machine');
         await this.applyExistingRegistration(response.data);
         this.loading.dismiss();
         this.router.navigate(['/starttest']);
+        this.settingsService.setSetting('scheduledTesting', true);
       } else {
         // No registration found - user needs to register
         console.log('ℹ️ No existing registration found');
@@ -139,21 +140,34 @@ export class HomePage {
    * Populate localStorage with existing registration data
    */
   private async applyExistingRegistration(registrationData: any) {
+    console.log('registrationData', registrationData);
     await this.storage.set('schoolUserId', registrationData.user_id);
     await this.storage.set('schoolId', registrationData.school_id);
-    await this.storage.set('gigaId', registrationData.giga_id);
+    await this.storage.set('gigaId', registrationData.giga_id_school);
     await this.storage.set('macAddress', registrationData.mac_address);
     await this.storage.set('deviceType', registrationData.os);
     await this.storage.set('ip_address', registrationData.ip_address);
     await this.storage.set('version', registrationData.app_version);
     await this.storage.set('country_code', registrationData.country_code);
 
+    // this.storage.set('schoolUserId', response);
+    // this.storage.set('schoolId', this.schoolId);
+
+    //this.storage.set('country_code', c.country);
+    // this.storage.set('country_code', this.selectedCountry);
+    // this.storage.set('school_id', this.school.school_id);
+    // this.storage.set('schoolInfo', JSON.stringify(this.school));
+
+    // Set first-time visit flags for new registration flow
+    // this.storage.setFirstTimeVisit(true);
+    // this.storage.setRegistrationCompleted(Date.now());
+
     // Handle school_info which might be an object or string
-    if (registrationData.school_info) {
+    if (registrationData.schoolInfo) {
       const schoolInfo =
-        typeof registrationData.school_info === 'string'
-          ? registrationData.school_info
-          : JSON.stringify(registrationData.school_info);
+        typeof registrationData.schoolInfo === 'string'
+          ? registrationData.schoolInfo
+          : JSON.stringify(registrationData.schoolInfo);
       await this.storage.set('schoolInfo', schoolInfo);
     }
 

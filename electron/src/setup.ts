@@ -432,8 +432,8 @@ export class ElectronCapacitorApp {
           const { execSync } = require('child_process');
           // Remove old auto-launch entry with the old app name
           const oldAppNames = ['Unicef PDCA', 'unicef-pdca'];
-          
-          oldAppNames.forEach(oldName => {
+
+          oldAppNames.forEach((oldName) => {
             try {
               execSync(
                 `reg delete "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run" /v "${oldName}" /f`,

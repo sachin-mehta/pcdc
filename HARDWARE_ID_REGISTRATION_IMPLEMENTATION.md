@@ -130,6 +130,7 @@ CREATE INDEX idx_measurements_device_hardware_id ON measurements(device_hardware
 {
   "success": true,
   "data": {
+    "exists": true,
     "user_id": "uuid-789",
     "school_id": "12345",
     "giga_id": "giga_12345",
@@ -153,7 +154,9 @@ CREATE INDEX idx_measurements_device_hardware_id ON measurements(device_hardware
 ```json
 {
   "success": true,
-  "data": null,
+  "data": {
+    "exists": false
+  },
   "timestamp": "2025-10-28T10:00:00.000Z",
   "message": "success"
 }
