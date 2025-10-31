@@ -108,6 +108,48 @@ export class HardwareIdService {
   }
 
   /**
+   * Wait for hardware ID to be available with timeout
+   * @param timeoutMs Maximum time to wait in milliseconds (default: 5000ms)
+   * @returns Promise that resolves to hardware ID or null
+   */
+  async ensureHardwareId(timeoutMs: number = 5000): Promise<string | null> {
+    // Check if already available in localStorage
+    const existingId = this.getHardwareId();
+    if (existingId) {
+      console.log('✅ Hardware ID already available:', existingId);
+      return existingId;
+    }
+
+    // If not in localStorage, wait for it to be fetched
+    console.log('⏳ Waiting for hardware ID to be fetched...');
+
+    return new Promise((resolve) => {
+      const startTime = Date.now();
+
+      // Set up timeout
+      const timeout = setTimeout(() => {
+        console.warn('⚠️ Hardware ID fetch timeout after', timeoutMs, 'ms');
+        resolve(null);
+      }, timeoutMs);
+
+      // Poll for hardware ID (check every 100ms)
+      const checkInterval = setInterval(() => {
+        const hardwareId = this.getHardwareId();
+        if (hardwareId) {
+          clearInterval(checkInterval);
+          clearTimeout(timeout);
+          const elapsed = Date.now() - startTime;
+          console.log(
+            `✅ Hardware ID available after ${elapsed}ms:`,
+            hardwareId
+          );
+          resolve(hardwareId);
+        }
+      }, 100);
+    });
+  }
+
+  /**
    * Clear hardware data from localStorage
    */
   clearHardwareData(): void {

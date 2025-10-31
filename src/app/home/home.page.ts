@@ -92,18 +92,32 @@ export class HomePage {
       getFlagsAndCheckGigaId();
     } else {
       // No local registration - check if machine is already registered via hardware ID
-      const hardwareId = this.hardwareIdService.getHardwareId();
+      this.checkHardwareRegistration();
+    }
+  }
+
+  /**
+   * Wait for hardware ID and check for existing registration
+   */
+  private async checkHardwareRegistration() {
+    try {
+      // Wait for hardware ID to be available (with 5 second timeout)
+      const hardwareId = await this.hardwareIdService.ensureHardwareId(5000);
 
       if (hardwareId) {
         console.log(
           'Checking for existing registration with hardware ID:',
           hardwareId
         );
-        this.checkMachineRegistration(hardwareId);
+        await this.checkMachineRegistration(hardwareId);
       } else {
-        // No hardware ID available - proceed normally
+        // No hardware ID available after timeout - proceed normally
+        console.log('⚠️ No hardware ID available, proceeding with normal flow');
         this.loading.dismiss();
       }
+    } catch (error) {
+      console.error('Error in hardware registration check:', error);
+      this.loading.dismiss();
     }
   }
 

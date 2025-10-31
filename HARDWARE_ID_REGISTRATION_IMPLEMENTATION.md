@@ -63,6 +63,7 @@ schoolData = {
 - Injected `HardwareIdService`
 - Added logic to check for existing registration when no local `schoolId` exists
 - New private methods:
+  - `checkHardwareRegistration()` - **NEW**: Waits for hardware ID with timeout
   - `checkMachineRegistration(hardwareId)` - Calls API to check registration
   - `applyExistingRegistration(data)` - Populates localStorage with existing data
 
@@ -71,12 +72,53 @@ schoolData = {
 ```typescript
 if (localStorage has schoolId) {
   → Existing flow (unchanged)
-} else if (hardware ID available) {
-  → Check backend for existing registration
-  → If found: populate localStorage → navigate to /starttest
-  → If not found: dismiss loading (show register button)
 } else {
-  → Normal flow (no hardware ID available)
+  → Wait for hardware ID to be fetched (5 second timeout)
+  → If hardware ID available:
+     → Check backend for existing registration
+     → If found: populate localStorage → navigate to /starttest
+     → If not found: dismiss loading (show register button)
+  → If timeout/no hardware ID:
+     → Normal flow (show register button)
+}
+```
+
+**Race Condition Fix**:
+
+The hardware ID is fetched asynchronously from Electron via IPC. Previously, `home.page.ts` would check for the hardware ID synchronously on first load, which could result in a race condition where the ID wasn't available yet. This has been fixed by:
+
+1. Adding `ensureHardwareId()` method to `HardwareIdService` that waits for the hardware ID (with timeout)
+2. Using this method in `home.page.ts` to ensure the hardware ID is available before checking registration
+
+---
+
+### 4. **hardware-id.service.ts** - Added Async Wait Method
+
+**File**: `src/app/services/hardware-id.service.ts`
+
+**New Method**:
+
+```typescript
+async ensureHardwareId(timeoutMs: number = 5000): Promise<string | null>
+```
+
+**Purpose**: Waits for the hardware ID to be available (with configurable timeout), solving the race condition on first app load.
+
+**How it works**:
+
+1. Checks if hardware ID is already in localStorage (instant return if available)
+2. If not available, polls localStorage every 100ms for up to 5 seconds
+3. Returns hardware ID once available, or `null` if timeout occurs
+4. Logs elapsed time for debugging
+
+**Usage**:
+
+```typescript
+// Wait for hardware ID with 5 second timeout
+const hardwareId = await this.hardwareIdService.ensureHardwareId(5000);
+if (hardwareId) {
+  // Hardware ID is guaranteed to be available
+  console.log("Hardware ID:", hardwareId);
 }
 ```
 
