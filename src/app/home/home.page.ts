@@ -155,29 +155,36 @@ export class HomePage {
    */
   private async applyExistingRegistration(registrationData: any) {
     console.log('registrationData', registrationData);
-    await this.storage.set('schoolUserId', registrationData.user_id);
-    await this.storage.set('schoolId', registrationData.school_id);
-    await this.storage.set('gigaId', registrationData.giga_id_school);
-    await this.storage.set('macAddress', registrationData.mac_address);
-    await this.storage.set('deviceType', registrationData.os);
-    await this.storage.set('ip_address', registrationData.ip_address);
-    await this.storage.set('version', registrationData.app_version);
-    await this.storage.set('country_code', registrationData.country_code);
 
-    // this.storage.set('schoolUserId', response);
-    // this.storage.set('schoolId', this.schoolId);
-
-    //this.storage.set('country_code', c.country);
-    // this.storage.set('country_code', this.selectedCountry);
-    // this.storage.set('school_id', this.school.school_id);
-    // this.storage.set('schoolInfo', JSON.stringify(this.school));
-
-    // Set first-time visit flags for new registration flow
-    // this.storage.setFirstTimeVisit(true);
-    // this.storage.setRegistrationCompleted(Date.now());
+    // Only set values that are non-null and not undefined
+    if (registrationData.user_id != null) {
+      await this.storage.set('schoolUserId', registrationData.user_id);
+    }
+    if (registrationData.school_id != null) {
+      await this.storage.set('schoolId', registrationData.school_id);
+      await this.storage.set('school_id', registrationData.school_id);
+    }
+    if (registrationData.giga_id_school != null) {
+      await this.storage.set('gigaId', registrationData.giga_id_school);
+    }
+    if (registrationData.mac_address != null) {
+      await this.storage.set('macAddress', registrationData.mac_address);
+    }
+    if (registrationData.os != null) {
+      await this.storage.set('deviceType', registrationData.os);
+    }
+    if (registrationData.ip_address != null) {
+      await this.storage.set('ip_address', registrationData.ip_address);
+    }
+    if (registrationData.app_version != null) {
+      await this.storage.set('version', registrationData.app_version);
+    }
+    if (registrationData.country_code != null) {
+      await this.storage.set('country_code', registrationData.country_code);
+    }
 
     // Handle school_info which might be an object or string
-    if (registrationData.schoolInfo) {
+    if (registrationData.schoolInfo != null) {
       const schoolInfo =
         typeof registrationData.schoolInfo === 'string'
           ? registrationData.schoolInfo
