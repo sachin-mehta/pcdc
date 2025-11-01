@@ -12,6 +12,7 @@ import { IndexedDBService } from './services/indexed-db.service';
 import { SyncService } from './services/sync.service';
 import { WhatsNewService } from './services/whats-new.service';
 import { WhatsNewModalComponent } from './components/whats-new-modal/whats-new-modal.component';
+import { HardwareIdService } from './services/hardware-id.service';
 
 // const shell = require('electron').shell;
 @Component({
@@ -63,7 +64,8 @@ export class AppComponent {
     private localStorageService: IndexedDBService,
     private syncService: SyncService,
     private whatsNewService: WhatsNewService,
-    private modalController: ModalController
+    private modalController: ModalController,
+    private hardwareIdService: HardwareIdService
   ) {
     this.filteredOptions = [];
     this.selectedLanguage =
