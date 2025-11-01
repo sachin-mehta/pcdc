@@ -128,6 +128,7 @@ export class HardwareIdService {
 
       // Set up timeout
       const timeout = setTimeout(() => {
+        clearInterval(checkInterval);
         console.warn('⚠️ Hardware ID fetch timeout after', timeoutMs, 'ms');
         resolve(null);
       }, timeoutMs);
