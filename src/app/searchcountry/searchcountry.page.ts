@@ -1228,4 +1228,9 @@ export class SearchcountryPage {
     this.filterCountries(event);
   }
 
+   openExternalUrl(href) {
+    this.settingsService.getShell().shell.openExternal(href);
+  }
+
 }
+

@@ -41,7 +41,9 @@
           </div>  
 
         </span>
-        <div *ngIf="this.isPcdcCountry === false" [routerLink]="['/contact-us']" class="request-access">Request Access</div>
+        <!-- <div *ngIf="this.isPcdcCountry === false" [routerLink]="['/contact-us']" class="request-access">Request Access</div> -->
+        <div *ngIf="this.isPcdcCountry === false" (click)="openExternalUrl('https://meter.giga.global/')" class="request-access">Request Access</div>
+        
         <span class="error_message"
           *ngIf="this.selectedCountry !=='' && this.selectedCountry !== this.detectedCountry && this.isPcdcCountry !== false">
           <ion-img class="error_icon" src="assets/images/Warning.svg"></ion-img>
