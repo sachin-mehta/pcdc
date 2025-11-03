@@ -242,12 +242,6 @@ export class AppComponent {
     this.filteredOptions = this.testOptions.filter((option) =>
       option.toLowerCase().includes(term)
     );
-    console.log(
-      'hhhih',
-      this.filteredOptions.length,
-      this.searchTerm.length,
-      term.length
-    );
 
     // Show dropdown if there's at least one match and user has typed something
     this.showDropdown =
