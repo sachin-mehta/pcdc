@@ -65,10 +65,10 @@ export class SchoolService {
     return this.http
       .get(
         environment.restAPI +
-        'schools/country_code_school_id/' +
-        code +
-        '/' +
-        id,
+          'schools/country_code_school_id/' +
+          code +
+          '/' +
+          id,
         this.options
       )
       .pipe(
@@ -96,6 +96,23 @@ export class SchoolService {
   }
 
   /**
+   * Check if a device with this hardware ID is already registered
+   * @param hardwareId - The unique hardware identifier
+   * @returns Observable with registration data or null
+   */
+  checkRegistrationByHardwareId(hardwareId: string): Observable<any> {
+    return this.http
+      .get(
+        `${environment.restAPI}dailycheckapp_schools/checkExistingInstallation/${hardwareId}`,
+        this.options
+      )
+      .pipe(
+        tap((data) => console.log('Hardware ID check response:', data)),
+        catchError(this.handleError)
+      );
+  }
+
+  /**
    * Return unique user id for perticular device
    *
    * @param data Object with these parameters {
@@ -103,7 +120,8 @@ export class SchoolService {
       "mac_address": "",
       "os": "",
       "app_version": "",
-      "created": ""
+      "created": "",
+      "device_hardware_id": "" (optional)
     }
    * @returns
    */
@@ -206,4 +224,3 @@ export class SchoolService {
     return throwError(error);
   }
 }
-

@@ -1,0 +1,59 @@
+<div class="modal-wrapper">
+  <div class="modal-header">
+    <div class="app-info">
+      <div class="app-title">{{ "GigaMeter" }}</div>
+      <div class="country-school">{{ selectedCountry }} - {{ schoolId }}</div>
+      <div class="school-name">{{ schoolInfo?.name || "School Name" }}</div>
+    </div>
+    <div class="header-actions">
+      <!-- Subtle close button inside modal -->
+      <button class="close-button" (click)="dismiss()">
+        <ion-icon name="close" size="small"></ion-icon>
+      </button>
+    </div>
+  </div>
+
+  <div class="modal-content">
+    <div class="success-animation">
+      <div class="clap-icon">
+        <img src="assets/images/clap.svg" alt="Clapping hands" />
+      </div>
+    </div>
+
+    <div class="congratulations-section">
+      <h2 class="congratulations-title">
+        {{ "startTest.congratulations" | translate }}
+      </h2>
+
+      <div class="success-items">
+        <div class="success-item">
+          <div class="icon-container">
+            <ion-icon name="home-outline" class="success-icon"></ion-icon>
+          </div>
+          <span class="success-text">{{
+            "startTest.schoolRegistered" | translate
+          }}</span>
+        </div>
+
+        <div class="success-item">
+          <div class="icon-container">
+            <ion-icon
+              name="checkmark-circle-outline"
+              class="success-icon"
+            ></ion-icon>
+          </div>
+          <span class="success-text">{{
+            "startTest.testWorking" | translate
+          }}</span>
+        </div>
+      </div>
+
+      <div class="info-message">
+        {{ "startTest.backgroundMessage" | translate }}
+        <span class="countdown-text"
+          >{{ "startTest.closingIn" | translate }} {{ countdown }}...</span
+        >
+      </div>
+    </div>
+  </div>
+</div>

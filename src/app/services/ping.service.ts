@@ -89,7 +89,7 @@ export class PingService {
   }
 
   async getBrowserId() {
-    const browserId = this.storage.get('schoolUserId'); 
+    const browserId = this.storage.get('schoolUserId');
     return { uuid: browserId };
   }
 

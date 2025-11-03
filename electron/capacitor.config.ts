@@ -13,7 +13,7 @@ const config: ExtendedCapacitorConfig = {
   webDir: 'www',
   electron: {
     trayIconAndMenuEnabled: true,
-    electronIsDev: true
+    electronIsDev: false
   }
 };
 

@@ -1,0 +1,29 @@
+{
+  "2.0.38": {
+    "title": "Better text editing & copy/paste",
+    "date": "Monday, 25 Aug 2025",
+    "items": [
+      "API key categorization for improved management and traceability",
+      "Public access enabled for Giga Meter API to support wider integrations",
+      "Accurate school counts with improved soft deletion checks"
+    ]
+  },
+  "2.0.3": {
+    "title": "Speed Improvements & Bug Fixes",
+    "date": "Friday, 20 Sep 2025",
+    "items": [
+      "Added real-time network monitoring for better connectivity insights",
+      "Faster test execution by 30% with optimized algorithms",
+      "Resolved connectivity issues on mobile networks"
+    ]
+  },
+  "2.0.2": {
+    "title": "Enhanced User Experience",
+    "date": "Monday, 15 Sep 2025",
+    "items": [
+      "Improved user interface with better navigation",
+      "Triggers a test as soon as the school is registered",
+      "Connectivity checks every 15 minutes"
+    ]
+  }
+}

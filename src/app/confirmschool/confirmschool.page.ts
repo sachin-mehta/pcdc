@@ -13,12 +13,14 @@ import { Device } from '@capacitor/device';
 import { DatePipe } from '@angular/common';
 import { environment } from 'src/environments/environment';
 import { SettingsService } from '../services/settings.service';
+import { SharedService } from '../services/shared-service.service';
 import { TranslateService } from '@ngx-translate/core';
+import { HardwareIdService } from '../services/hardware-id.service';
 @Component({
-    selector: 'app-confirmschool',
-    templateUrl: 'confirmschool.page.html',
-    styleUrls: ['confirmschool.page.scss'],
-    standalone: false
+  selector: 'app-confirmschool',
+  templateUrl: 'confirmschool.page.html',
+  styleUrls: ['confirmschool.page.scss'],
+  standalone: false,
 })
 export class ConfirmschoolPage {
   @ViewChild(IonAccordionGroup, { static: true })
@@ -27,7 +29,7 @@ export class ConfirmschoolPage {
   schoolId: any;
   selectedCountry: any;
   selectedCountryName: any;
-  showNotification =  true;
+  showNotification = true;
   detectedCountry: any;
   sub: any;
   appName = environment.appName;
@@ -40,7 +42,9 @@ export class ConfirmschoolPage {
     private settings: SettingsService,
     public loading: LoadingService,
     private datePipe: DatePipe,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private sharedService: SharedService,
+    private hardwareIdService: HardwareIdService
   ) {
     const appLang = this.settings.get('applicationLanguage');
     this.translate.use(appLang.code);
@@ -48,7 +52,7 @@ export class ConfirmschoolPage {
       this.schoolId = params.schoolId;
       this.selectedCountry = params.selectedCountry;
       this.detectedCountry = params.detectedCountry;
-      this.selectedCountryName = params.selectedCountryName
+      this.selectedCountryName = params.selectedCountryName;
 
       if (this.router.getCurrentNavigation()) {
         this.school = this.router.getCurrentNavigation().extras.state as School;
@@ -66,14 +70,16 @@ export class ConfirmschoolPage {
     );
     const translatedText = this.translate.instant('searchCountry.loading');
 
-    const loadingMsg =
-      `<div class="loadContent"><ion-img src="assets/loader/new_loader.gif" class="loaderGif"></ion-img><p class="green_loader">${translatedText}</p></div>`;
+    const loadingMsg = `<div class="loadContent"><ion-img src="assets/loader/new_loader.gif" class="loaderGif"></ion-img><p class="green_loader">${translatedText}</p></div>`;
     this.loading.present(loadingMsg, 4000, 'pdcaLoaderClass', 'null');
 
     // this.networkService.getAccessInformation().subscribe(c => {
     this.getIPAddress().then((c) => {
       this.getDeviceInfo().then((a) => {
         this.getDeviceId().then((b) => {
+          // Get hardware ID for machine-level registration
+          const hardwareId = this.hardwareIdService.getHardwareId();
+
           schoolData = {
             giga_id_school: this.school.giga_id_school,
             mac_address: b.identifier,
@@ -83,6 +89,7 @@ export class ConfirmschoolPage {
             ip_address: c, // c.ip,
             //country_code: c.country,
             country_code: this.selectedCountry,
+            device_hardware_id: hardwareId || null, // Add hardware ID
             //school_id: this.school.school_id
           };
 
@@ -102,17 +109,19 @@ export class ConfirmschoolPage {
               this.storage.set('country_code', this.selectedCountry);
               this.storage.set('school_id', this.school.school_id);
               this.storage.set('schoolInfo', JSON.stringify(this.school));
+
+              // Set first-time visit flags for new registration flow
+              this.storage.setFirstTimeVisit(true);
+              this.storage.setRegistrationCompleted(Date.now());
+
               this.loading.dismiss();
-              this.router.navigate(['/save-email']);
-              this.router.navigate(
-                [
-                  'save-email',
-                  this.school.school_id,
-                  this.selectedCountry,
-                  this.detectedCountry,
-                ],
-                { state: this.school }
-              );
+
+              // Navigate to starttest page normally
+              this.router.navigate(['/starttest']).then(() => {
+                // Broadcast registration completion event after navigation
+                // This will trigger the first-time flow in StartTest component
+                this.sharedService.broadcast('registration:completed');
+              });
 
               this.settings.setSetting('scheduledTesting', true);
             }),
@@ -123,7 +132,7 @@ export class ConfirmschoolPage {
                 this.schoolId,
                 this.selectedCountry,
                 this.detectedCountry,
-                this.selectedCountryName
+                this.selectedCountryName,
               ]);
               /* Redirect to no result found page */
             };
@@ -177,12 +186,11 @@ export class ConfirmschoolPage {
         schoolObj?.school_id || this.schoolId,
         this.selectedCountry,
         this.detectedCountry,
-        this.selectedCountryName
+        this.selectedCountryName,
       ],
       { state: schoolObj }
     );
   }
-
 
   async getDeviceInfo() {
     const info = await Device.getInfo();
@@ -208,16 +216,14 @@ export class ConfirmschoolPage {
 
   closeNotification() {
     this.showNotification = false;
-
   }
 
   backToSearchDetail() {
-    this.router.navigate(
-      [
-        'searchschool',
-        this.selectedCountry,
-        this.detectedCountry,
-        this.selectedCountryName
-      ]    );
+    this.router.navigate([
+      'searchschool',
+      this.selectedCountry,
+      this.detectedCountry,
+      this.selectedCountryName,
+    ]);
   }
 }

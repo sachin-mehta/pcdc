@@ -9,36 +9,36 @@
 
 // Wrap everything in a closure to ensure that local definitions don't
 // permanently shadow global definitions.
-(function() {
-  'use strict';
+(function () {
+  "use strict";
 
   /**
    * @name ndt7
    * @namespace ndt7
    */
-  const ndt7 = (function() {
+  const ndt7 = (function () {
     const staticMetadata = {
-      'client_library_name': 'ndt7-js',
-      'client_library_version': '0.0.6',
-      'client_name': 'giga-meter',
+      client_library_name: "ndt7-js",
+      client_library_version: "0.0.6",
+      client_name: "giga-meter",
     };
     // cb creates a default-empty callback function, allowing library users to
     // only need to specify callback functions for the events they care about.
     //
     // This function is not exported.
-    const cb = function(name, callbacks, defaultFn) {
-      if (typeof(callbacks) !== 'undefined' && name in callbacks) {
+    const cb = function (name, callbacks, defaultFn) {
+      if (typeof callbacks !== "undefined" && name in callbacks) {
         return callbacks[name];
-      } else if (typeof defaultFn !== 'undefined') {
+      } else if (typeof defaultFn !== "undefined") {
         return defaultFn;
       } else {
         // If no default function is provided, use the empty function.
-        return function() {};
+        return function () {};
       }
     };
 
     // The default response to an error is to throw an exception.
-    const defaultErrCallback = function(err) {
+    const defaultErrCallback = function (err) {
       throw new Error(err);
     };
 
@@ -61,39 +61,46 @@
       config.metadata = Object.assign({}, config.metadata);
       config.metadata = Object.assign(config.metadata, staticMetadata);
       const callbacks = {
-        error: cb('error', userCallbacks, defaultErrCallback),
-        serverDiscovery: cb('serverDiscovery', userCallbacks),
-        serverChosen: cb('serverChosen', userCallbacks),
+        error: cb("error", userCallbacks, defaultErrCallback),
+        serverDiscovery: cb("serverDiscovery", userCallbacks),
+        serverChosen: cb("serverChosen", userCallbacks),
       };
-      let protocol = 'wss';
-      if (config && ('protocol' in config)) {
+      let protocol = "wss";
+      if (config && "protocol" in config) {
         protocol = config.protocol;
       }
 
       const metadata = new URLSearchParams(config.metadata);
       // If a server was specified, use it.
-      if (config && ('server' in config)) {
+      if (config && "server" in config) {
         // Add metadata as querystring parameters.
-        const downloadURL = new URL(protocol + '://' + config.server + '/ndt/v7/download');
-        const uploadURL = new URL(protocol + '://' + config.server + '/ndt/v7/upload');
+        const downloadURL = new URL(
+          protocol + "://" + config.server + "/ndt/v7/download"
+        );
+        const uploadURL = new URL(
+          protocol + "://" + config.server + "/ndt/v7/upload"
+        );
         downloadURL.search = metadata;
         uploadURL.search = metadata;
         return {
-          '///ndt/v7/download': downloadURL.toString(),
-          '///ndt/v7/upload': uploadURL.toString(),
+          "///ndt/v7/download": downloadURL.toString(),
+          "///ndt/v7/upload": uploadURL.toString(),
         };
       }
 
       // If no server was specified then use a loadbalancer. If no loadbalancer
       // is specified, use the locate service from Measurement Lab.
-      const lbURL = (config && ('loadbalancer' in config)) ? new URL(config.loadbalancer) : new URL('https://locate.measurementlab.net/v2/nearest/ndt/ndt7');
+      const lbURL =
+        config && "loadbalancer" in config
+          ? new URL(config.loadbalancer)
+          : new URL("https://locate.measurementlab.net/v2/nearest/ndt/ndt7");
       lbURL.search = metadata;
-      callbacks.serverDiscovery({loadbalancer: lbURL});
+      callbacks.serverDiscovery({ loadbalancer: lbURL });
       const response = await fetch(lbURL).catch((err) => {
         throw new Error(err);
       });
       const js = await response.json();
-      if (! ('results' in js) ) {
+      if (!("results" in js)) {
         callbacks.error(`Could not understand response from ${lbURL}: ${js}`);
         return {};
       }
@@ -109,8 +116,8 @@
       callbacks.serverChosen(choice);
 
       return {
-        '///ndt/v7/download': choice.urls[protocol + ':///ndt/v7/download'],
-        '///ndt/v7/upload': choice.urls[protocol + ':///ndt/v7/upload'],
+        "///ndt/v7/download": choice.urls[protocol + ":///ndt/v7/download"],
+        "///ndt/v7/upload": choice.urls[protocol + ":///ndt/v7/upload"],
       };
     }
 
@@ -122,12 +129,21 @@
      *
      * @private
      */
-    const runNDT7Worker = async function(
-        config, callbacks, urlPromise, filename, testType) {
-      if (config.userAcceptedDataPolicy !== true &&
-          config.mlabDataPolicyInapplicable !== true) {
-        callbacks.error('The M-Lab data policy is applicable and the user ' +
-                        'has not explicitly accepted that data policy.');
+    const runNDT7Worker = async function (
+      config,
+      callbacks,
+      urlPromise,
+      filename,
+      testType
+    ) {
+      if (
+        config.userAcceptedDataPolicy !== true &&
+        config.mlabDataPolicyInapplicable !== true
+      ) {
+        callbacks.error(
+          "The M-Lab data policy is applicable and the user " +
+            "has not explicitly accepted that data policy."
+        );
         return 1;
       }
 
@@ -142,7 +158,7 @@
       // Workers are resolved with c-style return codes. 0 for success,
       // non-zero for failure.
       const workerPromise = new Promise((resolve) => {
-        worker.resolve = function(returnCode) {
+        worker.resolve = function (returnCode) {
           if (returnCode == 0) {
             callbacks.complete({
               LastClientMeasurement: clientMeasurement,
@@ -164,18 +180,18 @@
       // This is how the worker communicates back to the main thread of
       // execution.  The MsgTpe of `ev` determines which callback the message
       // gets forwarded to.
-      worker.onmessage = function(ev) {
-        if (!ev.data || !ev.data.MsgType || ev.data.MsgType === 'error') {
+      worker.onmessage = function (ev) {
+        if (!ev.data || !ev.data.MsgType || ev.data.MsgType === "error") {
           clearTimeout(workerTimeout);
           worker.resolve(1);
-          const msg = (!ev.data) ? `${testType} error` : ev.data.Error;
+          const msg = !ev.data ? `${testType} error` : ev.data.Error;
           callbacks.error(msg);
-        } else if (ev.data.MsgType === 'start') {
+        } else if (ev.data.MsgType === "start") {
           callbacks.start(ev.data.Data);
-        } else if (ev.data.MsgType == 'measurement') {
+        } else if (ev.data.MsgType == "measurement") {
           // For performance reasons, we parse the JSON outside of the thread
           // doing the downloading or uploading.
-          if (ev.data.Source == 'server') {
+          if (ev.data.Source == "server") {
             serverMeasurement = JSON.parse(ev.data.ServerMessage);
             callbacks.measurement({
               Source: ev.data.Source,
@@ -188,7 +204,7 @@
               Data: ev.data.ClientData,
             });
           }
-        } else if (ev.data.MsgType == 'complete') {
+        } else if (ev.data.MsgType == "complete") {
           clearTimeout(workerTimeout);
           worker.resolve(0);
         }
@@ -227,17 +243,21 @@
      */
     async function downloadTest(config, userCallbacks, urlPromise) {
       const callbacks = {
-        error: cb('error', userCallbacks, defaultErrCallback),
-        start: cb('downloadStart', userCallbacks),
-        measurement: cb('downloadMeasurement', userCallbacks),
-        complete: cb('downloadComplete', userCallbacks),
+        error: cb("error", userCallbacks, defaultErrCallback),
+        start: cb("downloadStart", userCallbacks),
+        measurement: cb("downloadMeasurement", userCallbacks),
+        complete: cb("downloadComplete", userCallbacks),
       };
-      const workerfile = config.downloadworkerfile || 'ndt7-download-worker.js';
+      const workerfile = config.downloadworkerfile || "ndt7-download-worker.js";
       return await runNDT7Worker(
-          config, callbacks, urlPromise, workerfile, 'download')
-          .catch((err) => {
-            callbacks.error(err);
-          });
+        config,
+        callbacks,
+        urlPromise,
+        workerfile,
+        "download"
+      ).catch((err) => {
+        callbacks.error(err);
+      });
     }
 
     /**
@@ -253,17 +273,21 @@
      */
     async function uploadTest(config, userCallbacks, urlPromise) {
       const callbacks = {
-        error: cb('error', userCallbacks, defaultErrCallback),
-        start: cb('uploadStart', userCallbacks),
-        measurement: cb('uploadMeasurement', userCallbacks),
-        complete: cb('uploadComplete', userCallbacks),
+        error: cb("error", userCallbacks, defaultErrCallback),
+        start: cb("uploadStart", userCallbacks),
+        measurement: cb("uploadMeasurement", userCallbacks),
+        complete: cb("uploadComplete", userCallbacks),
       };
-      const workerfile = config.uploadworkerfile || 'ndt7-upload-worker.js';
+      const workerfile = config.uploadworkerfile || "ndt7-upload-worker.js";
       const rv = await runNDT7Worker(
-          config, callbacks, urlPromise, workerfile, 'upload')
-          .catch((err) => {
-            callbacks.error(err);
-          });
+        config,
+        callbacks,
+        urlPromise,
+        workerfile,
+        "upload"
+      ).catch((err) => {
+        callbacks.error(err);
+      });
       return rv << 4;
     }
 
@@ -284,9 +308,11 @@
       // stuff to proceed in the background.
       const urlPromise = discoverServerURLs(config, userCallbacks);
       const downloadSuccess = await downloadTest(
-          config, userCallbacks, urlPromise);
-      const uploadSuccess = await uploadTest(
-          config, userCallbacks, urlPromise);
+        config,
+        userCallbacks,
+        urlPromise
+      );
+      const uploadSuccess = await uploadTest(config, userCallbacks, urlPromise);
       return downloadSuccess + uploadSuccess;
     }
 
@@ -300,7 +326,7 @@
 
   // Modules are used by `require`, if this file is included on a web page, then
   // module will be undefined and we use the window.ndt7 piece.
-  if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
+  if (typeof module !== "undefined" && typeof module.exports !== "undefined") {
     module.exports = ndt7;
   } else {
     window.ndt7 = ndt7;

@@ -1,0 +1,55 @@
+<div class="modal-wrapper">
+  <!-- Close button positioned absolutely -->
+  <button class="close-button" (click)="dismiss()">
+    <ion-icon name="close" size="small"></ion-icon>
+  </button>
+
+  <div class="modal-content">
+    <div class="success-animation">
+      <div class="celebration-icon">
+        <img src="assets/images/clap.svg" alt="Celebration" />
+      </div>
+    </div>
+
+    <div class="congratulations-section">
+      <h2 class="congratulations-title">
+        {{ "whatsNew.congratulations" | translate }}
+      </h2>
+
+      <div class="version-date">
+        {{ releaseData?.date || "" }} - v{{ releaseData?.version || "" }}
+      </div>
+
+      <div class="update-message">
+        {{ appName }} was successfully updated to the latest version - v{{
+          releaseData?.version || ""
+        }}
+      </div>
+
+      <div class="headline-section" *ngIf="releaseData?.title">
+        <div class="headline-title">
+          {{ releaseData.title }}
+        </div>
+      </div>
+
+      <div
+        class="release-items"
+        *ngIf="releaseData?.items && releaseData.items.length > 0"
+      >
+        <div class="release-item" *ngFor="let item of releaseData.items">
+          <div class="bullet-point">•</div>
+          <span class="release-text">{{ item }}</span>
+        </div>
+      </div>
+
+      <div class="action-buttons">
+        <!-- <button class="release-notes-btn" (click)="openReleaseNotes()">
+          {{ "whatsNew.checkReleaseNotes" | translate }} →
+        </button> -->
+        <button class="dashboard-btn" (click)="goToDashboard()">
+          {{ "whatsNew.goToDashboard" | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

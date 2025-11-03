@@ -1,5 +1,8 @@
 import type { CapacitorElectronConfig } from '@capacitor-community/electron';
-import { getCapacitorElectronConfig, setupElectronDeepLinking } from '@capacitor-community/electron';
+import {
+  getCapacitorElectronConfig,
+  setupElectronDeepLinking,
+} from '@capacitor-community/electron';
 import type { MenuItemConstructorOptions } from 'electron';
 import { app, MenuItem, ipcMain, dialog } from 'electron';
 import electronIsDev from 'electron-is-dev';
@@ -7,8 +10,15 @@ import unhandled from 'electron-unhandled';
 import { autoUpdater, UpdateDownloadedEvent } from 'electron-updater';
 import fs from 'fs-extra';
 import path from 'path';
+import * as si from 'systeminformation';
 
-import { ElectronCapacitorApp, setupContentSecurityPolicy, setupReloadWatcher } from './setup';
+import {
+  ElectronCapacitorApp,
+  setupContentSecurityPolicy,
+  setupReloadWatcher,
+  setIsQuiting,
+  getIsQuiting,
+} from './setup';
 import { captureException } from '@sentry/node';
 
 // Set userData path to use name instead of productName - must be set before app is ready
@@ -21,35 +31,34 @@ unhandled({
   logger: (e) => {
     console.error(e);
     captureException(e);
-    console.log("there is an error occurs")
+    console.log('there is an error occurs');
   },
   showDialog: false,
   reportButton: (error) => {
     console.log('Report Button Initialized');
     captureException(error);
-  }
+  },
 });
 
-
-
-let isQuiting = false;
 let mainWindow = null;
 let isDownloaded = false;
 
 // Define our menu templates (these are optional)
 const trayMenuTemplate: (MenuItemConstructorOptions | MenuItem)[] = [
   new MenuItem({
-    label: 'Open', click: function () {
+    label: 'Open',
+    click: function () {
       myCapacitorApp.getMainWindow().show();
-    }
+    },
   }),
   new MenuItem({
-    label: 'Quit App', click: function () {
-      isQuiting = true;
-      // myCapacitorApp.getMainWindow().close();
+    label: 'Quit App',
+    click: function () {
+      setIsQuiting(true);
+      myCapacitorApp.cleanup();
       app.quit();
-    }
-  })
+    },
+  }),
 ];
 const appMenuBarMenuTemplate: (MenuItemConstructorOptions | MenuItem)[] = [
   { role: process.platform === 'darwin' ? 'appMenu' : 'fileMenu' },
@@ -57,7 +66,8 @@ const appMenuBarMenuTemplate: (MenuItemConstructorOptions | MenuItem)[] = [
 ];
 
 // Get Config options from capacitor.config
-const capacitorFileConfig: CapacitorElectronConfig = getCapacitorElectronConfig();
+const capacitorFileConfig: CapacitorElectronConfig =
+  getCapacitorElectronConfig();
 
 // Enable features for unresponsive renderer call stacks and global shortcuts portal
 // Note: app.commandLine converts uppercase switches to lowercase
@@ -77,12 +87,18 @@ if (process.platform === 'linux') {
 }
 // Initialize our app. You can pass menu templates into the app here.
 // const myCapacitorApp = new ElectronCapacitorApp(capacitorFileConfig);
-const myCapacitorApp = new ElectronCapacitorApp(capacitorFileConfig, trayMenuTemplate, appMenuBarMenuTemplate);
+const myCapacitorApp = new ElectronCapacitorApp(
+  capacitorFileConfig,
+  trayMenuTemplate,
+  appMenuBarMenuTemplate
+);
 
 // If deeplinking is enabled then we will set it up here.
 if (capacitorFileConfig.electron?.deepLinkingEnabled) {
   setupElectronDeepLinking(myCapacitorApp, {
-    customProtocol: capacitorFileConfig.electron.deepLinkingCustomProtocol ?? 'mycapacitorapp',
+    customProtocol:
+      capacitorFileConfig.electron.deepLinkingCustomProtocol ??
+      'mycapacitorapp',
   });
 }
 
@@ -104,7 +120,7 @@ if (!gotTheLock) {
         mainWindow.show();
       }
       mainWindow.focus();
-      if (isQuiting) {
+      if (getIsQuiting()) {
         // mainWindow.close();
         app.quit();
       }
@@ -113,23 +129,48 @@ if (!gotTheLock) {
   // Wait for electron app to be ready.
   app.whenReady().then(async () => {
     mainWindow = await myCapacitorApp.init();
-  })
 
-  // Add web-contents-created event handler
-  app.on('web-contents-created', (_, webContents) => {
-    webContents.on('unresponsive', async () => {
-      try {
-        // Interrupt execution and collect call stack from unresponsive renderer
-        const callStack = await webContents.mainFrame.collectJavaScriptCallStack();
-        console.log('Renderer unresponsive - JavaScript call stack:', callStack);
-        captureException(new Error(`Renderer unresponsive: ${callStack}`));
-      } catch (error) {
-        console.error('Error collecting call stack from unresponsive renderer:', error);
-        captureException(error);
+    // Get and log system hardware ID
+    try {
+      const systemData = await si.system();
+      const osData = await si.osInfo();
+
+      console.log('=== SYSTEM HARDWARE ID ===');
+      console.log('System UUID:', systemData.uuid);
+      console.log('System Serial:', systemData.serial);
+      console.log('System SKU:', systemData.sku);
+      console.log('Manufacturer:', systemData.manufacturer);
+      console.log('Model:', systemData.model);
+      console.log('OS Serial:', osData.serial);
+      console.log('=========================');
+
+      // Primary Hardware ID (most reliable across Windows users)
+      const hardwareId =
+        systemData.uuid || systemData.serial || 'NO_UUID_AVAILABLE';
+      console.log('\n🔑 PRIMARY HARDWARE ID (use this):', hardwareId);
+
+      // Send hardware ID to renderer process when ready
+      if (mainWindow && mainWindow.webContents) {
+        mainWindow.webContents.once('did-finish-load', () => {
+          const hardwareData = {
+            hardwareId,
+            uuid: systemData.uuid,
+            serial: systemData.serial,
+            sku: systemData.sku,
+            manufacturer: systemData.manufacturer,
+            model: systemData.model,
+            osSerial: osData.serial,
+            timestamp: new Date().toISOString(),
+          };
+          mainWindow.webContents.send('system-hardware-id', hardwareData);
+          console.log('✅ Hardware ID sent to renderer process');
+        });
       }
-    });
+    } catch (error) {
+      console.error('Error getting system hardware ID:', error);
+      captureException(error);
+    }
   });
-
   /*
       app.on('ready', () => {
         updateApp = require('update-electron-app');
@@ -143,22 +184,17 @@ if (!gotTheLock) {
       */
   autoUpdater.autoDownload = true;
 
-
   setInterval(() => {
-    autoUpdater.checkForUpdates()
-  }, 3600000)
+    autoUpdater.checkForUpdates();
+  }, 3600000);
 
-
-  autoUpdater.on("update-downloaded", (_event: UpdateDownloadedEvent) => {
-    const releaseNotes = _event.releaseNotes.toString();
-    const releaseName = _event.releaseName.toString();
-
+  autoUpdater.on('update-downloaded', (_event, releaseNotes, releaseName) => {
     const dialogOpts = {
       type: 'info' as const,
       buttons: ['Restart / Reinicie. / Перезапуск', 'Later / Después / Позже'],
       title: 'Giga Meter Update',
       message: process.platform === 'win32' ? releaseNotes : releaseName,
-      detail: `A new version of UNICEF's Giga Meter has been downloaded. Restart the application to apply the updates.\n\nUna nueva version de la aplicación Giga Meter de UNICEF ha sido descargada. Reinicie la aplicación para aplicar los cambios.\n\nНовая версия приложения Giga Meter  загружена . Перезапустите приложение, чтобы применить обновления.`
+      detail: `A new version of UNICEF's Giga Meter has been downloaded. Restart the application to apply the updates.\n\nUna nueva version de la aplicación Giga Meter de UNICEF ha sido descargada. Reinicie la aplicación para aplicar los cambios.\n\nНовая версия приложения Giga Meter  загружена . Перезапустите приложение, чтобы применить обновления.`,
     };
     /*
     if (isDownloaded === false) {
@@ -175,18 +211,20 @@ if (!gotTheLock) {
 
         //for auto update comment the below codes, and uncomment the above line of code
 
-
         const dialogOpts = {
           type: 'info' as const,
-          buttons: ['Restart / Reinicie. / Перезапуск', 'Later / Después / Позже'],
+          buttons: [
+            'Restart / Reinicie. / Перезапуск',
+            'Later / Después / Позже',
+          ],
           title: 'Giga Meter Update',
           message: process.platform === 'win32' ? releaseNotes : releaseName,
-          detail: `A new version of UNICEF's Giga Meter  has been downloaded. Restart the application to apply the updates.\n\nUna nueva version de la aplicación Giga Meter de UNICEF ha sido descargada. Reinicie la aplicación para aplicar los cambios.\n\nНовая версия приложения Giga Meter  загружена . Перезапустите приложение, чтобы применить обновления.`
+          detail: `A new version of UNICEF's Giga Meter  has been downloaded. Restart the application to apply the updates.\n\nUna nueva version de la aplicación Giga Meter de UNICEF ha sido descargada. Reinicie la aplicación para aplicar los cambios.\n\nНовая версия приложения Giga Meter  загружена . Перезапустите приложение, чтобы применить обновления.`,
         };
         dialog.showMessageBox(dialogOpts).then((returnValue) => {
-          if (returnValue.response === 0) autoUpdater.quitAndInstall(false, true)
-        })
-
+          if (returnValue.response === 0)
+            autoUpdater.quitAndInstall(false, true);
+        });
 
         //throw new Error("opps there is unexpected error")
       } catch (error) {
@@ -194,24 +232,24 @@ if (!gotTheLock) {
         captureException(error);
         const dialogOpts = {
           type: 'info' as const,
-          buttons: ['Restart / Reinicie. / Перезапуск', 'Later / Después / Позже'],
+          buttons: [
+            'Restart / Reinicie. / Перезапуск',
+            'Later / Después / Позже',
+          ],
           title: 'Giga Meter Update',
           message: process.platform === 'win32' ? releaseNotes : releaseName,
-          detail: `A new version of UNICEF's Giga Meter  has been downloaded. Restart the application to apply the updates.\n\nUna nueva version de la aplicación Giga Meter de UNICEF  ha sido descargada. Reinicie la aplicación para aplicar los cambios.\n\nНовая версия приложения Giga Meter  загружена . Перезапустите приложение, чтобы применить обновления.`
+          detail: `A new version of UNICEF's Giga Meter  has been downloaded. Restart the application to apply the updates.\n\nUna nueva version de la aplicación Giga Meter de UNICEF  ha sido descargada. Reinicie la aplicación para aplicar los cambios.\n\nНовая версия приложения Giga Meter  загружена . Перезапустите приложение, чтобы применить обновления.`,
         };
         dialog.showMessageBox(dialogOpts).then((returnValue) => {
-          if (returnValue.response === 0) autoUpdater.quitAndInstall(false, true)
-        })
+          if (returnValue.response === 0)
+            autoUpdater.quitAndInstall(false, true);
+        });
       }
-
     }
-
-
-
   });
-autoUpdater.on('error', (error) => {
-  console.error('Update Error:', error);
-  captureException(error);
+  autoUpdater.on('error', (error) => {
+    console.error('Update Error:', error);
+    captureException(error);
   });
   /*
     autoUpdater.on('error', (error) => {
@@ -231,8 +269,6 @@ autoUpdater.on('error', (error) => {
     });
   
   */
-    
-
 
   // Security - Set Content-Security-Policy based on whether or not we are in dev mode.
   // setupContentSecurityPolicy(myCapacitorApp.getCustomURLScheme());
@@ -241,22 +277,13 @@ autoUpdater.on('error', (error) => {
   // Check for updates if we are in a packaged app.
   // autoUpdater.checkForUpdatesAndNotify();
 }
-if (mainWindow) {
-  mainWindow.on('close', (event) => {
-    if (!isQuiting) {
-      event.preventDefault();
-      mainWindow.hide();
-      return false;
-    } else {
-      app.quit();
-    }
-  });
-}
 // Handle when all of our windows are close (platforms have their own expectations).
 app.on('window-all-closed', function () {
   // On OS X it is common for applications and their menu bar
   // to stay active until the user quits explicitly with Cmd + Q
   if (process.platform !== 'darwin') {
+    setIsQuiting(true);
+    myCapacitorApp.cleanup(); // Cleanup resources before quitting
     app.quit();
   }
 });
@@ -265,15 +292,52 @@ app.on('window-all-closed', function () {
 app.on('activate', async function () {
   // On OS X it's common to re-create a window in the app when the
   // dock icon is clicked and there are no other windows open.
-  if (myCapacitorApp.getMainWindow().isDestroyed()) {
+  const mainWindow = myCapacitorApp.getMainWindow();
+  if (mainWindow && mainWindow.isDestroyed()) {
     await myCapacitorApp.init();
+  } else if (mainWindow) {
+    // Just show the existing window instead of recreating everything
+    mainWindow.show();
+    mainWindow.focus();
   }
 });
 
-
+// Handle app quitting to cleanup resources
+app.on('before-quit', () => {
+  setIsQuiting(true);
+  myCapacitorApp.cleanup();
+});
 
 // Place all ipc or other electron api calls and custom functionality under this line
 
 ipcMain.addListener('closeFromUi', (ev) => {
   myCapacitorApp.getMainWindow().hide();
+});
+
+// IPC handler to get hardware ID from renderer process
+ipcMain.handle('get-hardware-id', async () => {
+  try {
+    const systemData = await si.system();
+    const osData = await si.osInfo();
+    const hardwareId =
+      systemData.uuid || systemData.serial || 'NO_UUID_AVAILABLE';
+
+    const hardwareData = {
+      hardwareId,
+      uuid: systemData.uuid,
+      serial: systemData.serial,
+      sku: systemData.sku,
+      manufacturer: systemData.manufacturer,
+      model: systemData.model,
+      osSerial: osData.serial,
+      timestamp: new Date().toISOString(),
+    };
+
+    console.log('📤 Hardware ID requested via IPC');
+    return hardwareData;
+  } catch (error) {
+    console.error('Error getting hardware ID via IPC:', error);
+    captureException(error);
+    return { error: 'Failed to get hardware ID' };
+  }
 });

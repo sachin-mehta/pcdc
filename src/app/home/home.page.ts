@@ -8,19 +8,20 @@ import { SchoolService } from '../services/school.service';
 import { StorageService } from '../services/storage.service';
 import { checkRightGigaId, removeUnregisterSchool } from './home.utils';
 import { environment } from '../../environments/environment';
+import { HardwareIdService } from '../services/hardware-id.service';
 
 @Component({
-    selector: 'app-home',
-    templateUrl: 'home.page.html',
-    styleUrls: ['home.page.scss'],
-    standalone: false
+  selector: 'app-home',
+  templateUrl: 'home.page.html',
+  styleUrls: ['home.page.scss'],
+  standalone: false,
 })
 export class HomePage {
   appName = environment.appName;
   appNameSuffix = environment.appNameSuffix;
-  privacyUrl1 = "https://opendatacommons.org/licenses/odbl/1-0/";
-  privacyUrl2= "https://www.measurementlab.net/privacy/";
-  targetUrl="_blank"
+  privacyUrl1 = 'https://opendatacommons.org/licenses/odbl/1-0/';
+  privacyUrl2 = 'https://www.measurementlab.net/privacy/';
+  targetUrl = '_blank';
   isPrivacyChecked = false;
   constructor(
     public router: Router,
@@ -28,7 +29,8 @@ export class HomePage {
     private settingsService: SettingsService,
     private storage: StorageService,
     private loading: LoadingService,
-    private readonly schoolService: SchoolService
+    private readonly schoolService: SchoolService,
+    private hardwareIdService: HardwareIdService
   ) {
     translate.setDefaultLang('en');
     const applicationLanguage = this.settingsService.get('applicationLanguage');
@@ -49,7 +51,9 @@ export class HomePage {
       // eslint-disable-next-line max-len
       '<div class="loadContent"><ion-img src="assets/loader/new_loader.gif" class="loaderGif"></ion-img><p class="white" [translate]="\'loading\'">Loading...</p></div>';
     this.loading.present(loadingMsg, 6000, 'pdcaLoaderClass', 'null');
+
     if (this.storage.get('schoolId')) {
+      // User already has local registration - existing flow
       let schoolId = this.storage.get('schoolId');
       const gigaId = this.storage.get('gigaId');
       const schoolUserId = this.storage.get('schoolUserId');
@@ -87,8 +91,108 @@ export class HomePage {
       };
       getFlagsAndCheckGigaId();
     } else {
+      // No local registration - check if machine is already registered via hardware ID
+      this.checkHardwareRegistration();
+    }
+  }
+
+  /**
+   * Wait for hardware ID and check for existing registration
+   */
+  private async checkHardwareRegistration() {
+    try {
+      // Wait for hardware ID to be available (with 5 second timeout)
+      const hardwareId = await this.hardwareIdService.ensureHardwareId(5000);
+
+      if (hardwareId) {
+        console.log(
+          'Checking for existing registration with hardware ID:',
+          hardwareId
+        );
+        await this.checkMachineRegistration(hardwareId);
+      } else {
+        // No hardware ID available after timeout - proceed normally
+        console.log('⚠️ No hardware ID available, proceeding with normal flow');
+        this.loading.dismiss();
+      }
+    } catch (error) {
+      console.error('Error in hardware registration check:', error);
       this.loading.dismiss();
     }
+  }
+
+  /**
+   * Check if this machine is already registered using hardware ID
+   */
+  private async checkMachineRegistration(hardwareId: string) {
+    try {
+      const response = await this.schoolService
+        .checkRegistrationByHardwareId(hardwareId)
+        .toPromise();
+
+      // Backend returns: { success: true, data: { exists: true/false, ... }, timestamp, message }
+      if (response?.success && response?.data?.exists === true) {
+        // Found existing registration - populate localStorage
+        console.log('✅ Found existing registration for this machine');
+        await this.applyExistingRegistration(response.data);
+        this.loading.dismiss();
+        this.router.navigate(['/starttest']);
+        this.settingsService.setSetting('scheduledTesting', true);
+      } else {
+        // No registration found - user needs to register
+        console.log('ℹ️ No existing registration found');
+        this.loading.dismiss();
+      }
+    } catch (err) {
+      // API error - gracefully fallback to normal registration flow
+      console.error('Error checking machine registration:', err);
+      this.loading.dismiss();
+    }
+  }
+
+  /**
+   * Populate localStorage with existing registration data
+   */
+  private async applyExistingRegistration(registrationData: any) {
+    console.log('registrationData', registrationData);
+
+    // Only set values that are non-null and not undefined
+    if (registrationData.user_id != null) {
+      await this.storage.set('schoolUserId', registrationData.user_id);
+    }
+    if (registrationData.school_id != null) {
+      await this.storage.set('schoolId', registrationData.school_id);
+      await this.storage.set('school_id', registrationData.school_id);
+    }
+    if (registrationData.giga_id_school != null) {
+      await this.storage.set('gigaId', registrationData.giga_id_school);
+    }
+    if (registrationData.mac_address != null) {
+      await this.storage.set('macAddress', registrationData.mac_address);
+    }
+    if (registrationData.os != null) {
+      await this.storage.set('deviceType', registrationData.os);
+    }
+    if (registrationData.ip_address != null) {
+      await this.storage.set('ip_address', registrationData.ip_address);
+    }
+    if (registrationData.app_version != null) {
+      await this.storage.set('version', registrationData.app_version);
+    }
+    if (registrationData.country_code != null) {
+      await this.storage.set('country_code', registrationData.country_code);
+    }
+
+    // Handle school_info which might be an object or string
+    if (registrationData.schoolInfo != null) {
+      const schoolInfo =
+        typeof registrationData.schoolInfo === 'string'
+          ? registrationData.schoolInfo
+          : JSON.stringify(registrationData.schoolInfo);
+      await this.storage.set('schoolInfo', schoolInfo);
+    }
+
+    console.log('✅ Registration data loaded from hardware ID');
   }
 
   openExternalUrl(href) {
