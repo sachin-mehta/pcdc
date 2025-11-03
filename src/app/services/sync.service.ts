@@ -8,7 +8,7 @@ import { environment } from 'src/environments/environment';
   providedIn: 'root',
 })
 export class SyncService {
-  private syncInterval = 1 * 60 * 1000; // 2 hours
+  private syncInterval = 2 * 60 * 60 * 1000; // 2 hours
 
   constructor(
     private http: HttpClient,
