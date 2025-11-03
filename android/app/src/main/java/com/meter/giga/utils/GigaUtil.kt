@@ -3,6 +3,9 @@ package com.meter.giga.utils
 import android.app.AlarmManager
 import android.content.Context
 import android.os.Build
+import android.util.Log
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
 import com.meter.giga.domain.entity.history.AccessInformation
 import com.meter.giga.domain.entity.history.DataUsage
 import com.meter.giga.domain.entity.history.MeasurementsItem
@@ -300,5 +303,25 @@ object GigaUtil {
       uuid = c2sLastServerManagement?.connectionInfo?.uuid,
       version = 1
     )
+  }
+
+  fun checkDataPendingForSync(measurementItems: String): List<MeasurementsItem> {
+    val gson = Gson()
+
+// Step 1: Parse the outer array (which contains inner JSON strings)
+    val type = object : TypeToken<List<String>>() {}.type
+    val jsonStringList: List<String> = gson.fromJson(measurementItems, type)
+
+// Step 2: Parse each inner string to your model
+    val modelList: List<MeasurementsItem> = jsonStringList.map { json ->
+      gson.fromJson(json, MeasurementsItem::class.java)
+    }
+
+// Now you have List<MeasurementsItem>
+    Log.d("Giga : Parsed", " ${modelList.size} items")
+
+    val notUploadedItems = modelList.filter { it.uploaded == false }
+
+    return notUploadedItems
   }
 }

@@ -4,7 +4,7 @@
     <div class="centerPos">
       <ion-item class="custom-item" lines="none" color="light">
         <ion-label>
-          <p class="isNativeApp() ? nativesubtitle :subtitle">{{selectedCountry}} - {{schoolId}}</p>
+          <p [ngClass]="isNativeApp() ? nativesubtitle :subtitle">{{selectedCountry}} - {{schoolId}}</p>
           <h2 class="title" title={{schoolId}}>{{school.name}}</h2>
         </ion-label>
       </ion-item>
@@ -82,7 +82,9 @@
             <ion-col size="2">{{data.results['NDTResult.C2S'].LastClientMeasurement.MeanClientMbps | number:'1.2-2'}}</ion-col>
             <ion-col size="2">{{(data.results['NDTResult.S2C'].LastServerMeasurement.BBRInfo.MinRTT +
               data.results['NDTResult.C2S'].LastServerMeasurement.BBRInfo.MinRTT) / 2 / 1000 | number:'1.2-2'}}</ion-col>
-            <ion-col  class="green_color" size="2">Success</ion-col>
+            <ion-col [ngClass]="data.uploaded ? 'green_color' : (isNativeApp() ? 'red_color' : 'green_color')" size="2">
+              {{ data.uploaded ? 'Success' : (isNativeApp() ? 'Sync Failed' : 'Success') }}
+            </ion-col>
   
           </ion-row>
     

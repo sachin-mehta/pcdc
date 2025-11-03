@@ -588,10 +588,34 @@ class NetworkTestService : LifecycleService() {
               }
             }
           } catch (e: Exception) {
+            measurementsItem.uploaded = false
+            val updateSpeedTestData = GigaUtil.addJsonItem(
+              existingSpeedTestData,
+              Gson().toJson(measurementsItem)
+            )
+            Log.d(
+              "GIGA NetworkTestService",
+              "Updated Speed Test Data $updateSpeedTestData"
+            )
+            prefs.oldSpeedTestData = updateSpeedTestData
             Sentry.capture(e)
             stopForeground(STOP_FOREGROUND_DETACH)
             stopSelf()
           }
+        } else {
+          measurementsItem.uploaded = false
+          val updateSpeedTestData = GigaUtil.addJsonItem(
+            existingSpeedTestData,
+            Gson().toJson(measurementsItem)
+          )
+          Log.d(
+            "GIGA NetworkTestService",
+            "Updated Speed Test Data $updateSpeedTestData"
+          )
+          prefs.oldSpeedTestData = updateSpeedTestData
+          Sentry.capture("Failed to generate the speed test upload payload")
+          stopForeground(STOP_FOREGROUND_DETACH)
+          stopSelf()
         }
       } else {
         updateNotification("Speed Test Failed")

@@ -444,6 +444,55 @@ span.currentState {
   }
 }
 
+.custom-toast-native {
+  gap: 16px;
+  display: flex;
+  background-color: #E5E5E5;
+  color: black;
+  padding: 7px;
+  max-width: 380px;
+  font-family: Arial, sans-serif;
+  border-left: 3px solid red;
+  position: fixed;
+  top: 24px;
+  width: 97%;
+  z-index: 1000;
+
+  .icon {
+    color: red;
+    font-size: 20px;
+    margin-right: 10px;
+  }
+
+  .message {
+    flex-grow: 1;
+
+    strong {
+      font-size: 16px;
+    }
+
+    p {
+      margin: 4px 0 0;
+      font-size: 14px;
+      line-height: 1.4;
+    }
+
+    .highlight {
+      text-decoration: underline wavy lightblue;
+    }
+  }
+
+  .close-btn {
+    background: none;
+    border: none;
+    color: gray;
+    font-size: 20px;
+    cursor: pointer;
+    width: 20px;
+    height: 20px;
+  }
+}
+
 .msg {
   font-size: 14px;
   font-weight: 400;

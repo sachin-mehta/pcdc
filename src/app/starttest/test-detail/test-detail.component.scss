@@ -105,6 +105,9 @@ ion-col {
     color: #42BE65;
   }
 
+  &.red_color {
+    color: #DA1E28; // failure red (IBM Carbon palette)
+  }
   /* Optional text alignment: */
   /* justify-content: center; */
 }
