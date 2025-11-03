@@ -234,31 +234,21 @@ export class AppComponent {
     // Hide the dropdown
   }
   filterOptions(event: any) {
-    console.log('here');
     const term = event.target.value.toLowerCase();
     // Filter based on user input
     this.searchTerm = event.target.value;
-    console.log(this.searchTerm);
     this.filteredOptions = this.testOptions.filter((option) =>
       option.toLowerCase().includes(term)
-    );
-    console.log(
-      'hhhih',
-      this.filteredOptions.length,
-      this.searchTerm.length,
-      term.length
     );
 
     // Show dropdown if there's at least one match and user has typed something
     this.showDropdown =
       this.filteredOptions.length > 0 && this.searchTerm.length > 0;
-    console.log('thi', this.showDropdown);
   }
 
   selectOption(option: string) {
     // Set the input to the selected option
     this.searchTerm = option;
-    console.log(this.searchTerm);
     this.filteredOptions = [];
     // Hide the dropdown
     this.showDropdown = false;
