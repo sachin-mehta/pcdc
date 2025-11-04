@@ -95,13 +95,23 @@ class GigaAppPlugin : Plugin() {
      * This function used to pass the speed test measurements failed
      * TO UI
      */
-    fun sendSpeedTestCompletedWithError() {
+    fun sendSpeedTestCompletedWithError(
+      speedTestData: SpeedTestResultRequestEntity?,
+      measurementsItem: MeasurementsItem?
+    ) {
       pluginInstance?.let {
         Log.d("GIGA NetworkTestService", "sendSpeedTestCompletedWithError")
-        val data = JSObject().apply {
-          put("testStatus", "onerror")
-        }
-        it.notifyListeners("speedTestUpdate", data)
+        val speedTestResultEntity = SpeedTestResultEntity(
+          speedTestData = speedTestData,
+          testStatus = "onerror",
+          measurementsItem = measurementsItem
+        )
+        val jsonString = GsonBuilder()
+          .serializeNulls()
+          .create().toJson(speedTestResultEntity)
+        val data = JSObject(jsonString)
+        Log.d("GIGA NetworkTestService", "sendSpeedTestCompletedWithError $data")
+        it.notifyListeners("speedTestUpdate", data as JSObject?)
       }
     }
 

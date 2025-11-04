@@ -473,9 +473,12 @@ class NetworkTestService : LifecycleService() {
             )
           } else {
             Sentry.capture(e)
-            updateNotification("Speed Test Failed")
+            updateNotification("Speed test measurements not available, please try again.")
             Log.e("GIGA NetworkTestService", "Error: ${e.message}")
-            GigaAppPlugin.sendSpeedTestCompletedWithError()
+            GigaAppPlugin.sendSpeedTestCompletedWithError(
+              null,
+              null
+            )
           }
 
         } finally {
@@ -555,6 +558,11 @@ class NetworkTestService : LifecycleService() {
                 )
                 prefs.oldSpeedTestData = updateSpeedTestData
                 Sentry.capture("Failed to sync speed test data")
+                updateNotification("Failed to sync speed test data.")
+                GigaAppPlugin.sendSpeedTestCompletedWithError(
+                  speedTestResultRequestEntity,
+                  measurementsItem
+                )
                 stopForeground(STOP_FOREGROUND_DETACH)
                 stopSelf()
               }
@@ -606,6 +614,10 @@ class NetworkTestService : LifecycleService() {
               "Updated Speed Test Data $updateSpeedTestData"
             )
             prefs.oldSpeedTestData = updateSpeedTestData
+            GigaAppPlugin.sendSpeedTestCompletedWithError(
+              speedTestResultRequestEntity,
+              measurementsItem
+            )
             Sentry.capture(e)
             stopForeground(STOP_FOREGROUND_DETACH)
             stopSelf()
@@ -621,13 +633,20 @@ class NetworkTestService : LifecycleService() {
             "Updated Speed Test Data $updateSpeedTestData"
           )
           prefs.oldSpeedTestData = updateSpeedTestData
+          GigaAppPlugin.sendSpeedTestCompletedWithError(
+            speedTestResultRequestEntity,
+            measurementsItem
+          )
           Sentry.capture("Failed to generate the speed test upload payload")
           stopForeground(STOP_FOREGROUND_DETACH)
           stopSelf()
         }
       } else {
-        updateNotification("Speed Test Failed")
-        GigaAppPlugin.sendSpeedTestCompletedWithError()
+        updateNotification("Speed test measurements not available, please try again.")
+        GigaAppPlugin.sendSpeedTestCompletedWithError(
+          null,
+          null
+        )
         stopForeground(STOP_FOREGROUND_DETACH)
         stopSelf()
       }

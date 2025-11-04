@@ -259,7 +259,62 @@ export class StarttestPage implements OnInit, OnDestroy {
             this.gaugeError();
             this.currentState = undefined;
             this.currentRate = undefined;
+            if (data.speedTestData) {
+              this.uploadStarted = false;
+              if (this.uploadTimer) {
+                clearInterval(this.uploadTimer);
+              }
+              this.currentDate = new Date();
+              this.currentRateUpload =
+                data.speedTestData.results[
+                  'NDTResult.C2S'
+                ].LastClientMeasurement.MeanClientMbps?.toFixed(2);
+              this.currentRateDownload =
+                data.speedTestData.results[
+                  'NDTResult.S2C'
+                ].LastClientMeasurement.MeanClientMbps?.toFixed(2);
+              this.progressGaugeState.current = this.progressGaugeState.maximum;
+              if (
+                data.speedTestData.results['NDTResult.S2C']
+                  .LastServerMeasurement.BBRInfo.MinRTT == null ||
+                data.speedTestData.results['NDTResult.C2S']
+                  .LastServerMeasurement.BBRInfo.MinRTT == null
+              ) {
+                this.latency = '0';
+              } else {
+                this.latency = (
+                  (data.speedTestData.results['NDTResult.S2C']
+                    .LastServerMeasurement.BBRInfo.MinRTT +
+                    data.speedTestData.results['NDTResult.C2S']
+                      .LastServerMeasurement.BBRInfo.MinRTT) /
+                  2 /
+                  1000
+                ).toFixed(0);
+              }
+              if (
+                data.speedTestData.ClientInfo !== null &&
+                data.speedTestData.ClientInfo !== undefined
+              ) {
+                this.measurementnetworkServer =
+                  data.speedTestData.ClientInfo.City;
+                this.measurementISP = data.speedTestData.ClientInfo.ISP;
+              }
+              console.log(
+                'GIGA',
+                'Executed complete on error:' +
+                  JSON.stringify(data.measurementsItem)
+              );
+            }
+            if (data.measurementsItem) {
+              this.historyService.add(data.measurementsItem);
+              this.sharedService.broadcast(
+                'history:measurement:change',
+                'history:measurement:change'
+              );
+              this.refreshHistory();
+            }
             this.ref.markForCheck();
+
             console.log('GIGA', 'Executed onerror');
           } else {
             console.log('GIGA', 'Executed Else');
