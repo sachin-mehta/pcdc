@@ -1,6 +1,6 @@
 <app-pcdc-header></app-pcdc-header>
 <ion-content class="font_open_sans">
-  <ion-button class="isNativeApp() ? button_disable_hover_native : button_disable_hover" fill="clear" [routerLink]="['/register-school']">
+  <ion-button [ngClass]="isNativeApp() ? button_disable_hover_native : button_disable_hover" fill="clear" [routerLink]="['/register-school']">
     <ion-img src="assets/images/back_button.svg" name="arrow-back-outline" class="backIcon"></ion-img>
   </ion-button>
   <div class="container">

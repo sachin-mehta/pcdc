@@ -14,6 +14,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.PowerManager;
 import android.provider.Settings;
 import android.util.Log;
 
@@ -36,6 +37,9 @@ public class MainActivity extends BridgeActivity {
         AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !am.canScheduleExactAlarms()) {
           showPermissionDialog();
+        } else {
+          // Need to allow if need to grant background operations
+          // checkAllowBackGroundPermission();              // 3️⃣
         }
       });
 
@@ -64,6 +68,9 @@ public class MainActivity extends BridgeActivity {
             intent.setData(Uri.parse("package:" + activity.getPackageName()));
 
             alarmPermissionLauncher.launch(intent);    // modern API
+          } else {
+            // Enable it if need to allow background operation in doze/sleep mode
+            //checkAllowBackGroundPermission();              // 3️⃣
           }
         }
       }
@@ -115,8 +122,33 @@ public class MainActivity extends BridgeActivity {
         REQ_NOTIF_PERMISSION);
       return;
     }
-    checkAlarmPermission();              // 3️⃣
+    checkAlarmPermission();
   }
+
+// Need to enable if need to get background operation permission
+//  private void checkAllowBackGroundPermission() {
+//    PowerManager pm = (PowerManager) getSystemService(Context.POWER_SERVICE);
+//    if (pm != null && !pm.isIgnoringBatteryOptimizations(getPackageName())) {
+//      new AlertDialog.Builder(this)
+//        .setTitle("Allow background activity")
+//        .setMessage("To ensure continuous network checks and uploads even when the device sleeps, " +
+//          "please allow the app to ignore battery optimizations. This enables reliable background " +
+//          "network access. You can revoke this later in system settings.")
+//        .setPositiveButton("Allow", (dialog, which) -> {
+//          try {
+//            Intent intent = new Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS);
+//            intent.setData(Uri.parse("package:" + getPackageName()));
+//            startActivity(intent);
+//          } catch (Exception e) {
+//            // Fallback: open the full battery optimization settings screen
+//            Intent intent = new Intent(Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS);
+//            startActivity(intent);
+//          }
+//        })
+//        .setNegativeButton("Cancel", null)
+//        .show();
+//    }
+//  }
 
   /**
    * This function is getting used to check the Schedule Alarm Permission
