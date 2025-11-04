@@ -33,7 +33,7 @@ export class AppComponent {
   scheduleSemaphore: any;
   // eslint-disable-next-line @typescript-eslint/naming-convention
   app_version: any;
-  device_id:string;
+  device_id: string;
   device_id_short: string;
   appName = environment.appName;
   showAboutMenu = environment.showAboutMenu;
@@ -163,7 +163,7 @@ export class AppComponent {
   }
 
   isNativeApp(): boolean {
-    return this.isNative;
+    return Capacitor.isNativePlatform();
   }
 
   startSyncingPeriodicProcess() {

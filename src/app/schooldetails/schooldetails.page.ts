@@ -139,6 +139,9 @@ export class SchooldetailsPage {
         });
     }
   }
+  isNativeApp(): boolean {
+    return Capacitor.isNativePlatform();
+  }
 
   confirmSchool(schoolObj) {
     this.selectedSchool = schoolObj;

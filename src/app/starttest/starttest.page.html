@@ -6,7 +6,7 @@
     <div class="container centerPos">
       <ion-item class="custom-item" lines="none" color="light">
         <ion-label>
-          <p [ngClass]="isNativeApp() ? nativesubtitle :subtitle">{{selectedCountry}} - {{schoolId}}</p>
+          <p [ngClass]="isNativeApp() ? 'nativesubtitle' : 'subtitle'">{{selectedCountry}} - {{schoolId}}</p>
           <h2 class="title" title={{school?.name}}>{{school?.name}}</h2>
         </ion-label>
       </ion-item>
@@ -92,7 +92,7 @@
           </div>
         </div>
       </div> -->
-      <div [ngClass]="isNativeApp() ? custom-toast-native : custom-toast"
+      <div [ngClass]="isNativeApp() ? 'custom-toast-native' : 'custom-toast'"
         *ngIf="((connectionStatus=='error' && currentState == undefined) || (!onlineStatus)) && !isErrorClosed">
         <!-- <span class="icon">⚠️</span> -->
         <ion-img src="../../assets/images/test_failed_Icon.svg" class="testFailed"></ion-img>

@@ -37,7 +37,7 @@ export class PcdcHeaderComponent implements OnInit {
   }
 
   isNativeApp(): boolean {
-    return this.isNative;
+    return Capacitor.isNativePlatform();
   }
   ngOnInit() {}
   onLanguageChange() {

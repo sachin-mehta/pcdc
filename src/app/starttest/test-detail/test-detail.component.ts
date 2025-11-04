@@ -54,9 +54,8 @@ export class TestDetailComponent implements OnInit {
       }
     });
   }
-
   isNativeApp(): boolean {
-    return this.isNative;
+    return Capacitor.isNativePlatform();
   }
 
   handleBackButton() {

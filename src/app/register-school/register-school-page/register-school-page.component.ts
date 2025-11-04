@@ -60,9 +60,8 @@ export class RegisterSchoolPageComponent implements OnInit {
   reachedEnd() {
     this.isLast = true;
   }
-
   isNativeApp(): boolean {
-    return this.isNative;
+    return Capacitor.isNativePlatform();
   }
   moveToStartTest() {
     const translatedText = this.translate.instant('searchCountry.check');

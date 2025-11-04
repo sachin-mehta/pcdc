@@ -39,6 +39,6 @@ export class InvalidLocationPage {
     });
   }
   isNativeApp(): boolean {
-    return this.isNative;
+    return Capacitor.isNativePlatform();
   }
 }

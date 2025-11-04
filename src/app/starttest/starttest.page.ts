@@ -319,7 +319,7 @@ export class StarttestPage implements OnInit, OnDestroy {
   }
 
   isNativeApp(): boolean {
-    return this.isNative;
+    return Capacitor.isNativePlatform();
   }
   handleBackButton() {
     App.addListener('backButton', async () => {

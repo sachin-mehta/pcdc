@@ -65,7 +65,7 @@ export class ConfirmschoolPage {
   }
 
   isNativeApp(): boolean {
-    return this.isNative;
+    return Capacitor.isNativePlatform();
   }
   confirmSchool() {
     /* Store school id and giga id inside storage */

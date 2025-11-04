@@ -1097,7 +1097,7 @@ export class SearchcountryPage {
   }
 
   isNativeApp(): boolean {
-    return this.isNative;
+    return Capacitor.isNativePlatform();
   }
 
   confirmCountry() {

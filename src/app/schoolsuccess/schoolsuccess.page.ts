@@ -52,7 +52,7 @@ export class SchoolsuccessPage {
   }
 
   isNativeApp(): boolean {
-    return this.isNative;
+    return Capacitor.isNativePlatform();
   }
 
   async checkCurrentSlide() {

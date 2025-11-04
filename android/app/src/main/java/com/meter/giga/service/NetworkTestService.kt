@@ -84,18 +84,20 @@ class NetworkTestService : LifecycleService() {
     super.onStartCommand(intent, flags, startId)
     startForeground(NOTIFICATION_ID, createNotification("Starting speed test..."))
     val networkChecker = NetworkCheckerImpl(this)
-    if (networkChecker.isNetworkAvailable()) {
+    val prefs = AlarmSharedPref(this)
+    if (networkChecker.isNetworkAvailable() && !prefs.isTestRunning) {
       Log.d("GIGA NetworkTestService ", "Device is online")
 
       try {
         // Example logging
         Sentry.capture("Foreground Service started")
-        val prefs = AlarmSharedPref(this)
+
         secureDataStore = SecureDataStore(this)
         val scheduleType = intent?.getStringExtra(SCHEDULE_TYPE) ?: SCHEDULE_TYPE_DAILY
         Log.d("GIGA NetworkTestService SCHEDULE_TYPE", scheduleType)
         val appVersion = GigaUtil.getAppVersionName(this)
         val isRunningOnChromebook = GigaUtil.isRunningOnChromebook(this)
+        prefs.isTestRunning = true
         val client = NDTTestImpl(
           createHttpClient(),
           scheduleType,
@@ -110,9 +112,14 @@ class NetworkTestService : LifecycleService() {
         Sentry.capture(e)
       }
     } else {
-      Log.d("GIGA NetworkTestService ", "Device is offline")
-      Sentry.capture("Device is offline, speed test skipped")
-      updateNotification("Device is offline, please check internet connectivity")
+      if (prefs.isTestRunning) {
+        Log.d("GIGA NetworkTestService ", "Already Speed Test Executing")
+        Sentry.capture("Already Speed Test Executing")
+      } else {
+        Log.d("GIGA NetworkTestService ", "Device is offline")
+        Sentry.capture("Device is offline, speed test skipped")
+        updateNotification("Device is offline, please check internet connectivity")
+      }
     }
     return START_STICKY
   }
@@ -327,6 +334,7 @@ class NetworkTestService : LifecycleService() {
             appVersion,
             isRunningOnChromebook,
           )
+          prefs.isTestRunning = false
           allDoneInvoked = 0
         }
       } catch (e: Exception) {

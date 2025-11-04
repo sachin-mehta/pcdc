@@ -14,6 +14,7 @@ import com.meter.giga.utils.Constants.KEY_GIGA_SCHOOL_ID
 import com.meter.giga.utils.Constants.KEY_HISTORY_DATA_INDEX
 import com.meter.giga.utils.Constants.KEY_IP_ADDRESS
 import com.meter.giga.utils.Constants.KEY_IP_INFO_TOKEN
+import com.meter.giga.utils.Constants.KEY_IS_TEST_RUNNING
 import com.meter.giga.utils.Constants.KEY_LAST_EXECUTION_DAY
 import com.meter.giga.utils.Constants.KEY_LAST_SLOT_EXECUTION_HOUR
 import com.meter.giga.utils.Constants.KEY_MLAB_UPLOAD_KEY
@@ -145,6 +146,14 @@ class AlarmSharedPref(context: Context) {
     get() = prefs.getString(KEY_OLD_SPEEDTEST_DATA, "[]").toString()
     set(value) = prefs.edit() { putString(KEY_OLD_SPEEDTEST_DATA, value) }
 
+
+  /**
+   * This checks if last executed speed test date is
+   * not equal to today date
+   */
+  var isTestRunning: Boolean
+    get() = prefs.getBoolean(KEY_IS_TEST_RUNNING, false)
+    set(value) = prefs.edit() { putBoolean(KEY_IS_TEST_RUNNING, value) }
 
   /**
    * This checks if last executed speed test date is

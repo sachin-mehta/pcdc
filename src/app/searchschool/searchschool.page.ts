@@ -89,7 +89,7 @@ export class SearchschoolPage {
     }
   }
   isNativeApp(): boolean {
-    return this.isNative;
+    return Capacitor.isNativePlatform();
   }
   /**
    * Search school by id and country code

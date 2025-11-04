@@ -6,12 +6,13 @@ import { NotFound } from './types';
 import { TranslateService } from '@ngx-translate/core';
 import { SettingsService } from '../services/settings.service';
 import { environment } from 'src/environments/environment';
+import { Capacitor } from '@capacitor/core';
 
 @Component({
-    selector: 'app-schoolnotfound',
-    templateUrl: 'schoolnotfound.page.html',
-    styleUrls: ['schoolnotfound.page.scss'],
-    standalone: false
+  selector: 'app-schoolnotfound',
+  templateUrl: 'schoolnotfound.page.html',
+  styleUrls: ['schoolnotfound.page.scss'],
+  standalone: false,
 })
 export class SchoolnotfoundPage {
   @ViewChild(IonAccordionGroup, { static: true })
@@ -21,7 +22,7 @@ export class SchoolnotfoundPage {
   sub: any;
   selectedCountry: any;
   detectedCountry: any;
-  selectedCountryName: any
+  selectedCountryName: any;
   notFound = true;
   appName = environment.appName;
   constructor(
@@ -41,17 +42,19 @@ export class SchoolnotfoundPage {
       this.schoolId = params.schoolId;
       this.selectedCountry = params.selectedCountry;
       this.detectedCountry = params.detectedCountry;
-      this.selectedCountryName = params.selectedCountryName
+      this.selectedCountryName = params.selectedCountryName;
       console.log(this.selectedCountry);
     });
   }
+  isNativeApp(): boolean {
+    return Capacitor.isNativePlatform();
+  }
   backToSearchDetail() {
-    this.router.navigate(
-      [
-        'searchschool',
-        this.selectedCountry,
-        this.detectedCountry,
-        this.selectedCountryName
-      ]);
+    this.router.navigate([
+      'searchschool',
+      this.selectedCountry,
+      this.detectedCountry,
+      this.selectedCountryName,
+    ]);
   }
 }
