@@ -11,6 +11,7 @@ import { Observable, throwError } from 'rxjs';
 import { SettingsService } from '../services/settings.service';
 import { StorageService } from './storage.service';
 import { HardwareIdService } from './hardware-id.service';
+import { LocationService } from './location.service';
 
 @Injectable({
   providedIn: 'root',
@@ -21,7 +22,9 @@ export class UploadService {
     private http: HttpClient,
     private settingService: SettingsService,
     private storage: StorageService,
-    private hardwareIdService: HardwareIdService
+    private hardwareIdService: HardwareIdService,
+    private locationService: LocationService
+
   ) {}
 
   /**
@@ -159,6 +162,7 @@ export class UploadService {
     measurement.giga_id_school = this.storage.get('gigaId');
     measurement.app_version = environment.app_version;
     measurement.ip_address = measurement.ClientInfo.IP;
+    measurement['geolocation'] = this.locationService.getSavedGeolocation();
 
     // Add hardware ID for machine-level tracking
     const hardwareId = this.hardwareIdService.getHardwareId();
