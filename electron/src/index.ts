@@ -1,16 +1,18 @@
+
 import type { CapacitorElectronConfig } from '@capacitor-community/electron';
 import {
   getCapacitorElectronConfig,
   setupElectronDeepLinking,
 } from '@capacitor-community/electron';
 import type { MenuItemConstructorOptions } from 'electron';
-import { app, MenuItem, ipcMain, dialog } from 'electron';
+import { app, MenuItem, ipcMain, dialog, safeStorage  } from 'electron';
 import electronIsDev from 'electron-is-dev';
 import unhandled from 'electron-unhandled';
 import { autoUpdater } from 'electron-updater';
 import fs from 'fs-extra';
 import path from 'path';
 import * as si from 'systeminformation';
+import { createHmac, randomBytes } from "crypto";
 
 import {
   ElectronCapacitorApp,
@@ -20,6 +22,7 @@ import {
   getIsQuiting,
 } from './setup';
 import { captureException } from '@sentry/node';
+let encryptedToken: Buffer | null = null;
 
 // Set userData path to use name instead of productName - must be set before app is ready
 const userDataPath = path.join(app.getPath('appData'), 'unicef-pdca');
@@ -85,6 +88,56 @@ if (capacitorFileConfig.electron?.deepLinkingEnabled) {
       'mycapacitorapp',
   });
 }
+
+ipcMain.handle("hmac-sign", async (_event, { secretkey, token, nonce, timestamp }) => {
+  const ts = timestamp ?? Date.now();
+
+  // Construct message
+  const msg = [token, nonce, ts.toString()].join("|");
+
+  // Use token or a separate secret key as HMAC secret
+  const signature = createHmac("sha256", secretkey)
+    .update(msg, "utf8")
+    .digest("base64");
+
+  return { signature, timestamp: ts };
+});
+
+// Optional helper if you want Electron to generate nonce centrally
+ipcMain.handle("generate-nonce", async () => {
+  return randomBytes(32).toString("base64");
+});
+
+ipcMain.handle("save-token", async (_event, token: string) => {
+  try {
+    if (safeStorage.isEncryptionAvailable()) {
+      encryptedToken = safeStorage.encryptString(token);
+      console.log('Encrypted & saved token:', encryptedToken.toString("base64"));
+      return true; 
+    } else {
+      console.warn("Encryption not available on this platform.");
+      return false;
+    }
+  } catch (e) {
+    console.error('Error while saving token:', e);
+    return false;
+  }
+});
+
+
+ipcMain.handle("get-token", async () => {
+  try {
+    if (encryptedToken && safeStorage.isEncryptionAvailable()) {
+      return safeStorage.decryptString(encryptedToken);
+    }
+  }
+
+  catch (error) {
+    console.log('envruptoon failed', error)
+
+  }
+  return null;
+});
 
 // If we are in Dev mode, use the file watcher components.
 if (electronIsDev) {
@@ -172,7 +225,8 @@ if (!gotTheLock) {
     autoUpdater.checkForUpdates();
   }, 3600000);
 
-  autoUpdater.on('update-downloaded', (_event, releaseNotes, releaseName) => {
+  
+  autoUpdater.on('update-downloaded', (_event: any, releaseNotes: any, releaseName: any) => {
     const dialogOpts = {
       type: 'info' as const,
       buttons: ['Restart / Reinicie. / Перезапуск', 'Later / Después / Позже'],

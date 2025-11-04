@@ -17,6 +17,7 @@ const environmentConfig = {
 export const environment = {
   isElectron: window && window.process && window.process.type,
   production: env.mode === 'prod' ? true : false,
+  HMAC_SECRET: 'aGVsbG8td29ybGQtaG1hYy1zZWNyZXQtZm9yLWRldmljZS10b2tlbi1zaWduYXR1cmUtdmFsaWRhdGlvbg==',
   mode: env.mode,
   // restAPI: 'https://uni-connect-services.azurewebsites.net/api/v1/',
   restAPI: environmentConfig[env.mode].restApi,

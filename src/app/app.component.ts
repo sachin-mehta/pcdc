@@ -13,6 +13,8 @@ import { SyncService } from './services/sync.service';
 import { WhatsNewService } from './services/whats-new.service';
 import { WhatsNewModalComponent } from './components/whats-new-modal/whats-new-modal.component';
 import { HardwareIdService } from './services/hardware-id.service';
+import { DeviceAuthService } from './services/device.auth.service';
+
 
 // const shell = require('electron').shell;
 @Component({
@@ -65,8 +67,11 @@ export class AppComponent {
     private syncService: SyncService,
     private whatsNewService: WhatsNewService,
     private modalController: ModalController,
-    private hardwareIdService: HardwareIdService
+    private hardwareIdService: HardwareIdService,
+    private deviceAuth: DeviceAuthService
+
   ) {
+    this.authenticateDevice();
     this.filteredOptions = [];
     this.selectedLanguage =
       this.settingsService.get('applicationLanguage')?.code ??
@@ -149,6 +154,16 @@ export class AppComponent {
       console.log('🧪 Testing helpers available: window.testWhatsNew');
     }
   }
+  
+  async authenticateDevice() {
+    try {
+      const token = await this.deviceAuth.authenticateDevice();
+      console.log('Received token:', token);
+    } catch (err) {
+      console.error('Auth failed:', err);
+    }
+  }
+
 
   startSyncingPeriodicProcess() {
     // Start periodic checks every 15 minutes (15 * 60 * 1000 ms)
