@@ -85,7 +85,11 @@ export class AppComponent {
     };
     this.translate.use(appLang.code);
     this.app_version = environment.app_version;
-    this.device_id = this.storage.get('schoolUserId') || 'unknown-device';
+    // Use system hardware ID instead of schoolUserId
+    this.device_id =
+      this.hardwareIdService.getHardwareId() ||
+      this.storage.get('system_hardware_id') ||
+      'unknown-device';
     // Show the full device ID as requested
     this.device_id_short = this.device_id;
     if (this.storage.get('schoolId')) {

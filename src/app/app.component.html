@@ -284,6 +284,12 @@
             <ion-label [innerHTML]="'app.whats-new' | translate"></ion-label>
             <ion-img src="assets/images/setting_arrow.svg"></ion-img>
           </ion-item>
+          <div class="version-section">
+            <div class="version-header">VERSION</div>
+            <div class="version-container">
+              <div class="version-value">{{ app_version }}</div>
+            </div>
+          </div>
           <div class="device-id-section">
             <div class="device-id-header">DEVICE ID</div>
             <div class="device-id-container" (click)="copy(device_id)">
@@ -650,9 +656,7 @@
           </div>
 
           <div class="release-content">
-            <ion-label class="release-title"
-              >Headline: {{ release.title }}</ion-label
-            >
+            <ion-label class="release-title">{{ release.title }}</ion-label>
 
             <div class="release-items">
               <div class="release-item" *ngFor="let item of release.items">
