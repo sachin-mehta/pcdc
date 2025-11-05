@@ -116,6 +116,7 @@ if (!gotTheLock) {
 
     // Get and log system hardware ID
     try {
+      console.log('🔍 [Electron] Retrieving system hardware ID...');
       const systemData = await si.system();
       const osData = await si.osInfo();
 
@@ -135,24 +136,57 @@ if (!gotTheLock) {
 
       // Send hardware ID to renderer process when ready
       if (mainWindow && mainWindow.webContents) {
-        mainWindow.webContents.once('did-finish-load', () => {
-          const hardwareData = {
-            hardwareId,
-            uuid: systemData.uuid,
-            serial: systemData.serial,
-            sku: systemData.sku,
-            manufacturer: systemData.manufacturer,
-            model: systemData.model,
-            osSerial: osData.serial,
-            timestamp: new Date().toISOString(),
-          };
+        const hardwareData = {
+          hardwareId,
+          uuid: systemData.uuid,
+          serial: systemData.serial,
+          sku: systemData.sku,
+          manufacturer: systemData.manufacturer,
+          model: systemData.model,
+          osSerial: osData.serial,
+          timestamp: new Date().toISOString(),
+        };
+
+        // Try to send immediately if already loaded
+        if (mainWindow.webContents.isLoading()) {
+          mainWindow.webContents.once('did-finish-load', () => {
+            mainWindow.webContents.send('system-hardware-id', hardwareData);
+            console.log(
+              '✅ [Electron] Hardware ID sent to renderer (after load)'
+            );
+          });
+        } else {
+          // Already loaded, send immediately
           mainWindow.webContents.send('system-hardware-id', hardwareData);
-          console.log('✅ Hardware ID sent to renderer process');
-        });
+          console.log('✅ [Electron] Hardware ID sent to renderer (immediate)');
+        }
       }
     } catch (error) {
-      console.error('Error getting system hardware ID:', error);
+      console.error('❌ [Electron] Error getting system hardware ID:', error);
       captureException(error);
+
+      // Send error event to renderer
+      if (mainWindow && mainWindow.webContents) {
+        const errorData = {
+          error: 'Failed to retrieve hardware ID',
+          message: error.message || 'Unknown error',
+          timestamp: new Date().toISOString(),
+        };
+
+        if (mainWindow.webContents.isLoading()) {
+          mainWindow.webContents.once('did-finish-load', () => {
+            mainWindow.webContents.send('system-hardware-id-error', errorData);
+            console.log(
+              '❌ [Electron] Hardware ID error sent to renderer (after load)'
+            );
+          });
+        } else {
+          mainWindow.webContents.send('system-hardware-id-error', errorData);
+          console.log(
+            '❌ [Electron] Hardware ID error sent to renderer (immediate)'
+          );
+        }
+      }
     }
   });
   /*
@@ -301,6 +335,7 @@ ipcMain.addListener('closeFromUi', (ev) => {
 // IPC handler to get hardware ID from renderer process
 ipcMain.handle('get-hardware-id', async () => {
   try {
+    console.log('📤 [Electron] Hardware ID requested via IPC');
     const systemData = await si.system();
     const osData = await si.osInfo();
     const hardwareId =
@@ -317,11 +352,15 @@ ipcMain.handle('get-hardware-id', async () => {
       timestamp: new Date().toISOString(),
     };
 
-    console.log('📤 Hardware ID requested via IPC');
+    console.log('✅ [Electron] Hardware ID returned via IPC:', hardwareId);
     return hardwareData;
   } catch (error) {
-    console.error('Error getting hardware ID via IPC:', error);
+    console.error('❌ [Electron] Error getting hardware ID via IPC:', error);
     captureException(error);
-    return { error: 'Failed to get hardware ID' };
+    return {
+      error: 'Failed to get hardware ID',
+      message: error.message || 'Unknown error',
+      timestamp: new Date().toISOString(),
+    };
   }
 });

@@ -661,13 +661,13 @@
               </div>
             </div>
 
-            <ion-button
+            <!-- <ion-button
               fill="clear"
               class="release-notes-link"
               (click)="openReleaseNotes()"
             >
               Check Release notes →
-            </ion-button>
+            </ion-button> -->
           </div>
         </div>
 
@@ -729,6 +729,12 @@
               [translateParams]="{ app_version: app_version }"></ion-label>
             <ion-icon name="chevron-download"></ion-icon>
           </ion-item> -->
+
+          <!-- Logout Item -->
+          <ion-item (click)="openLogoutModal()" class="logout-item">
+            <ion-icon name="log-out-outline"></ion-icon>
+            <ion-label>Logout</ion-label>
+          </ion-item>
         </ion-list>
       </div>
     </ion-content>
