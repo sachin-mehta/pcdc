@@ -90,20 +90,29 @@ export class HomePage {
 
       console.log('📊 [HomePage] Device status:', status);
 
-      if (status.exists && status.is_active === false) {
+      // Failsafe: Check if status and status.data exist
+      if (!status || !status.data) {
+        console.warn(
+          '⚠️ [HomePage] Invalid status response, proceeding with existing registration'
+        );
+        this.proceedWithExistingRegistration();
+        return;
+      }
+
+      if (status.data.exists && status.data.is_active === false) {
         // Device was deactivated by another user (logged out)
         console.warn('🚫 [HomePage] Device has been deactivated (logged out)');
         console.log('   Clearing localStorage and forcing new registration...');
         await this.storage.clear();
         this.loading.dismiss();
         // Stay on home page - user will see registration options
-      } else if (status.exists && status.is_active === true) {
+      } else if (status.data.exists && status.data.is_active === true) {
         // Device is active, proceed normally
         console.log(
           '✅ [HomePage] Device is active, proceeding with existing registration...'
         );
         this.proceedWithExistingRegistration();
-      } else if (!status.exists) {
+      } else if (!status.data.exists) {
         // Device not found in backend - backward compatibility
         // Keep local data for old registrations before hardware ID tracking
         console.warn(
