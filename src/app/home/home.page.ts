@@ -101,22 +101,30 @@ export class HomePage {
    */
   private async checkHardwareRegistration() {
     try {
+      console.log('🔍 [HomePage] Starting hardware registration check...');
+
       // Wait for hardware ID to be available (with 5 second timeout)
       const hardwareId = await this.hardwareIdService.ensureHardwareId(5000);
 
       if (hardwareId) {
         console.log(
-          'Checking for existing registration with hardware ID:',
+          '🔍 [HomePage] Checking for existing registration with hardware ID:',
           hardwareId
         );
         await this.checkMachineRegistration(hardwareId);
       } else {
         // No hardware ID available after timeout - proceed normally
-        console.log('⚠️ No hardware ID available, proceeding with normal flow');
+        console.warn(
+          '⚠️ [HomePage] No hardware ID available, proceeding with normal flow'
+        );
+        console.log('   User will need to manually register the device');
         this.loading.dismiss();
       }
     } catch (error) {
-      console.error('Error in hardware registration check:', error);
+      console.error(
+        '❌ [HomePage] Error in hardware registration check:',
+        error
+      );
       this.loading.dismiss();
     }
   }
@@ -126,26 +134,41 @@ export class HomePage {
    */
   private async checkMachineRegistration(hardwareId: string) {
     try {
+      console.log(
+        '🌐 [HomePage] Querying backend for existing registration...'
+      );
       const response = await this.schoolService
         .checkRegistrationByHardwareId(hardwareId)
         .toPromise();
 
+      console.log('📥 [HomePage] Backend response:', response);
+
       // Backend returns: { success: true, data: { exists: true/false, ... }, timestamp, message }
       if (response?.success && response?.data?.exists === true) {
         // Found existing registration - populate localStorage
-        console.log('✅ Found existing registration for this machine');
+        console.log(
+          '✅ [HomePage] Found existing registration for this machine!'
+        );
+        console.log('   User ID:', response.data.user_id);
+        console.log('   School ID:', response.data.school_id);
+        console.log('   Giga ID:', response.data.giga_id_school);
         await this.applyExistingRegistration(response.data);
         this.loading.dismiss();
+        console.log('🚀 [HomePage] Navigating to /starttest...');
         this.router.navigate(['/starttest']);
         this.settingsService.setSetting('scheduledTesting', true);
       } else {
         // No registration found - user needs to register
-        console.log('ℹ️ No existing registration found');
+        console.log(
+          'ℹ️ [HomePage] No existing registration found for this hardware ID'
+        );
+        console.log('   User needs to manually register the device');
         this.loading.dismiss();
       }
     } catch (err) {
       // API error - gracefully fallback to normal registration flow
-      console.error('Error checking machine registration:', err);
+      console.error('❌ [HomePage] Error checking machine registration:', err);
+      console.log('   Falling back to normal registration flow');
       this.loading.dismiss();
     }
   }
@@ -154,33 +177,44 @@ export class HomePage {
    * Populate localStorage with existing registration data
    */
   private async applyExistingRegistration(registrationData: any) {
-    console.log('registrationData', registrationData);
+    console.log(
+      '💾 [HomePage] Applying existing registration to localStorage...'
+    );
+    console.log('   Registration data:', registrationData);
 
     // Only set values that are non-null and not undefined
     if (registrationData.user_id != null) {
       await this.storage.set('schoolUserId', registrationData.user_id);
+      console.log('   ✓ Set schoolUserId:', registrationData.user_id);
     }
     if (registrationData.school_id != null) {
       await this.storage.set('schoolId', registrationData.school_id);
       await this.storage.set('school_id', registrationData.school_id);
+      console.log('   ✓ Set schoolId:', registrationData.school_id);
     }
     if (registrationData.giga_id_school != null) {
       await this.storage.set('gigaId', registrationData.giga_id_school);
+      console.log('   ✓ Set gigaId:', registrationData.giga_id_school);
     }
     if (registrationData.mac_address != null) {
       await this.storage.set('macAddress', registrationData.mac_address);
+      console.log('   ✓ Set macAddress:', registrationData.mac_address);
     }
     if (registrationData.os != null) {
       await this.storage.set('deviceType', registrationData.os);
+      console.log('   ✓ Set deviceType:', registrationData.os);
     }
     if (registrationData.ip_address != null) {
       await this.storage.set('ip_address', registrationData.ip_address);
+      console.log('   ✓ Set ip_address:', registrationData.ip_address);
     }
     if (registrationData.app_version != null) {
       await this.storage.set('version', registrationData.app_version);
+      console.log('   ✓ Set version:', registrationData.app_version);
     }
     if (registrationData.country_code != null) {
       await this.storage.set('country_code', registrationData.country_code);
+      console.log('   ✓ Set country_code:', registrationData.country_code);
     }
 
     // Handle school_info which might be an object or string
@@ -190,9 +224,12 @@ export class HomePage {
           ? registrationData.schoolInfo
           : JSON.stringify(registrationData.schoolInfo);
       await this.storage.set('schoolInfo', schoolInfo);
+      console.log('   ✓ Set schoolInfo');
     }
 
-    console.log('✅ Registration data loaded from hardware ID');
+    console.log(
+      '✅ [HomePage] Registration data successfully loaded from hardware ID'
+    );
   }
 
   openExternalUrl(href) {
