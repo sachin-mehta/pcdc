@@ -53,47 +53,116 @@ export class HomePage {
     this.loading.present(loadingMsg, 6000, 'pdcaLoaderClass', 'null');
 
     if (this.storage.get('schoolId')) {
-      // User already has local registration - existing flow
-      let schoolId = this.storage.get('schoolId');
-      const gigaId = this.storage.get('gigaId');
-      const schoolUserId = this.storage.get('schoolUserId');
-
-      const getFlagsAndCheckGigaId = async () => {
-        try {
-          // get the feature flags
-          await settingsService.getFeatureFlags();
-          // check if the gigaId is correct
-          schoolId = this.storage.get('schoolId');
-          removeUnregisterSchool(
-            schoolId,
-            schoolService,
-            storage,
-            settingsService
-          ).then((response) => {
-            if (response) {
-              loading.dismiss();
-              this.router.navigate(['/starttest']);
-            } else {
-              loading.dismiss();
-              this.router.navigate([
-                'schoolnotfound',
-                schoolId,
-                0,
-                0,
-                NotFound.notRegister,
-              ]);
-            }
-          });
-        } catch (e) {
-          this.router.navigate(['/starttest']);
-          this.loading.dismiss();
-        }
-      };
-      getFlagsAndCheckGigaId();
+      // User has local registration - check if device is still active
+      this.checkDeviceStatusAndProceed();
     } else {
       // No local registration - check if machine is already registered via hardware ID
       this.checkHardwareRegistration();
     }
+  }
+
+  /**
+   * Check device status and proceed if active, or clear if deactivated
+   */
+  private async checkDeviceStatusAndProceed() {
+    console.log(
+      '🔍 [HomePage] Checking device status for existing registration...'
+    );
+
+    const gigaId = this.storage.get('gigaId');
+
+    // Need hardware ID to check status
+    const hardwareId = await this.hardwareIdService.ensureHardwareId(5000);
+
+    if (!hardwareId || !gigaId) {
+      // Can't check status without hardware ID or gigaId, proceed with existing registration
+      console.warn(
+        '⚠️ [HomePage] Missing hardwareId or gigaId, proceeding with existing registration'
+      );
+      this.proceedWithExistingRegistration();
+      return;
+    }
+
+    try {
+      const status = await this.schoolService
+        .checkDeviceStatus(hardwareId, gigaId)
+        .toPromise();
+
+      console.log('📊 [HomePage] Device status:', status);
+
+      if (status.exists && status.is_active === false) {
+        // Device was deactivated by another user (logged out)
+        console.warn('🚫 [HomePage] Device has been deactivated (logged out)');
+        console.log('   Clearing localStorage and forcing new registration...');
+        await this.storage.clear();
+        this.loading.dismiss();
+        // Stay on home page - user will see registration options
+      } else if (status.exists && status.is_active === true) {
+        // Device is active, proceed normally
+        console.log(
+          '✅ [HomePage] Device is active, proceeding with existing registration...'
+        );
+        this.proceedWithExistingRegistration();
+      } else if (!status.exists) {
+        // Device not found in backend - backward compatibility
+        // Keep local data for old registrations before hardware ID tracking
+        console.warn(
+          '⚠️ [HomePage] Device not found in backend (may be old registration)'
+        );
+        console.log(
+          '   Proceeding with existing registration for backward compatibility...'
+        );
+        this.proceedWithExistingRegistration();
+      }
+    } catch (error) {
+      console.error('❌ [HomePage] Error checking device status:', error);
+      // On API error, proceed with existing registration (fail open)
+      // This prevents blocking users if backend is temporarily down
+      console.log('   Proceeding with existing registration (fail open)...');
+      this.proceedWithExistingRegistration();
+    }
+  }
+
+  /**
+   * Proceed with existing registration flow
+   */
+  private async proceedWithExistingRegistration() {
+    let schoolId = this.storage.get('schoolId');
+    const gigaId = this.storage.get('gigaId');
+    const schoolUserId = this.storage.get('schoolUserId');
+
+    const getFlagsAndCheckGigaId = async () => {
+      try {
+        // get the feature flags
+        await this.settingsService.getFeatureFlags();
+        // check if the gigaId is correct
+        schoolId = this.storage.get('schoolId');
+        removeUnregisterSchool(
+          schoolId,
+          this.schoolService,
+          this.storage,
+          this.settingsService
+        ).then((response) => {
+          if (response) {
+            this.loading.dismiss();
+            this.router.navigate(['/starttest']);
+          } else {
+            this.loading.dismiss();
+            this.router.navigate([
+              'schoolnotfound',
+              schoolId,
+              0,
+              0,
+              NotFound.notRegister,
+            ]);
+          }
+        });
+      } catch (e) {
+        this.router.navigate(['/starttest']);
+        this.loading.dismiss();
+      }
+    };
+    getFlagsAndCheckGigaId();
   }
 
   /**

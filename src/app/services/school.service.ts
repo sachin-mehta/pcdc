@@ -113,6 +113,26 @@ export class SchoolService {
   }
 
   /**
+   * Check if a device is still active (not deactivated/logged out)
+   * @param hardwareId - Device hardware ID
+   * @param gigaId - School giga ID
+   * @returns Observable with device status
+   */
+  checkDeviceStatus(hardwareId: string, gigaId: string): Observable<any> {
+    return this.http
+      .get(
+        `${environment.restAPI}dailycheckapp_schools/checkDeviceStatus/${hardwareId}/${gigaId}`,
+        this.options
+      )
+      .pipe(
+        tap((response) =>
+          console.log('Device status check response:', response)
+        ),
+        catchError(this.handleError)
+      );
+  }
+
+  /**
    * Return unique user id for perticular device
    *
    * @param data Object with these parameters {
