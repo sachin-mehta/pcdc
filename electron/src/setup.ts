@@ -213,7 +213,7 @@ export class ElectronCapacitorApp {
       height: this.mainWindowState?.height,
       // titleBarStyle: 'hidden',
       maximizable: false,
-      minimizable: false,
+      minimizable: true,
       resizable: false,
       frame: true,
       useContentSize: true, //Make content area exactly 390x700
@@ -396,7 +396,7 @@ export class ElectronCapacitorApp {
         }
       });
       setTimeout(() => {
-        if ((this.CapacitorFileConfig.electron as any)?.electronIsDev) {
+        if (1) {
           this.MainWindow.webContents.openDevTools();
           this.MainWindow.setSize(390, 700);
         }

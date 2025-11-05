@@ -72,7 +72,7 @@ export class HomePage {
     const gigaId = this.storage.get('gigaId');
 
     // Need hardware ID to check status
-    const hardwareId = await this.hardwareIdService.ensureHardwareId(5000);
+    const hardwareId = await this.hardwareIdService.ensureHardwareId(10000);
 
     if (!hardwareId || !gigaId) {
       // Can't check status without hardware ID or gigaId, proceed with existing registration
@@ -172,8 +172,8 @@ export class HomePage {
     try {
       console.log('🔍 [HomePage] Starting hardware registration check...');
 
-      // Wait for hardware ID to be available (with 5 second timeout)
-      const hardwareId = await this.hardwareIdService.ensureHardwareId(5000);
+      // Wait for hardware ID to be available (with 10 second timeout)
+      const hardwareId = await this.hardwareIdService.ensureHardwareId(10000);
 
       if (hardwareId) {
         console.log(

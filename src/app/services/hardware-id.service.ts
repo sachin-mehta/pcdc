@@ -174,10 +174,10 @@ export class HardwareIdService {
    * The constructor's event listeners handle saving to localStorage,
    * this method just waits for the data to appear there.
    *
-   * @param timeoutMs Maximum time to wait in milliseconds (default: 5000ms)
+   * @param timeoutMs Maximum time to wait in milliseconds (default: 10000ms)
    * @returns Promise that resolves to hardware ID or null
    */
-  async ensureHardwareId(timeoutMs: number = 5000): Promise<string | null> {
+  async ensureHardwareId(timeoutMs: number = 10000): Promise<string | null> {
     const startTime = Date.now();
 
     // Check immediately first (most common case - already available)
