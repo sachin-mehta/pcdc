@@ -396,7 +396,7 @@ export class ElectronCapacitorApp {
         }
       });
       setTimeout(() => {
-        if (1) {
+        if ((this.CapacitorFileConfig.electron as any)?.electronIsDev) {
           this.MainWindow.webContents.openDevTools();
           this.MainWindow.setSize(390, 700);
         }
