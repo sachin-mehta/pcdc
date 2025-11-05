@@ -654,3 +654,32 @@ ion-content.menuContent::part(scroll)::-webkit-scrollbar {
     color: #3367d6;
 }
 
+// Logout item styling
+.logout-item {
+    ion-icon {
+        color: #999;
+        font-size: 20px;
+    }
+    
+    ion-label {
+        color: #999;
+        font-size: 14px !important;
+        font-weight: 400;
+        padding-left: 8px;
+    }
+    
+    &:hover {
+        ion-icon,
+        ion-label {
+            color: #666;
+        }
+    }
+}
+
+// Modal styling for logout modal
+.logout-modal {
+    --width: 90%;
+    --max-width: 450px;
+    --border-radius: 12px;
+}
+

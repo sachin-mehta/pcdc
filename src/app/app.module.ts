@@ -16,6 +16,7 @@ import { SharedModule } from './shared/shared.module';
 import { SentryService } from './services/sentry.service';
 import { SentryErrorHandler } from './core/sentry-error-handler';
 import { WhatsNewModalComponent } from './components/whats-new-modal/whats-new-modal.component';
+import { LogoutModalComponent } from './components/logout-modal/logout-modal.component';
 
 /* Import token interceptor */
 import { TokenInterceptor } from './auth/token.interceptor';
@@ -27,7 +28,7 @@ export function tokenGetter() {
 }
 
 @NgModule({
-  declarations: [AppComponent, WhatsNewModalComponent],
+  declarations: [AppComponent, WhatsNewModalComponent, LogoutModalComponent],
   imports: [
     FormsModule,
     BrowserModule,
