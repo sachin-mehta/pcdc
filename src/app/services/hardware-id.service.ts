@@ -170,14 +170,17 @@ export class HardwareIdService {
   }
 
   /**
-   * Wait for hardware ID to be available with timeout (event-driven, no polling)
+   * Wait for hardware ID to be available with timeout (polling localStorage)
+   * The constructor's event listeners handle saving to localStorage,
+   * this method just waits for the data to appear there.
+   *
    * @param timeoutMs Maximum time to wait in milliseconds (default: 5000ms)
    * @returns Promise that resolves to hardware ID or null
    */
   async ensureHardwareId(timeoutMs: number = 5000): Promise<string | null> {
     const startTime = Date.now();
 
-    // Check if already available in localStorage
+    // Check immediately first (most common case - already available)
     const existingId = this.getHardwareId();
     if (existingId) {
       console.log(
@@ -198,82 +201,61 @@ export class HardwareIdService {
       `⏳ [HardwareID] Waiting for hardware ID (timeout: ${timeoutMs}ms)...`
     );
 
-    // Create a promise that will be resolved by event listeners
+    // Poll localStorage for hardware ID (saved by constructor's event listeners)
     return new Promise((resolve) => {
       let isResolved = false;
 
+      // Polling function with error handling
+      const checkForHardwareId = () => {
+        try {
+          const id = this.getHardwareId();
+          if (id && !isResolved) {
+            isResolved = true;
+            clearInterval(pollInterval);
+            clearTimeout(timeoutHandle);
+            const elapsed = Date.now() - startTime;
+            console.log(
+              `✅ [HardwareID] Hardware ID found after ${elapsed}ms:`,
+              id
+            );
+            resolve(id);
+          }
+        } catch (error) {
+          console.error(
+            '❌ [HardwareID] Error reading from localStorage:',
+            error
+          );
+          // Continue polling, might be a temporary issue
+        }
+      };
+
+      // Poll every 50ms (finds data quickly without excessive CPU usage)
+      const pollInterval = setInterval(checkForHardwareId, 50);
+
       // Set up timeout
-      const timeout = setTimeout(() => {
+      const timeoutHandle = setTimeout(() => {
         if (!isResolved) {
           isResolved = true;
+          clearInterval(pollInterval);
           const elapsed = Date.now() - startTime;
-          console.error(
-            `❌ [HardwareID] Hardware ID fetch timeout after ${elapsed}ms`
-          );
+          console.error(`❌ [HardwareID] Timeout after ${elapsed}ms`);
           console.error('   Possible causes:');
           console.error(
             '   1. Electron main process failed to retrieve system info'
           );
           console.error('   2. IPC communication is broken');
-          console.error('   3. Event listeners not properly set up');
+          console.error('   3. Hardware ID not saved to localStorage');
+          console.error('   4. Event listeners not triggering properly');
           resolve(null);
         }
       }, timeoutMs);
 
-      // Set up one-time success handler
-      const onSuccess = (data: HardwareData) => {
-        if (!isResolved) {
-          isResolved = true;
-          clearTimeout(timeout);
-          const elapsed = Date.now() - startTime;
-          console.log(
-            `✅ [HardwareID] Hardware ID received after ${elapsed}ms:`,
-            data.hardwareId
-          );
-          resolve(data.hardwareId);
-        }
-      };
-
-      // Set up one-time error handler
-      const onError = (error: HardwareError) => {
-        if (!isResolved) {
-          isResolved = true;
-          clearTimeout(timeout);
-          const elapsed = Date.now() - startTime;
-          console.error(
-            `❌ [HardwareID] Hardware ID error after ${elapsed}ms:`,
-            error.message
-          );
-          resolve(null);
-        }
-      };
-
-      // Listen for events
-      if (this.isElectron()) {
-        this.getElectronAPI()?.onHardwareId(onSuccess);
-        this.getElectronAPI()?.onHardwareIdError(onError);
-
-        // Try to fetch via IPC if not already in progress
-        this.fetchHardwareId()
-          .then((data) => {
-            if (data && !isResolved) {
-              isResolved = true;
-              clearTimeout(timeout);
-              const elapsed = Date.now() - startTime;
-              console.log(
-                `✅ [HardwareID] Hardware ID fetched via IPC after ${elapsed}ms:`,
-                data.hardwareId
-              );
-              resolve(data.hardwareId);
-            }
-          })
-          .catch((error) => {
-            if (!isResolved) {
-              console.error('❌ [HardwareID] IPC fetch failed:', error);
-              // Don't resolve here, let timeout handle it
-            }
-          });
-      }
+      // Try to fetch via IPC as a backup (don't await, let it happen async)
+      // The constructor's listeners will save it to localStorage if successful
+      this.fetchHardwareId().catch((err) => {
+        console.warn('⚠️ [HardwareID] Background IPC fetch failed:', err);
+        // Don't resolve on error, let timeout handle it
+      });
     });
   }
 
