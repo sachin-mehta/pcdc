@@ -53,6 +53,37 @@ ion-content {
     }
 }
 
+// Version section styling to match device ID design
+.version-section {
+    margin: 16px;
+    
+    .version-header {
+        font-size: 12px;
+        font-weight: 600;
+        color: #666;
+        margin-bottom: 8px;
+        letter-spacing: 0.5px;
+    }
+    
+    .version-container {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: #f8f9fa;
+        border: 1px solid #e9ecef;
+        border-radius: 8px;
+        padding: 16px;
+        
+        .version-value {
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            color: #333;
+            flex: 1;
+            line-height: 1.4;
+        }
+    }
+}
+
 // Device ID section styling to match the design
 .device-id-section {
     margin: 16px;
