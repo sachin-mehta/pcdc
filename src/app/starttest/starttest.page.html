@@ -86,6 +86,7 @@
       <app-circular-progress-bar
         [progressValue]="progress"
         [secondLabel]="(currentState !=undefined && currentState != 'Starting' && onlineStatus) && downloadStarted ? 'DOWNLOAD' : (currentState !=undefined && currentState != 'Starting' && onlineStatus && uploadStarted === true) ? 'UPLOAD' : currentState == 'Completed' ? 'TEST AGAIN': ''"
+        [statusMessage]="getStatusMessage()"
         [icon]="''"
         [error]="(connectionStatus=='error' && currentState == undefined) || (!onlineStatus)"
         (startTest)="startNDT()"

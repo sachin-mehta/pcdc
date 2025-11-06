@@ -11,12 +11,12 @@ import { Country } from '../shared/country.model';
 import { CountryService } from '../services/country.service';
 import { TranslateService } from '@ngx-translate/core';
 import { environment } from 'src/environments/environment';
+import { finalize } from 'rxjs/operators';
 @Component({
   selector: 'app-searchcountry',
   templateUrl: 'searchcountry.page.html',
   styleUrls: ['searchcountry.page.scss'],
-  standalone: false
-
+  standalone: false,
 })
 export class SearchcountryPage {
   @ViewChild(IonAccordionGroup, { static: true })
@@ -1033,6 +1033,7 @@ export class SearchcountryPage {
   appNameSuffix = environment.appNameSuffix;
   searchTerm: string = '';
   filteredCountries: Country[] = [];
+  isCheckingEligibility: boolean = false;
 
   constructor(
     private storage: StorageService,
@@ -1055,7 +1056,7 @@ export class SearchcountryPage {
       this.filteredCountries = [];
     } else {
       const searchTerm = event.target.value.toLowerCase();
-      this.filteredCountries = this.countries.filter(country =>
+      this.filteredCountries = this.countries.filter((country) =>
         country.name.toLowerCase().includes(searchTerm)
       );
       this.selectedFromList = false;
@@ -1075,28 +1076,35 @@ export class SearchcountryPage {
   validateSelectedCountry(country: Country) {
     // if (!this.selectedCountry) return;
 
-    this.countryService.getPcdcCountryByCode(country.code).subscribe(
-      (response) => {
-        this.pcdcCountry = response;
-        if (this.pcdcCountry.length > 0) {
-          this.isPcdcCountry = true;
-          this.selectedCountry = country.code;
-
-        } else {
+    this.isCheckingEligibility = true;
+    this.countryService
+      .getPcdcCountryByCode(country.code)
+      .pipe(
+        finalize(() => {
+          this.isCheckingEligibility = false;
+        })
+      )
+      .subscribe(
+        (response) => {
+          this.pcdcCountry = response;
+          if (this.pcdcCountry.length > 0) {
+            this.isPcdcCountry = true;
+            this.selectedCountry = country.code;
+          } else {
+            this.isPcdcCountry = false;
+            // this.selectedCountry = country.code;
+          }
+        },
+        (err) => {
+          console.log('Validation error:', err);
           this.isPcdcCountry = false;
           // this.selectedCountry = country.code;
         }
-      },
-      (err) => {
-        console.log('Validation error:', err);
-        this.isPcdcCountry = false;
-        // this.selectedCountry = country.code;
-
-      }
-    );
+      );
   }
 
   confirmCountry() {
+    if (this.isCheckingEligibility) return;
     if (!this.selectedCountry || !this.isPcdcCountry) return;
 
     if (this.detectedCountry === undefined || this.detectedCountry === null) {
@@ -1108,7 +1116,7 @@ export class SearchcountryPage {
       'searchschool',
       this.selectedCountry,
       this.detectedCountry,
-      selectedCountryName
+      selectedCountryName,
     ]);
   }
 
@@ -1116,25 +1124,29 @@ export class SearchcountryPage {
     /* Store school id and giga id inside storage */
     let countryData = {};
 
-    this.networkService.getNetInfo().then((c) => {
-      console.log(c);
-      this.selectedCountry = c.country;
-      this.detectedCountry = c.country;
-      countryData = {
-        ip_address: c.ip,
-        country_code: c.country,
-      };
-      this.automaticSearched = true;
-      this.searchTerm = this.filterCountryByCode(this.selectedCountry).name;
-      this.selectCountry({name: this.searchTerm, code: c.country})
-
-    }, error => {
-      this.automaticSearched = false;
-    });
+    this.networkService.getNetInfo().then(
+      (c) => {
+        console.log(c);
+        this.selectedCountry = c.country;
+        this.detectedCountry = c.country;
+        countryData = {
+          ip_address: c.ip,
+          country_code: c.country,
+        };
+        this.automaticSearched = true;
+        this.searchTerm = this.filterCountryByCode(this.selectedCountry).name;
+        this.selectCountry({ name: this.searchTerm, code: c.country });
+      },
+      (error) => {
+        this.automaticSearched = false;
+      }
+    );
   }
 
   filterCountryByCode(countryCode: string): any {
-    return this.countries.find(country => country.code.toLowerCase() === countryCode.toLowerCase());
+    return this.countries.find(
+      (country) => country.code.toLowerCase() === countryCode.toLowerCase()
+    );
   }
 
   // onCountryChange(event) {
@@ -1227,5 +1239,4 @@ export class SearchcountryPage {
     this.isPcdcCountry = true; // temporarily assume it's valid during input
     this.filterCountries(event);
   }
-
 }

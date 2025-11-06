@@ -89,7 +89,7 @@ export class PingService {
   }
 
   async getBrowserId() {
-    const browserId = this.storage.get('schoolUserId'); 
+    const browserId = this.storage.get('schoolUserId');
     return { uuid: browserId };
   }
 
@@ -118,11 +118,9 @@ export class PingService {
 
       if (!this.storage.get('schoolId')) {
         console.log('No schoolId found, skipping Ping service');
-      } 
-      // else if (!featureFlags?.pingService) {
-      //   console.log('Ping service disabled by feature flags');
-      // } 
-      else {
+      } else if (!featureFlags?.pingService) {
+        console.log('Ping service disabled by feature flags');
+      } else {
         const result = await this.performCheck();
         if (result) {
           console.log('Ping result:', result);
@@ -185,7 +183,7 @@ export class PingService {
       this.latency = null;
 
       const configOptions = {
-        measurements: [{ type: 'latency', numPackets: 1 }],
+        measurements: [{ type: 'latency', numPackets: 10 }],
       };
       const speedTest = new SpeedTest(configOptions as any);
 

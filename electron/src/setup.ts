@@ -26,7 +26,6 @@ import windowStateKeeper from 'electron-window-state';
 import { join } from 'path';
 import * as Sentry from '@sentry/node';
 import { Console } from 'console';
-var AutoLaunch = require('auto-launch');
 var isQuiting = false;
 
 // Export functions to control quitting state
@@ -200,8 +199,8 @@ export class ElectronCapacitorApp {
       )
     );
     this.mainWindowState = windowStateKeeper({
-      defaultWidth: 376,
-      defaultHeight: 550,
+      defaultWidth: 390,
+      defaultHeight: 650,
     });
     // Setup preload script path and construct our main window.
     const preloadPath = join(app?.getAppPath(), 'build', 'src', 'preload.js');
@@ -214,7 +213,7 @@ export class ElectronCapacitorApp {
       height: this.mainWindowState?.height,
       // titleBarStyle: 'hidden',
       maximizable: false,
-      minimizable: false,
+      minimizable: true,
       resizable: false,
       frame: true,
       useContentSize: true, //Make content area exactly 390x700
@@ -267,7 +266,7 @@ export class ElectronCapacitorApp {
       }
     );
 
-    this.MainWindow?.setSize(390, 700);
+    this.MainWindow?.setSize(390, 650);
     this.mainWindowState?.manage(this.MainWindow);
 
     if (this.CapacitorFileConfig?.backgroundColor) {
@@ -424,26 +423,58 @@ export class ElectronCapacitorApp {
       });
     }
 
-    // Auto lunching code added by Kajal
-    var measureAppAutoLuncher = new AutoLaunch({
-      name: 'Unicef PDCA',
-    });
+    // Auto-launch configuration using Electron's native API
+    // This ensures the app starts on system boot for all users when installed per-machine
+    try {
+      // MIGRATION: Clean up old auto-launch registry entries to prevent duplicates
+      if (process.platform === 'win32') {
+        try {
+          const { execSync } = require('child_process');
+          // Remove old auto-launch entry with the old app name
+          const oldAppNames = ['Unicef PDCA', 'unicef-pdca'];
 
-    measureAppAutoLuncher?.enable();
-    measureAppAutoLuncher
-      ?.isEnabled()
-      .then(function (isEnabled) {
-        if (isEnabled) {
-          return;
+          oldAppNames.forEach((oldName) => {
+            try {
+              execSync(
+                `reg delete "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run" /v "${oldName}" /f`,
+                { stdio: 'ignore' }
+              );
+              console.log(`🧹 Cleaned up old auto-launch entry: ${oldName}`);
+            } catch (err) {
+              // Entry doesn't exist or already removed - this is fine
+              // Don't log to avoid noise
+            }
+          });
+        } catch (cleanupErr) {
+          // Cleanup is best-effort, don't fail if it doesn't work
+          console.log('ℹ️ Old auto-launch cleanup skipped (not critical)');
         }
-        measureAppAutoLuncher?.enable();
-      })
-      .catch(function (err) {
-        // handle error
-        Sentry.captureException(err);
-        console.log(err);
+      }
+
+      // Set up auto-launch with Electron's native API
+      app.setLoginItemSettings({
+        openAtLogin: true,
+        openAsHidden: false,
+        path: process.execPath,
+        args: [],
       });
-    // End of Auto lunching code
+
+      // Verify it was set correctly
+      const loginItemSettings = app.getLoginItemSettings();
+      console.log('✅ Auto-launch enabled:', loginItemSettings.openAtLogin);
+
+      if (!loginItemSettings.openAtLogin) {
+        console.warn('⚠️ Auto-launch could not be enabled');
+        Sentry.captureMessage('Auto-launch setting failed to enable', {
+          level: 'warning' as any,
+          extra: { loginItemSettings },
+        });
+      }
+    } catch (err) {
+      console.error('❌ Error setting auto-launch:', err);
+      Sentry.captureException(err);
+    }
+    // End of Auto-launch code
   }
 }
 

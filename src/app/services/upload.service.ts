@@ -1,10 +1,16 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpRequest, HttpParams } from '@angular/common/http';
+import {
+  HttpClient,
+  HttpHeaders,
+  HttpRequest,
+  HttpParams,
+} from '@angular/common/http';
 import { catchError, map, tap } from 'rxjs/operators';
 import { environment } from 'src/environments/environment';
 import { Observable, throwError } from 'rxjs';
 import { SettingsService } from '../services/settings.service';
 import { StorageService } from './storage.service';
+import { HardwareIdService } from './hardware-id.service';
 
 @Injectable({
   providedIn: 'root',
@@ -14,8 +20,9 @@ export class UploadService {
   constructor(
     private http: HttpClient,
     private settingService: SettingsService,
-    private storage: StorageService
-  ) { }
+    private storage: StorageService,
+    private hardwareIdService: HardwareIdService
+  ) {}
 
   /**
    * Return all network related information
@@ -27,10 +34,19 @@ export class UploadService {
     this.ts = new Date(record.timestamp);
     let measurement = {
       UUID: record.uuid,
-      Download: record.results["NDTResult.S2C"].LastClientMeasurement.MeanClientMbps * 1000,
-      Upload: record.results["NDTResult.C2S"].LastClientMeasurement.MeanClientMbps * 1000,
-      Latency: ((record.results['NDTResult.S2C'].LastServerMeasurement.BBRInfo.MinRTT +
-        record.results['NDTResult.C2S'].LastServerMeasurement.BBRInfo.MinRTT) / 2 / 1000).toFixed(0),
+      Download:
+        record.results['NDTResult.S2C'].LastClientMeasurement.MeanClientMbps *
+        1000,
+      Upload:
+        record.results['NDTResult.C2S'].LastClientMeasurement.MeanClientMbps *
+        1000,
+      Latency: (
+        (record.results['NDTResult.S2C'].LastServerMeasurement.BBRInfo.MinRTT +
+          record.results['NDTResult.C2S'].LastServerMeasurement.BBRInfo
+            .MinRTT) /
+        2 /
+        1000
+      ).toFixed(0),
       // TODO: Uncomment when new backend is ready
       // DataUsage: record.dataUsage.total,
       // DataUploaded: record.dataUsage.upload,
@@ -123,12 +139,12 @@ export class UploadService {
     let measurement = this.makeMeasurement(record);
 
     this.storage.get('country_code') === '' ||
-      this.storage.get('country_code') === null
+    this.storage.get('country_code') === null
       ? (measurement.country_code = measurement.ClientInfo.Country)
       : (measurement.country_code = this.storage.get('country_code'));
 
     this.storage.get('ip_address') === '' ||
-      this.storage.get('ip_address') === null
+    this.storage.get('ip_address') === null
       ? (measurement.ip_address = measurement.ClientInfo.IP)
       : (measurement.ip_address = this.storage.get('ip_address'));
     measurement.country_code = measurement.ClientInfo.Country;
@@ -143,6 +159,10 @@ export class UploadService {
     measurement.giga_id_school = this.storage.get('gigaId');
     measurement.app_version = environment.app_version;
     measurement.ip_address = measurement.ClientInfo.IP;
+
+    // Add hardware ID for machine-level tracking
+    const hardwareId = this.hardwareIdService.getHardwareId();
+    measurement['device_hardware_id'] = hardwareId || null;
 
     // Add API key if configured.
 
