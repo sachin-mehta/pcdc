@@ -110,4 +110,22 @@ export class TestDetailComponent implements OnInit {
 
     return triggerMapping[notes] || notes || '-';
   }
+
+  /**
+   * Get sync status text based on uploaded flag
+   * @param measurement The measurement data
+   * @returns Status text
+   */
+  getSyncStatusText(measurement: any): string {
+    return measurement.uploaded ? 'Success' : '-';
+  }
+
+  /**
+   * Get CSS class for sync status
+   * @param measurement The measurement data
+   * @returns CSS class name
+   */
+  getSyncStatusClass(measurement: any): string {
+    return measurement.uploaded ? 'green_color' : 'orange_color';
+  }
 }

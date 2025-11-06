@@ -292,19 +292,26 @@ export class MeasurementClientService {
 
     if (this.settingsService.get('uploadEnabled')) {
       try {
-        this.historyService.add(measurementRecord);
-        this.sharedService.broadcast(
-          'history:measurement:change',
-          'history:measurement:change'
-        );
+        // Try to upload first before saving to localStorage
         await this.uploadService
           .uploadMeasurement(measurementRecord)
           .toPromise();
         measurementRecord.uploaded = true;
       } catch (error) {
         console.error('Upload failed:', error);
+        measurementRecord.uploaded = false;
       }
+    } else {
+      // If upload is disabled, mark as not uploaded
+      measurementRecord.uploaded = false;
     }
+
+    // Now save to localStorage with the correct uploaded status
+    this.historyService.add(measurementRecord);
+    this.sharedService.broadcast(
+      'history:measurement:change',
+      'history:measurement:change'
+    );
 
     this.broadcastMeasurementStatus('complete', {
       passedResults: measurementRecord.results,
