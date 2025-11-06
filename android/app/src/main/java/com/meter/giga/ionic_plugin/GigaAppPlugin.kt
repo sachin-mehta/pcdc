@@ -147,7 +147,16 @@ class GigaAppPlugin : Plugin() {
     val intent = Intent(context, NetworkTestService::class.java)
     intent.putExtra(SCHEDULE_TYPE, SCHEDULE_TYPE_MANUAL)
     context.startForegroundService(intent)
-    call.resolve()
+    val alarmPrefs = AlarmSharedPref(context)
+    if (AlarmHelper.checkIfFutureAlarmScheduled(alarmPrefs)) {
+      Log.d("GIGA GigaAppPlugin", "Alarm is already scheduled")
+    } else {
+      Log.d(
+        "GIGA GigaAppPlugin",
+        "Schedule the next alarm as fallback if no future scheduled speed test."
+      )
+      scheduleAlarm(context, alarmPrefs)
+    }
     call.resolve()
   }
 
@@ -254,12 +263,13 @@ class GigaAppPlugin : Plugin() {
       val randomIn15Min = now + (Math.random() * (15 * 60 * 1000L)).toLong()
       alarmPrefs.first15ScheduledTime = randomIn15Min
       Log.d("GIGA GigaAppPlugin", "On New Registraion New Day 15 Min $randomIn15Min")
-
+      alarmPrefs.nextExecutionTime = randomIn15Min
       AlarmHelper.scheduleExactAlarm(context, randomIn15Min, "FIRST_15_MIN")
     } else if (alarmPrefs.first15ExecutedTime == -1L) {
       val randomIn15Min = now + (Math.random() * (15 * 60 * 1000L)).toLong()
       alarmPrefs.first15ScheduledTime = randomIn15Min
       Log.d("GIGA GigaAppPlugin", "Not Executed 15 Min $randomIn15Min")
+      alarmPrefs.nextExecutionTime = randomIn15Min
       AlarmHelper.scheduleExactAlarm(context, randomIn15Min, "FIRST_15_MIN")
     } else {
       val executedTime = alarmPrefs.first15ExecutedTime
@@ -270,6 +280,7 @@ class GigaAppPlugin : Plugin() {
       val end: Long = range.second!!
       val nextAlarmTime = start + (Math.random() * (end - start)).toLong()
       Log.d("GIGA GigaAppPlugin", "For New Slot $nextAlarmTime")
+      alarmPrefs.nextExecutionTime = nextAlarmTime
       AlarmHelper.scheduleExactAlarm(context, nextAlarmTime, "NEXT_SLOT")
     }
   }

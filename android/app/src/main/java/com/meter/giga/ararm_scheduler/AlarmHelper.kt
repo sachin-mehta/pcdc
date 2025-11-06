@@ -6,10 +6,12 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.util.Log
+import com.meter.giga.prefrences.AlarmSharedPref
 
 import com.meter.giga.receiver.ScheduleBroadcastReceiver
 import com.meter.giga.utils.Constants.SCHEDULE_TYPE
 import java.util.Calendar
+import java.util.Date
 import kotlin.jvm.java
 
 /**
@@ -145,4 +147,10 @@ object AlarmHelper {
     }
   }
 
+  @JvmStatic
+  fun checkIfFutureAlarmScheduled(alarmPrefs: AlarmSharedPref): Boolean {
+    val nextScheduleTime = alarmPrefs.nextExecutionTime
+    val currentTime = Calendar.getInstance().timeInMillis
+    return nextScheduleTime > currentTime
+  }
 }

@@ -18,6 +18,7 @@ import com.meter.giga.utils.Constants.KEY_IS_TEST_RUNNING
 import com.meter.giga.utils.Constants.KEY_LAST_EXECUTION_DAY
 import com.meter.giga.utils.Constants.KEY_LAST_SLOT_EXECUTION_HOUR
 import com.meter.giga.utils.Constants.KEY_MLAB_UPLOAD_KEY
+import com.meter.giga.utils.Constants.KEY_NEXT_EXECUTION_TIME
 import com.meter.giga.utils.Constants.KEY_OLD_SPEEDTEST_DATA
 import com.meter.giga.utils.Constants.KEY_SCHOOL_ID
 import java.util.Calendar
@@ -53,6 +54,14 @@ class AlarmSharedPref(context: Context) {
   var lastExecutionDay: Int
     get() = prefs.getInt(KEY_LAST_EXECUTION_DAY, -1)
     set(value) = prefs.edit() { putInt(KEY_LAST_EXECUTION_DAY, value) }
+
+  /**
+   * This provides time stamp when last
+   * speed test executed else -1
+   */
+  var nextExecutionTime: Long
+    get() = prefs.getLong(KEY_NEXT_EXECUTION_TIME, -1L)
+    set(value) = prefs.edit() { putLong(KEY_NEXT_EXECUTION_TIME, value) }
 
   /**
    * This provides slot hour when last

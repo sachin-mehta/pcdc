@@ -48,7 +48,9 @@ public class MainActivity extends BridgeActivity {
     registerPlugin(GigaAppPlugin.class);
     super.onCreate(savedInstanceState);
     WindowCompat.setDecorFitsSystemWindows(getWindow(), true);
-    checkStoragePermission(this);
+    // This will required if local file read/write required
+    //checkStoragePermission(this);
+    checkNotificationPermission(this);
   }
 
   private void showPermissionDialog() {

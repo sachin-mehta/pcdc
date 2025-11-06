@@ -10,6 +10,7 @@ import com.meter.giga.utils.Constants.FIRST_15_MIN
 import com.meter.giga.utils.Constants.NEXT_SLOT
 import com.meter.giga.utils.GigaUtil
 import io.sentry.Sentry
+import java.util.Date
 import kotlin.random.Random
 
 /**
@@ -74,6 +75,7 @@ class BootBroadCastReceiver : BroadcastReceiver() {
       val randomIn15Min = now + Random.nextLong(0, 15 * 60 * 1000L)
       alarmPrefs.first15ScheduledTime = randomIn15Min
       Log.d("GIGA BootBroadCastReceiver", "On Boot New Day 15 Min $randomIn15Min")
+      alarmPrefs.nextExecutionTime - randomIn15Min
       AlarmHelper.scheduleExactAlarm(context, randomIn15Min, FIRST_15_MIN)
     }
     /**
@@ -85,6 +87,7 @@ class BootBroadCastReceiver : BroadcastReceiver() {
       val randomIn15Min = now + Random.nextLong(0, 15 * 60 * 1000L)
       alarmPrefs.first15ScheduledTime = randomIn15Min
       Log.d("GIGA BootBroadCastReceiver", "On Boot Not Executed 15 Min $randomIn15Min")
+      alarmPrefs.nextExecutionTime - randomIn15Min
       AlarmHelper.scheduleExactAlarm(context, randomIn15Min, FIRST_15_MIN)
     }
     /**
@@ -103,6 +106,7 @@ class BootBroadCastReceiver : BroadcastReceiver() {
       )
       val nextAlarmTime = Random.nextLong(start, end)
       Log.d("GIGA BootBroadCastReceiver", "On Boot For Slot $nextAlarmTime")
+      alarmPrefs.nextExecutionTime - nextAlarmTime
       AlarmHelper.scheduleExactAlarm(context, nextAlarmTime, NEXT_SLOT)
     }
   }

@@ -86,6 +86,7 @@ class ScheduleBroadcastReceiver : BroadcastReceiver() {
         AlarmHelper.getNextSlotRange(now, currentSlotStartHour, lastExecutionDate)
       }
       val nextAlarmTime = Random.nextLong(start, end)
+      prefs.nextExecutionTime = nextAlarmTime
       AlarmHelper.scheduleExactAlarm(context, nextAlarmTime, NEXT_SLOT)
     } catch (e: Exception) {
       Sentry.capture(e)
