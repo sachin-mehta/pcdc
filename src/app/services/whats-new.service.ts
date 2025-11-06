@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
 import { StorageService } from './storage.service';
 import { environment } from 'src/environments/environment';
 import { Observable, of } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
+import { map } from 'rxjs/operators';
+import { TranslateService } from '@ngx-translate/core';
 
 export interface ReleaseNote {
   title: string;
@@ -32,7 +32,7 @@ export class WhatsNewService {
 
   constructor(
     private storageService: StorageService,
-    private http: HttpClient
+    private translate: TranslateService
   ) {}
 
   /**
@@ -103,17 +103,19 @@ export class WhatsNewService {
   }
 
   /**
-   * Load release notes from JSON file
+   * Load release notes from translation service
    */
   public getReleaseNotes(): Observable<ReleaseNotes> {
-    return this.http
-      .get<ReleaseNotes>('assets/release-notes/release-notes.json')
-      .pipe(
-        catchError((error) => {
-          console.warn('Failed to load release notes:', error);
-          return of({});
-        })
-      );
+    return this.translate.get('releaseNotes').pipe(
+      map((releaseNotes) => {
+        // If translation key doesn't exist or is empty, return empty object
+        if (!releaseNotes || releaseNotes === 'releaseNotes') {
+          console.warn('Release notes not found in translations');
+          return {};
+        }
+        return releaseNotes as ReleaseNotes;
+      })
+    );
   }
 
   /**

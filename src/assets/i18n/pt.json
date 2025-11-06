@@ -202,5 +202,16 @@
     "goToDashboard": "Ir para o seu painel",
     "headline": "Título"
   },
+  "releaseNotes": {
+    "2.0.2": {
+      "title": "Rastreie o tempo de atividade com Ping e experiência do usuário aprimorada",
+      "date": "Segunda-feira, 15 de setembro de 2025",
+      "items": [
+        "Rastreie o tempo de atividade com o novo recurso Ping",
+        "Visualize seu histórico de testes de velocidade",
+        "Desfrute de uma experiência de usuário aprimorada"
+      ]
+    }
+  },
   "yes": "Sim"
 }

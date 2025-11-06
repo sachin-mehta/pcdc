@@ -122,7 +122,9 @@
             <ion-col size="2">{{
               getTestTriggerDisplayText(data.Notes)
             }}</ion-col>
-            <ion-col class="green_color" size="2">Success</ion-col>
+            <ion-col [ngClass]="getSyncStatusClass(data)" size="2">{{
+              getSyncStatusText(data)
+            }}</ion-col>
           </ion-row>
         </span>
       </ion-grid>

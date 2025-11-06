@@ -202,5 +202,16 @@
     "goToDashboard": "Accédez à votre tableau de bord",
     "headline": "Titre"
   },
+  "releaseNotes": {
+    "2.0.2": {
+      "title": "Suivi du temps de fonctionnement avec Ping et expérience utilisateur améliorée",
+      "date": "Lundi, 15 septembre 2025",
+      "items": [
+        "Suivez le temps de fonctionnement avec la nouvelle fonctionnalité Ping",
+        "Consultez votre historique de tests de vitesse",
+        "Profitez d'une expérience utilisateur améliorée"
+      ]
+    }
+  },
   "yes": "Oui"
 }
