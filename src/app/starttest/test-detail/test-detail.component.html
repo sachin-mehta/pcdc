@@ -73,12 +73,24 @@
         <!-- Header Row -->
         <ion-row class="table-header">
           <ion-col size="2.5" [translate]="'startTest.date'">Date</ion-col>
-          <ion-col
-            size="2"
-            [translate]="'startTest.downloadLowerCase'"
-          ></ion-col>
-          <ion-col size="2" [translate]="'startTest.uploadLowerCase'"></ion-col>
-          <ion-col size="1.5" [translate]="'startTest.latencyDetail'"></ion-col>
+          <ion-col size="2">
+            <div class="header-with-unit">
+              <span [translate]="'startTest.downloadLowerCase'"></span>
+              <span class="unit-text">(Mbps)</span>
+            </div>
+          </ion-col>
+          <ion-col size="2">
+            <div class="header-with-unit">
+              <span [translate]="'startTest.uploadLowerCase'"></span>
+              <span class="unit-text">(Mbps)</span>
+            </div>
+          </ion-col>
+          <ion-col size="1.5">
+            <div class="header-with-unit">
+              <span [translate]="'startTest.latencyDetail'"></span>
+              <span class="unit-text">(ms)</span>
+            </div>
+          </ion-col>
           <ion-col size="2" [translate]="'startTest.testTrigger'"
             >Test Trigger</ion-col
           >
@@ -110,7 +122,9 @@
             <ion-col size="2">{{
               getTestTriggerDisplayText(data.Notes)
             }}</ion-col>
-            <ion-col class="green_color" size="2">Success</ion-col>
+            <ion-col [ngClass]="getSyncStatusClass(data)" size="2">{{
+              getSyncStatusText(data)
+            }}</ion-col>
           </ion-row>
         </span>
       </ion-grid>

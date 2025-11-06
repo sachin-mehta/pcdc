@@ -32,7 +32,8 @@
     "electron-unhandled": "^3.0.2",
     "electron-updater": "~4.3.9",
     "electron-window-state": "^5.0.3",
-    "fs-extra": "^10.0.1"
+    "fs-extra": "^10.0.1",
+    "systeminformation": "^5.27.11"
   },
   "devDependencies": {
     "electron": "^29.4.6",

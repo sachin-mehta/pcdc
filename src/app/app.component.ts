@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { IonPopover, MenuController, ModalController } from '@ionic/angular';
+import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { StorageService } from '../app/services/storage.service';
 import { SettingsService } from './services/settings.service';
@@ -12,7 +13,9 @@ import { IndexedDBService } from './services/indexed-db.service';
 import { SyncService } from './services/sync.service';
 import { WhatsNewService } from './services/whats-new.service';
 import { WhatsNewModalComponent } from './components/whats-new-modal/whats-new-modal.component';
+import { LogoutModalComponent } from './components/logout-modal/logout-modal.component';
 import { HardwareIdService } from './services/hardware-id.service';
+import { SchoolService } from './services/school.service';
 
 // const shell = require('electron').shell;
 @Component({
@@ -65,7 +68,9 @@ export class AppComponent {
     private syncService: SyncService,
     private whatsNewService: WhatsNewService,
     private modalController: ModalController,
-    private hardwareIdService: HardwareIdService
+    private hardwareIdService: HardwareIdService,
+    private router: Router,
+    private schoolService: SchoolService
   ) {
     this.filteredOptions = [];
     this.selectedLanguage =
@@ -80,7 +85,11 @@ export class AppComponent {
     };
     this.translate.use(appLang.code);
     this.app_version = environment.app_version;
-    this.device_id = this.storage.get('schoolUserId') || 'unknown-device';
+    // Use system hardware ID instead of schoolUserId
+    this.device_id =
+      this.hardwareIdService.getHardwareId() ||
+      this.storage.get('system_hardware_id') ||
+      'unknown-device';
     // Show the full device ID as requested
     this.device_id_short = this.device_id;
     if (this.storage.get('schoolId')) {
@@ -488,6 +497,77 @@ export class AppComponent {
         'https://github.com/unicef/project-connect-daily-check-app/releases',
         '_blank'
       );
+    }
+  }
+
+  /**
+   * Open logout confirmation modal
+   */
+  async openLogoutModal(): Promise<void> {
+    const modal = await this.modalController.create({
+      component: LogoutModalComponent,
+      cssClass: 'logout-modal',
+      backdropDismiss: true,
+    });
+
+    modal.onDidDismiss().then((result) => {
+      if (result.data && result.data.action === 'logout') {
+        this.handleLogout();
+      }
+    });
+
+    await modal.present();
+  }
+
+  /**
+   * Handle logout action - deactivate device, clear localStorage and redirect to home
+   */
+  private async handleLogout(): Promise<void> {
+    try {
+      // Close the settings menu
+      this.closeMenu();
+
+      // Get hardware ID and giga ID before clearing storage
+      const hardwareId = this.hardwareIdService.getHardwareId();
+      const gigaId = this.storage.get('gigaId');
+
+      // Deactivate device on backend if we have the required IDs
+      if (hardwareId && gigaId) {
+        console.log('Deactivating device:', { hardwareId, gigaId });
+        try {
+          await this.schoolService
+            .deactivateDevice(hardwareId, gigaId)
+            .toPromise();
+          console.log('✅ Device marked as inactive on backend');
+        } catch (deactivateError) {
+          console.error(
+            '⚠️ Error deactivating device on backend:',
+            deactivateError
+          );
+          // Continue with logout even if deactivation fails
+        }
+      } else {
+        console.warn(
+          '⚠️ Missing hardware ID or giga ID, skipping backend deactivation'
+        );
+      }
+
+      // Clear all localStorage data
+      await this.storage.clear();
+
+      // Show success toast
+      this.showToast('Logged out successfully', 'success');
+
+      // Navigate to home page after a brief delay
+      setTimeout(() => {
+        this.router.navigate(['/home']).then(() => {
+          // Reload the page to reset the app state
+          window.location.reload();
+        });
+      }, 500);
+    } catch (error) {
+      console.error('Error during logout:', error);
+      this.showToast('Error during logout. Please try again.', 'danger');
     }
   }
 }

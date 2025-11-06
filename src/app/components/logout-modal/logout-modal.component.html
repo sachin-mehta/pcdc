@@ -1,0 +1,63 @@
+<div class="modal-wrapper">
+  <div class="modal-header">
+    <div class="header-content">
+      <ion-icon name="log-out-outline" class="logout-icon"></ion-icon>
+      <div class="header-title">Confirm Logout</div>
+    </div>
+    <button class="close-button" (click)="dismiss()">
+      <ion-icon name="close" size="small"></ion-icon>
+    </button>
+  </div>
+
+  <div class="modal-content">
+    <div class="warning-section">
+      <div class="warning-message">
+        <p class="main-text">
+          This action <strong>cannot</strong> be undone. This will permanently
+          log you out and clear all local data.
+        </p>
+        <p class="sub-text">
+          Please type
+          <strong class="school-id-highlight">{{ schoolId }}</strong> to
+          confirm.
+        </p>
+      </div>
+
+      <div class="input-section">
+        <ion-item lines="none" class="confirmation-input">
+          <ion-input
+            [(ngModel)]="enteredSchoolId"
+            placeholder="Enter school ID"
+            (ionInput)="onInputChange()"
+            type="text"
+          ></ion-input>
+        </ion-item>
+        <div class="error-message" *ngIf="errorMessage">
+          <ion-icon name="alert-circle-outline"></ion-icon>
+          {{ errorMessage }}
+        </div>
+      </div>
+
+      <div class="button-section">
+        <ion-button
+          expand="block"
+          color="danger"
+          class="logout-button"
+          (click)="confirmLogout()"
+          [disabled]="!enteredSchoolId || enteredSchoolId.trim() === ''"
+        >
+          Logout
+        </ion-button>
+        <ion-button
+          expand="block"
+          fill="outline"
+          color="medium"
+          class="cancel-button"
+          (click)="dismiss()"
+        >
+          Cancel
+        </ion-button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -25,4 +25,13 @@ contextBridge.exposeInMainWorld('electronAPI', {
   onHardwareId: (callback: (data: any) => void) => {
     ipcRenderer.on('system-hardware-id', (event, data) => callback(data));
   },
+  onHardwareIdError: (callback: (error: any) => void) => {
+    ipcRenderer.on('system-hardware-id-error', (event, error) =>
+      callback(error)
+    );
+  },
+  removeHardwareIdListener: () => {
+    ipcRenderer.removeAllListeners('system-hardware-id');
+    ipcRenderer.removeAllListeners('system-hardware-id-error');
+  },
 });
