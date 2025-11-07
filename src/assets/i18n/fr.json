@@ -207,13 +207,22 @@
   "releaseNotes": {
     "2.0.2": {
       "title": "Un suivi du taux de disponibilité avec le test Ping et une expérience utilisateur améliorée:",
-      "date": "Lundi, 15 septembre 2025",
+      "date": "Lundi, 10 novembre 2025",
       "items": [
         "Suivez le taux de disponibilité grâce à la nouvelle fonctionnalité Ping",
         "Consultez votre historique de tests de vitesse",
-        "Profitez d’une expérience utilisateur optimisée"
+        "Profitez d'une expérience utilisateur optimisée"
       ]
     }
+  },
+  "logout": {
+    "title": "Confirmer la déconnexion",
+    "warning": "Cette opération déconnectera tous les comptes d'utilisateurs de l'application sur cet appareil, désenregistrera l'école et effacera toutes les données locales.",
+    "confirmText": "Veuillez saisir <strong class=\"school-id-highlight\">{{ schoolId }}</strong> pour confirmer l'identifiant de l'école pour le désenregistrement.",
+    "placeholder": "Entrez l'identifiant de l'école",
+    "errorMessage": "L'identifiant de l'école ne correspond pas. Veuillez réessayer.",
+    "logoutButton": "Se déconnecter",
+    "cancelButton": "Annuler"
   },
   "yes": "Oui"
 }
