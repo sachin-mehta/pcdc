@@ -3,7 +3,9 @@
 }
 
 .header-toolbar {
-    text-align: end;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
     padding: 0;
 }
 
@@ -28,6 +30,9 @@
 
 .giga_meter_logo {
     max-width: 97px;
+    height: auto;
+    cursor: pointer;
+    padding: 8px;
 }
 
 .selected-label {

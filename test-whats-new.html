@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>What's New Dialog Test</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+      }
+      .test-section {
+        margin: 20px 0;
+        padding: 15px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+      button {
+        padding: 10px 15px;
+        margin: 5px;
+        background: #007cba;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      button:hover {
+        background: #005a87;
+      }
+      .code {
+        background: #f5f5f5;
+        padding: 10px;
+        margin: 10px 0;
+        border-radius: 4px;
+        font-family: monospace;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>What's New Dialog - Test Scenarios</h1>
+
+    <div class="test-section">
+      <h3>🧪 Test Scenario 1: Fresh Install</h3>
+      <p>Should NOT show dialog (no previous version)</p>
+      <div class="code">
+        localStorage.clear();<br />
+        // Start app - no dialog should appear
+      </div>
+      <button onclick="testFreshInstall()">Test Fresh Install</button>
+    </div>
+
+    <div class="test-section">
+      <h3>🧪 Test Scenario 2: Version Update</h3>
+      <p>Should show dialog (version changed from 2.0.1 to 2.0.2)</p>
+      <div class="code">
+        localStorage.setItem('lastKnownAppVersion', '2.0.1');<br />
+        localStorage.removeItem('whatsNewShownFor');<br />
+        // Refresh app - dialog should appear
+      </div>
+      <button onclick="testVersionUpdate()">Test Version Update</button>
+    </div>
+
+    <div class="test-section">
+      <h3>🧪 Test Scenario 3: Already Shown</h3>
+      <p>Should NOT show dialog (already shown for current version)</p>
+      <div class="code">
+        localStorage.setItem('lastKnownAppVersion', '2.0.2');<br />
+        localStorage.setItem('whatsNewShownFor', '2.0.2');<br />
+        // Refresh app - no dialog should appear
+      </div>
+      <button onclick="testAlreadyShown()">Test Already Shown</button>
+    </div>
+
+    <div class="test-section">
+      <h3>🧪 Test Scenario 4: Force Show</h3>
+      <p>Force show dialog regardless of state</p>
+      <div class="code">
+        // Run this in app console after loading:<br />
+        const app = document.querySelector('app-root').__ng_context__[8];<br />
+        app.whatsNewService.forceShowForCurrentVersion();<br />
+        app.checkAndShowWhatsNew();
+      </div>
+      <button onclick="copyForceShowCode()">Copy Force Show Code</button>
+    </div>
+
+    <div class="test-section">
+      <h3>🧪 Test Scenario 5: Disabled Feature</h3>
+      <p>Should NOT show dialog (feature disabled)</p>
+      <div class="code">
+        localStorage.setItem('whatsNewDialogEnabled', 'false');<br />
+        localStorage.setItem('lastKnownAppVersion', '2.0.1');<br />
+        // Refresh app - no dialog should appear
+      </div>
+      <button onclick="testDisabled()">Test Disabled</button>
+    </div>
+
+    <div class="test-section">
+      <h3>📋 Instructions</h3>
+      <ol>
+        <li>
+          Start your app: <code>npm run start</code> or
+          <code>npm run start:electron</code>
+        </li>
+        <li>Click one of the test buttons above</li>
+        <li>Refresh your app to see the result</li>
+        <li>Check browser console for any errors</li>
+        <li>For "Force Show", copy the code and paste in your app's console</li>
+      </ol>
+    </div>
+
+    <script>
+      function testFreshInstall() {
+        localStorage.clear();
+        alert(
+          "Storage cleared. Refresh your app - NO dialog should appear (fresh install)."
+        );
+      }
+
+      function testVersionUpdate() {
+        localStorage.setItem("lastKnownAppVersion", "2.0.1");
+        localStorage.removeItem("whatsNewShownFor");
+        localStorage.setItem("whatsNewDialogEnabled", "true");
+        alert(
+          "Set up version update scenario. Refresh your app - dialog SHOULD appear."
+        );
+      }
+
+      function testAlreadyShown() {
+        localStorage.setItem("lastKnownAppVersion", "2.0.2");
+        localStorage.setItem("whatsNewShownFor", "2.0.2");
+        localStorage.setItem("whatsNewDialogEnabled", "true");
+        alert(
+          "Set up already shown scenario. Refresh your app - NO dialog should appear."
+        );
+      }
+
+      function copyForceShowCode() {
+        const code = `const app = document.querySelector('app-root').__ng_context__[8];
+app.whatsNewService.forceShowForCurrentVersion();
+app.checkAndShowWhatsNew();`;
+        navigator.clipboard.writeText(code);
+        alert(
+          "Code copied to clipboard. Paste it in your app console after loading."
+        );
+      }
+
+      function testDisabled() {
+        localStorage.setItem("whatsNewDialogEnabled", "false");
+        localStorage.setItem("lastKnownAppVersion", "2.0.1");
+        localStorage.removeItem("whatsNewShownFor");
+        alert("Feature disabled. Refresh your app - NO dialog should appear.");
+      }
+
+      // Display current storage state
+      function showCurrentState() {
+        const state = {
+          lastKnownVersion: localStorage.getItem("lastKnownAppVersion"),
+          shownFor: localStorage.getItem("whatsNewShownFor"),
+          enabled: localStorage.getItem("whatsNewDialogEnabled"),
+        };
+        document.getElementById("currentState").textContent = JSON.stringify(
+          state,
+          null,
+          2
+        );
+      }
+
+      // Check state every 2 seconds
+      setInterval(showCurrentState, 2000);
+    </script>
+
+    <div class="test-section">
+      <h3>📊 Current Storage State</h3>
+      <pre id="currentState">Loading...</pre>
+    </div>
+  </body>
+</html>

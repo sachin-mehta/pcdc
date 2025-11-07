@@ -1,13 +1,78 @@
 <app-pcdc-header></app-pcdc-header>
 
+<!-- Testing Controls for Development (Remove in Production) -->
+<!-- <div class="testing-controls">
+  <span>🧪 DEV TESTING:</span>
+  <ion-button
+    size="small"
+    fill="outline"
+    color="primary"
+    (click)="showFirstTimeModalForTesting()"
+  >
+    <ion-icon name="trophy-outline" slot="start"></ion-icon>
+    First-Time Modal
+  </ion-button>
+  <ion-button
+    size="small"
+    fill="outline"
+    color="secondary"
+    (click)="showNotificationForTesting()"
+  >
+    <ion-icon name="notifications-outline" slot="start"></ion-icon>
+    Notifications
+  </ion-button>
+  <ion-button
+    size="small"
+    fill="clear"
+    color="danger"
+    (click)="hideTestingElements()"
+  >
+    <ion-icon name="refresh-outline" slot="start"></ion-icon>
+    Reset
+  </ion-button>
+</div> -->
+
+<!-- Registration Banners for First-Time Visit -->
+<div class="notification-container" *ngIf="showRegistrationBanner">
+  <!-- Registration Completed Notification -->
+  <div class="notification completed">
+    <ion-icon
+      name="checkmark-circle"
+      style="color: #007bff; font-size: 20px; margin-right: 5px"
+    ></ion-icon>
+    <div
+      class="notification-text"
+      [translate]="'notifications.registrationCompleted'"
+    ></div>
+  </div>
+
+  <!-- Running First Test Notification -->
+  <div class="notification in-progress">
+    <ion-icon
+      *ngIf="registrationStatus === 'done'"
+      name="checkmark-circle"
+      style="color: #007bff; font-size: 20px; margin-right: 5px"
+    ></ion-icon>
+    <ion-spinner
+      name="circular"
+      style="color: #007bff; width: 20px; height: 20px; margin-right: 5px"
+      *ngIf="registrationStatus === 'testing' || registrationStatus === 'completed'"
+    ></ion-spinner>
+
+    <div
+      class="notification-text"
+      [translate]="'notifications.runningFirstTest'"
+    ></div>
+  </div>
+</div>
+
 <ion-content class="scrollable_content">
   <ion-card class="card_margin">
-
     <div class="container centerPos">
       <ion-item class="custom-item" lines="none" color="light">
         <ion-label>
           <p [ngClass]="isNativeApp() ? 'nativesubtitle' : 'subtitle'">{{selectedCountry}} - {{schoolId}}</p>
-          <h2 class="title" title={{school?.name}}>{{school?.name}}</h2>
+          <h2 class="title" title="{{school?.name}}">{{school?.name}}</h2>
         </ion-label>
       </ion-item>
       <!---------   Start test Section ------------------>
@@ -18,13 +83,18 @@
           <button class="test-btn" (click)="startNDT()" [translate]="'startTest.startTest'"></button>
         </div>
       </div> -->
-      <app-circular-progress-bar [progressValue]="progress"
+      <app-circular-progress-bar
+        [progressValue]="progress"
         [secondLabel]="(currentState !=undefined && currentState != 'Starting' && onlineStatus) && downloadStarted ? 'DOWNLOAD' : (currentState !=undefined && currentState != 'Starting' && onlineStatus && uploadStarted === true) ? 'UPLOAD' : currentState == 'Completed' ? 'TEST AGAIN': ''"
-        [icon]="''" [error]="(connectionStatus=='error' && currentState == undefined) || (!onlineStatus)"
+        [statusMessage]="getStatusMessage()"
+        [icon]="''"
+        [error]="(connectionStatus=='error' && currentState == undefined) || (!onlineStatus)"
         (startTest)="startNDT()"
         [firstLabel]="(currentState == undefined && currentRate != 'error' && onlineStatus) ? ('startTest.startTest' | translate) : ''"
-        [currentRateDownload]="currentRateDownload" [currentRateUpload]="currentRateUpload" [completed]="currentState =='Completed'"></app-circular-progress-bar>
-
+        [currentRateDownload]="currentRateDownload"
+        [currentRateUpload]="currentRateUpload"
+        [completed]="currentState =='Completed'"
+      ></app-circular-progress-bar>
 
       <div class="location">{{mlabInformation.label}}</div>
       <!-- </div> -->
@@ -40,7 +110,9 @@
     </div> -->
       <!----------   Start test progress Section END --------------->
       <!---------   Test Result Section ----------------->
-      <div *ngIf="currentState !=undefined && currentState != 'Starting' && onlineStatus">
+      <div
+        *ngIf="currentState !=undefined && currentState != 'Starting' && onlineStatus"
+      >
         <!-- <div class="uploadDownldSec">
         <div class="uplanddowld" *ngIf="currentState !=undefined">
           <div class="downloadsec">
@@ -76,7 +148,6 @@
         </div> -->
         <!-- <div class="location">{{mlabInformation.label}}</div> -->
         <!-- </div> -->
-
       </div>
       <!-- ------------------------------------------- -->
       <!--   Test Failed Section------------------------->
@@ -92,13 +163,21 @@
           </div>
         </div>
       </div> -->
-      <div [ngClass]="isNativeApp() ? 'custom-toast-native' : 'custom-toast'"
-        *ngIf="((connectionStatus=='error' && currentState == undefined) || (!onlineStatus)) && !isErrorClosed">
+      <div
+        [ngClass]="isNativeApp() ? 'custom-toast-native' : 'custom-toast'"
+        *ngIf="((connectionStatus=='error' && currentState == undefined) || (!onlineStatus)) && !isErrorClosed"
+      >
         <!-- <span class="icon">⚠️</span> -->
-        <ion-img src="../../assets/images/test_failed_Icon.svg" class="testFailed"></ion-img>
+        <ion-img
+          src="../../assets/images/test_failed_Icon.svg"
+          class="testFailed"
+        ></ion-img>
 
         <div class="message">
-          <ion-label class="failed_test" [translate]="'startTest.testFailed'"></ion-label>
+          <ion-label
+            class="failed_test"
+            [translate]="'startTest.testFailed'"
+          ></ion-label>
           <div class="msg" [translate]="'startTest.testFailedDesc'"></div>
         </div>
         <button class="close-btn" (click)="closeError()">&times;</button>
@@ -124,67 +203,82 @@
       <!-- ------------------------------------------- -->
       <ion-list lines="none" class="horizontal-list">
         <!-- <ion-item lines="none" class="left-item"> -->
-          <!-- <ion-label>
+        <!-- <ion-label>
             <h3  [translate]="'startTest.network'"></h3>
             <p title="--">--</p>
           </ion-label> -->
         <!-- </ion-item> -->
-      
+
         <ion-item lines="none" class="center-item">
           <ion-label class="position">
-            <h3  [translate]="'startTest.isp'"></h3>
-            <p title={{measurementISP}}>{{measurementISP?.length ? measurementISP : '---'}}</p>
+            <h3 [translate]="'startTest.isp'"></h3>
+            <p title="{{measurementISP}}">
+              {{measurementISP?.length ? measurementISP : '---'}}
+            </p>
           </ion-label>
         </ion-item>
-      
+
         <ion-item lines="none" class="right-item">
           <ion-label class="position">
-            <h3  [translate]="'startTest.server'"></h3>
-            <p title={{measurementnetworkServer}}>{{measurementnetworkServer?.length ? measurementnetworkServer : '---' }}</p>
+            <h3 [translate]="'startTest.server'"></h3>
+            <p title="{{measurementnetworkServer}}">
+              {{measurementnetworkServer?.length ? measurementnetworkServer :
+              '---' }}
+            </p>
           </ion-label>
         </ion-item>
       </ion-list>
-      
     </div>
-
-
   </ion-card>
   <ion-card class="footer_card_margin">
-    <ion-label class="latest_measurement" [translate]="'startTest.measurement'"></ion-label>
+    <ion-label
+      class="latest_measurement"
+      [translate]="'startTest.measurement'"
+    ></ion-label>
     <div class="footer-grid">
       <div class="footer-row">
-        <ion-card class="footer-card" >
+        <ion-card class="footer-card">
           <ion-card-header class="footer_card_header">
             <ion-card-title>
-              <span class="footer_text"> <img src="assets/images/Download.svg" />
+              <span class="footer_text">
+                <img src="assets/images/Download.svg" />
                 <span [translate]="'startTest.downloadLowerCase'"></span>
               </span>
               <span class="time">{{ currentDate | date:'shortTime' }}</span>
             </ion-card-title>
-            <ion-card-subtitle [ngClass]="{'error_status': (connectionStatus=='error' && currentState == undefined) ||
-            (!onlineStatus)}">{{currentRateDownload && !((connectionStatus=='error' && currentState == undefined) ||
-              (!onlineStatus)) ? currentRateDownload : '---'}}
-              <span class="footer_card_font_size">{{((connectionStatus=='error' && currentState == undefined) ||
-                (!onlineStatus)) ? '' : 'Mbps'}}</span>
+            <ion-card-subtitle
+              [ngClass]="{'error_status': (connectionStatus=='error' && currentState == undefined) ||
+            (!onlineStatus)}"
+              >{{currentRateDownload && !((connectionStatus=='error' &&
+              currentState == undefined) || (!onlineStatus)) ?
+              currentRateDownload : '---'}}
+              <span class="footer_card_font_size"
+                >{{((connectionStatus=='error' && currentState == undefined) ||
+                (!onlineStatus)) ? '' : 'Mbps'}}</span
+              >
             </ion-card-subtitle>
-
           </ion-card-header>
         </ion-card>
 
         <ion-card class="footer-card" color="medium">
           <ion-card-header class="footer_card_header">
-
-            <ion-card-title><span class="footer_text">
+            <ion-card-title
+              ><span class="footer_text">
                 <img src="assets/images/Upload.svg" />
-                <span [translate]="'startTest.uploadLowerCase'">
-                    </span> </span> <span class="time">{{ currentDate | date:'shortTime' }}</span>
+                <span [translate]="'startTest.uploadLowerCase'"> </span>
+              </span>
+              <span class="time">{{ currentDate | date:'shortTime' }}</span>
             </ion-card-title>
-            <ion-card-subtitle [ngClass]="{'error_status': (connectionStatus=='error' && currentState == undefined) ||
-            (!onlineStatus)}">{{currentRateUpload && !((connectionStatus=='error' && currentState == undefined) ||
-              (!onlineStatus)) ? currentRateUpload : '---'}}
-              <span class="footer_card_font_size">{{((connectionStatus=='error' && currentState == undefined) ||
-                (!onlineStatus)) ? '' : 'Mbps'}}</span>
-
+            <ion-card-subtitle
+              [ngClass]="{'error_status': (connectionStatus=='error' && currentState == undefined) ||
+            (!onlineStatus)}"
+              >{{currentRateUpload && !((connectionStatus=='error' &&
+              currentState == undefined) || (!onlineStatus)) ? currentRateUpload
+              : '---'}}
+              <span class="footer_card_font_size"
+                >{{((connectionStatus=='error' && currentState == undefined) ||
+                (!onlineStatus)) ? '' : 'Mbps'}}</span
+              >
             </ion-card-subtitle>
           </ion-card-header>
         </ion-card>
@@ -193,33 +287,47 @@
       <div class="footer-row">
         <ion-card class="footer-card" color="medium">
           <ion-card-header class="footer_card_header">
-            <ion-card-title> <span class="footer_text">
+            <ion-card-title>
+              <span class="footer_text">
                 <img src="assets/images/Arrows--horizontal.svg" />
                 <span [translate]="'startTest.latencyDetail'"></span>
-              </span> <span class="time">{{ currentDate | date:'shortTime' }}</span>
-
+              </span>
+              <span class="time">{{ currentDate | date:'shortTime' }}</span>
             </ion-card-title>
-            <ion-card-subtitle [ngClass]="{'error_status': (connectionStatus=='error' && currentState == undefined) ||
-            (!onlineStatus)}">{{currentRateDownload && !((connectionStatus=='error' && currentState == undefined) ||
-              (!onlineStatus)) ? latency ? latency : '---' : '---'}}
-              <span class="footer_card_font_size">{{((connectionStatus=='error' && currentState == undefined) ||
-                (!onlineStatus)) ? '---' : 'ms'}}</span>
-
+            <ion-card-subtitle
+              [ngClass]="{'error_status': (connectionStatus=='error' && currentState == undefined) ||
+            (!onlineStatus)}"
+              >{{currentRateDownload && !((connectionStatus=='error' &&
+              currentState == undefined) || (!onlineStatus)) ? latency ? latency
+              : '---' : '---'}}
+              <span class="footer_card_font_size"
+                >{{((connectionStatus=='error' && currentState == undefined) ||
+                (!onlineStatus)) ? '---' : 'ms'}}</span
+              >
             </ion-card-subtitle>
           </ion-card-header>
         </ion-card>
 
-        <ion-card class="footer-card" style="background: #F5F5F5;">
-          <!-- <ion-card-header class="footer_card_header">
+        <ion-card class="footer-card" color="medium">
+          <ion-card-header class="footer_card_header">
             <ion-card-title>
               <span class="footer_text">
                 <img src="assets/images/Arrows--horizontal.svg" />
-                <span [translate]="'startTest.ping'"></span> </span> <span class="time">{{ currentDate | date:'shortTime' }}</span>
+                <span [translate]="'startTest.ping'"></span>
+              </span>
+              <span class="time"
+                >{{ pingTimestamp ? (pingTimestamp | date:'shortTime') : '---'
+                }}</span
+              >
             </ion-card-title>
-            <ion-card-subtitle [ngClass]="{'error_status': (connectionStatus=='error' && currentState == undefined) ||
-            (!onlineStatus)}">---
+            <ion-card-subtitle
+              [ngClass]="{
+                'error_status': pingStatus === 'Failed' || pingStatus === '---',
+                'success_status': pingStatus === 'Success'
+              }"
+              >{{ pingStatus }}
             </ion-card-subtitle>
-          </ion-card-header> -->
+          </ion-card-header>
         </ion-card>
       </div>
     </div>
@@ -260,7 +368,6 @@
 </ion-footer> -->
 <!-- <ion-footer class="ion-no-border">
   <ion-toolbar> -->
-
 
 <!-- </ion-toolbar>
 </ion-footer> -->

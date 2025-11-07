@@ -1,33 +1,46 @@
 <ion-header no-shadow>
   <ion-toolbar [ngClass]="isNativeApp() ? 'header-native-toolbar' : 'header-toolbar'">
-    <!-- <div slot="start"> -->
-      <!-- <ion-img src="assets/images/gigameter_logo.png" [routerLink]="['/home']" class="giga_meter_logo"></ion-img> -->
-
-    <!-- </div> -->
+    <div slot="start">
+      <ion-img
+        src="assets/images/gigameter_logo.png"
+        class="giga_meter_logo"
+      ></ion-img>
+    </div>
     <ion-buttons slot="end">
       <!-- <ion-select [(ngModel)]="selectedLanguage" (ionChange)="onLanguageChange()" class="custom-select"> -->
-        <!-- <ion-select-option *ngFor="let language of languages" [value]="language.code">
+      <!-- <ion-select-option *ngFor="let language of languages" [value]="language.code">
           {{ language.label }}
         </ion-select-option> -->
       <!-- </ion-select> -->
-      <ion-label class="selected-label"
-        onmouseover="this.style.cursor='pointer'">
+      <ion-label
+        class="selected-label"
+        onmouseover="this.style.cursor='pointer'"
+      >
         <a (click)="onLanguageChange()" class="selected-label">
           {{ selectedLanguageName }}
-          <img src="assets/images/right_arrow.svg" alt="Language Icon" class="language-icon">
+          <img
+            src="assets/images/right_arrow.svg"
+            alt="Language Icon"
+            class="language-icon"
+          />
         </a>
       </ion-label>
-      <ion-menu-button  class="size margin_icon" color="light" (click)="openMenu('help')">
-
+      <ion-menu-button
+        class="size margin_icon"
+        color="light"
+        (click)="openMenu('help')"
+      >
         <ion-img src="assets/images/Help.svg" class="noschool-icon"></ion-img>
       </ion-menu-button>
       <ion-menu-button class="size" color="light" (click)="openMenu('setting')">
-        <ion-img src="assets/images/Settings.svg" class="noschool-icon"></ion-img>
+        <ion-img
+          src="assets/images/Settings.svg"
+          class="noschool-icon"
+        ></ion-img>
       </ion-menu-button>
     </ion-buttons>
-    
   </ion-toolbar>
 </ion-header>
 <div class="testMode">
-  {{ test ? "Test Mode" :"" }}
+  {{ test ? "Test Mode" : "" }}
 </div>

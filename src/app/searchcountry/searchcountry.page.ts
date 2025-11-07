@@ -11,6 +11,7 @@ import { Country } from '../shared/country.model';
 import { CountryService } from '../services/country.service';
 import { TranslateService } from '@ngx-translate/core';
 import { environment } from 'src/environments/environment';
+import { finalize } from 'rxjs/operators';
 import { Capacitor } from '@capacitor/core';
 @Component({
   selector: 'app-searchcountry',
@@ -1033,6 +1034,7 @@ export class SearchcountryPage {
   appNameSuffix = environment.appNameSuffix;
   searchTerm: string = '';
   filteredCountries: Country[] = [];
+  isCheckingEligibility: boolean = false;
   isNative: boolean;
 
   constructor(
@@ -1077,23 +1079,31 @@ export class SearchcountryPage {
   validateSelectedCountry(country: Country) {
     // if (!this.selectedCountry) return;
 
-    this.countryService.getPcdcCountryByCode(country.code).subscribe(
-      (response) => {
-        this.pcdcCountry = response;
-        if (this.pcdcCountry.length > 0) {
-          this.isPcdcCountry = true;
-          this.selectedCountry = country.code;
-        } else {
+    this.isCheckingEligibility = true;
+    this.countryService
+      .getPcdcCountryByCode(country.code)
+      .pipe(
+        finalize(() => {
+          this.isCheckingEligibility = false;
+        })
+      )
+      .subscribe(
+        (response) => {
+          this.pcdcCountry = response;
+          if (this.pcdcCountry.length > 0) {
+            this.isPcdcCountry = true;
+            this.selectedCountry = country.code;
+          } else {
+            this.isPcdcCountry = false;
+            // this.selectedCountry = country.code;
+          }
+        },
+        (err) => {
+          console.log('Validation error:', err);
           this.isPcdcCountry = false;
           // this.selectedCountry = country.code;
         }
-      },
-      (err) => {
-        console.log('Validation error:', err);
-        this.isPcdcCountry = false;
-        // this.selectedCountry = country.code;
-      }
-    );
+      );
   }
 
   isNativeApp(): boolean {
@@ -1101,6 +1111,7 @@ export class SearchcountryPage {
   }
 
   confirmCountry() {
+    if (this.isCheckingEligibility) return;
     if (!this.selectedCountry || !this.isPcdcCountry) return;
 
     if (this.detectedCountry === undefined || this.detectedCountry === null) {

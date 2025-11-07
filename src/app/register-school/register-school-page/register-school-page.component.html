@@ -1,75 +1,147 @@
 <app-pcdc-header></app-pcdc-header>
 <ion-content>
-  <div class="container" [ngClass]="{'privacy_height': isLast}">
-    <ion-button [ngClass]="isNativeApp() ? 'button_disable_hover_native' : 'button_disable_hover'" fill="clear" (click)="handleBackClick()">
-      <ion-img src="assets/images/back_button.svg" name="arrow-back-outline" class="backIcon"></ion-img>
+  <div class="container" [ngClass]="{ privacy_height: isLast }">
+    <ion-button
+      [ngClass]="isNativeApp() ? 'button_disable_hover_native' : 'button_disable_hover'"
+      fill="clear"
+      (click)="handleBackClick()"
+    >
+      <ion-img
+        src="assets/images/back_button.svg"
+        name="arrow-back-outline"
+        class="backIcon"
+      ></ion-img>
     </ion-button>
-    <ion-slides (ionSlideDidChange)="checkCurrentSlide()" (ionSlideWillChange)="checkCurrentSlide()"
-      [options]="slideOpts" (ionSlideReachEnd)="reachedEnd()" class="schoolsuccess" [ngClass]="{ 'last-slide-active': isLast }" #mySlider>
+    <ion-slides
+      (ionSlideDidChange)="checkCurrentSlide()"
+      (ionSlideWillChange)="checkCurrentSlide()"
+      [options]="slideOpts"
+      (ionSlideReachEnd)="reachedEnd()"
+      class="schoolsuccess"
+      [ngClass]="{ 'last-slide-active': isLast }"
+      #mySlider
+    >
       <ion-slide>
         <div class="top-layout">
           <div class="successInfo">
-            <ion-img src="assets/images/register_plugin.svg" class="icon1"></ion-img>
-            <div class="success-txt txt-font" [translate]="'registerSchool.register-step-1'"></div>
-            <div class="success-txt" [innerHtml]="'registerSchool.register-part-2' | translate:{ appName }"></div>
+            <ion-img
+              src="assets/images/register_plugin.svg"
+              class="icon1"
+            ></ion-img>
+            <div
+              class="success-txt txt-font"
+              [translate]="'registerSchool.register-step-1'"
+            ></div>
+            <div
+              class="success-txt"
+              [innerHtml]="
+                'registerSchool.register-part-2' | translate : { appName }
+              "
+            ></div>
           </div>
         </div>
       </ion-slide>
       <ion-slide>
         <div class="top-layout">
           <div class="successInfo">
-            <ion-img src="assets/images/installing_register.svg" class="icon2"></ion-img>
-            <div class="success-txt" [innerHtml]="'registerSchool.register-step-2' | translate"></div>
+            <ion-img
+              src="assets/images/installing_register.svg"
+              class="icon2"
+            ></ion-img>
+            <div
+              class="success-txt"
+              [innerHtml]="'registerSchool.register-step-2' | translate"
+            ></div>
           </div>
         </div>
       </ion-slide>
       <ion-slide>
         <div class="top-layout">
           <div class="successInfo-slide3">
-            <ion-img src="assets/images/start_registeration.svg" class="icon3"></ion-img>
-            <div class="success-txt last-step" [innerHtml]="'registerSchool.register-step-3' | translate"></div>
-
+            <ion-img
+              src="assets/images/start_registeration.svg"
+              class="icon3"
+            ></ion-img>
+            <div
+              class="success-txt last-step"
+              [innerHtml]="'registerSchool.register-step-3' | translate"
+            ></div>
           </div>
-
         </div>
-
       </ion-slide>
-
     </ion-slides>
 
     <div class="middle-layout" *ngIf="isLast">
       <div class="read_content">
-        <div class="register_readMore" (click)="openExternalUrl('https://www.unicef.org/legal#privacy-policy')"
+        <!-- <div class="register_readMore" (click)="openExternalUrl('https://www.unicef.org/legal#privacy-policy')"
           [translate]="'registerSchoolPage.readMore' | translate">
 
-        </div>
-        <ion-img src="assets/images/forward_arrow.svg"></ion-img>
+        </div> -->
+        <!-- <ion-img src="assets/images/forward_arrow.svg"></ion-img> -->
       </div>
       <label class="privacy-container">
         <div class="input">
-          <ion-checkbox name="privacy" [(ngModel)]="isPrivacyChecked" class="checkbox"></ion-checkbox>
+          <ion-checkbox
+            name="privacy"
+            [(ngModel)]="isPrivacyChecked"
+            class="checkbox"
+          ></ion-checkbox>
         </div>
         <div class="learnmore">
-          <span class="learnmore" [innerHTML]="'registerSchoolPage.privacy' | translate"></span>
-          <span class="learnmore"> <b class="underline"
-              (click)="openExternalUrl('https://opendatacommons.org/licenses/odbl/1-0/')"> Open Database License
-              (ODBL)</b>,
-            the <b class="underline" (click)="openExternalUrl('https://www.measurementlab.net/privacy/')">M-Lab Privacy
-              Policy</b> and <b class="underline"
-              (click)="openExternalUrl('https://www.unicef.org/legal#privacy-policy')">UNICEF’s Privacy
-              Policy</b>.</span>
+          <span
+            class="learnmore"
+            [innerHTML]="'registerSchoolPage.privacy' | translate"
+          ></span>
+          <span class="learnmore">
+            <b
+              class="underline"
+              (click)="
+                openExternalUrl(
+                  'https://opendatacommons.org/licenses/odbl/1-0/'
+                )
+              "
+            >
+              CC-BY-4.0 License</b
+            >, the
+            <b
+              class="underline"
+              (click)="
+                openExternalUrl('https://www.unicef.org/legal#privacy-policy')
+              "
+              >UNICEF's Privacy Policy</b
+            >
+            and
+            <b
+              class="underline"
+              (click)="
+                openExternalUrl('https://creativecommons.org/licenses/by/4.0/')
+              "
+              >M-Lab Privacy Policy</b
+            >.</span
+          >
         </div>
       </label>
     </div>
     <div class="bottom-layout">
-
       <div class="swiper-pagination"></div>
 
-      <ion-button color="primary" appEnterKeyClick (click)="swipeNext()" class="dailycheck_btn btn_margin"
-        *ngIf="!isLast" [translate]="'next'"></ion-button>
-      <ion-button color="primary" [disabled]="!isPrivacyChecked" appEnterKeyClick (click)="moveToStartTest()"
-        class="dailycheck_btn btn_margin" *ngIf="isLast"
-        [translate]="'registerSchool.start-registeration'"></ion-button>
+      <ion-button
+        color="primary"
+        appEnterKeyClick
+        (click)="swipeNext()"
+        class="dailycheck_btn btn_margin"
+        *ngIf="!isLast"
+        [translate]="'next'"
+      ></ion-button>
+      <ion-button
+        color="primary"
+        [disabled]="!isPrivacyChecked"
+        appEnterKeyClick
+        (click)="moveToStartTest()"
+        class="dailycheck_btn btn_margin"
+        *ngIf="isLast"
+        [translate]="'registerSchool.start-registeration'"
+      ></ion-button>
     </div>
   </div>
 </ion-content>

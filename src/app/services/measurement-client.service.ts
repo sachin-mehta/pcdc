@@ -20,6 +20,8 @@ export class MeasurementClientService {
   public uploadStarted$ = new Subject<any>();
 
   private TIME_EXPECTED = 10;
+  private retryAttempts = 0;
+  private maxRetries = 3;
   private readonly measurementNotificationActivity = new BehaviorSubject<any>(
     {}
   ).asObservable();
@@ -81,6 +83,11 @@ export class MeasurementClientService {
 
   async runTest(notes = 'manual'): Promise<void> {
     console.log('Starting ndt7 test', ndt7);
+    this.retryAttempts = 0;
+    await this.runTestWithRetry(notes);
+  }
+
+  private async runTestWithRetry(notes = 'manual'): Promise<void> {
     this.broadcastMeasurementStatus('onstart', {});
     const measurementRecord = this.initializeMeasurementRecord(notes);
 
@@ -97,7 +104,31 @@ export class MeasurementClientService {
       await this.finalizeMeasurement(measurementRecord);
     } catch (error) {
       console.error('Error running ndt7 test:', error);
-      this.broadcastMeasurementStatus('onError', { error: error.message });
+
+      // Check if this is a locate server error and we can retry
+      const isLocateServerError =
+        error.message.includes('locate.measurementlab.net') ||
+        error.message.includes('Could not understand response') ||
+        error.message.includes('fetch');
+
+      if (isLocateServerError && this.retryAttempts < this.maxRetries) {
+        this.retryAttempts++;
+        console.log(
+          `Retrying test due to locate server error. Attempt ${this.retryAttempts}/${this.maxRetries}`
+        );
+
+        this.broadcastMeasurementStatus('retrying', {
+          attempt: this.retryAttempts,
+          maxRetries: this.maxRetries,
+          message: `Retrying test... (${this.retryAttempts}/${this.maxRetries})`,
+        });
+
+        // Wait a bit before retrying
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+        return this.runTestWithRetry(notes);
+      } else {
+        this.broadcastMeasurementStatus('onError', { error: error.message });
+      }
     }
   }
 
@@ -127,6 +158,7 @@ export class MeasurementClientService {
 
   private getTestCallbacks(measurementRecord: any) {
     return {
+      serverDiscovery: this.onServerDiscovery,
       serverChosen: this.onServerChosen,
       downloadMeasurement: (data) =>
         this.onDownloadMeasurement(data, measurementRecord),
@@ -139,6 +171,14 @@ export class MeasurementClientService {
     };
   }
 
+  private onServerDiscovery = (data: { loadbalancer: URL }): void => {
+    console.log('Discovering servers from:', data.loadbalancer.toString());
+    this.broadcastMeasurementStatus('server_discovery', {
+      loadbalancer: data.loadbalancer.toString(),
+      message: 'Discovering test servers...',
+    });
+  };
+
   private onServerChosen = (server: {
     machine: string;
     location: string;
@@ -146,6 +186,10 @@ export class MeasurementClientService {
     console.log('Testing to:', {
       machine: server.machine,
       locations: server.location,
+    });
+    this.broadcastMeasurementStatus('server_chosen', {
+      server: server,
+      message: 'Server selected, preparing test...',
     });
   };
 
@@ -200,7 +244,25 @@ export class MeasurementClientService {
 
   private onError = (err: Error): void => {
     console.error('Error while running the test:', err.message);
-    this.broadcastMeasurementStatus('error', { error: err.message });
+
+    // Check if this is a locate server error
+    const isLocateServerError =
+      err.message.includes('locate.measurementlab.net') ||
+      err.message.includes('Could not understand response') ||
+      err.message.includes('fetch');
+
+    const errorType = isLocateServerError
+      ? 'locate_server_error'
+      : 'test_error';
+    const errorMessage = isLocateServerError
+      ? 'Failed to discover test servers. Please check your internet connection and try again.'
+      : err.message;
+
+    this.broadcastMeasurementStatus('error', {
+      error: errorMessage,
+      errorType: errorType,
+      originalError: err.message,
+    });
   };
 
   private updateProgress(
@@ -230,19 +292,26 @@ export class MeasurementClientService {
 
     if (this.settingsService.get('uploadEnabled')) {
       try {
-        this.historyService.add(measurementRecord);
-        this.sharedService.broadcast(
-          'history:measurement:change',
-          'history:measurement:change'
-        );
+        // Try to upload first before saving to localStorage
         await this.uploadService
           .uploadMeasurement(measurementRecord)
           .toPromise();
         measurementRecord.uploaded = true;
       } catch (error) {
         console.error('Upload failed:', error);
+        measurementRecord.uploaded = false;
       }
+    } else {
+      // If upload is disabled, mark as not uploaded
+      measurementRecord.uploaded = false;
     }
+
+    // Now save to localStorage with the correct uploaded status
+    this.historyService.add(measurementRecord);
+    this.sharedService.broadcast(
+      'history:measurement:change',
+      'history:measurement:change'
+    );
 
     this.broadcastMeasurementStatus('complete', {
       passedResults: measurementRecord.results,

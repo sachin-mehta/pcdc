@@ -1,5 +1,210 @@
 @import "../../theme/variables.scss";
 
+// Testing Controls Styles (Development Only)
+.testing-controls {
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-bottom: 2px solid #dee2e6;
+  padding: 12px 16px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  
+  span {
+    font-weight: 600;
+    color: #495057;
+    font-size: 14px;
+    white-space: nowrap;
+  }
+
+  ion-button {
+    --border-radius: 6px;
+    --padding-start: 12px;
+    --padding-end: 12px;
+    font-size: 12px;
+    height: 32px;
+
+    &[color="primary"] {
+      --background: #007bff;
+      --color: white;
+      
+      &[fill="outline"] {
+        --border-color: #007bff;
+        --color: #007bff;
+        --background: transparent;
+        
+        &:hover {
+          --background: #007bff;
+          --color: white;
+        }
+      }
+    }
+
+    &[color="secondary"] {
+      --background: #6c757d;
+      --color: white;
+      
+      &[fill="outline"] {
+        --border-color: #6c757d;
+        --color: #6c757d;
+        --background: transparent;
+        
+        &:hover {
+          --background: #6c757d;
+          --color: white;
+        }
+      }
+    }
+
+    &[color="danger"] {
+      &[fill="clear"] {
+        --color: #dc3545;
+        
+        &:hover {
+          --background: rgba(220, 53, 69, 0.1);
+        }
+      }
+    }
+  }
+
+  @media (max-width: 768px) {
+    padding: 8px 12px;
+    gap: 8px;
+    
+    span {
+      font-size: 12px;
+    }
+    
+    ion-button {
+      font-size: 11px;
+      height: 28px;
+      --padding-start: 8px;
+      --padding-end: 8px;
+    }
+  }
+}
+
+// Registration Notifications Styles (matching reference design)
+.notification-container {
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.notification {
+  display: flex;
+  align-items: center;
+  background-color: #e9ecef;
+  border-left: 4px solid #007bff;
+  padding: 16px 20px;
+  margin-bottom: 8px;
+  border-radius: 0 4px 4px 0;
+  position: relative;
+
+  &.completed {
+    border-left-color: #28a745;
+  }
+
+  &.in-progress {
+    border-left-color: #007bff;
+  }
+}
+
+.icon {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 16px;
+  flex-shrink: 0;
+
+  &.completed {
+    background-color: #28a745;
+    color: white;
+  }
+
+  &.loading {
+    background-color: #007bff;
+    position: relative;
+  }
+}
+
+.checkmark {
+  font-size: 14px;
+  font-weight: bold;
+  color: white;
+}
+
+.spinner {
+  width: 12px;
+  height: 12px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.notification-text {
+  flex: 1;
+  font-size: 16px;
+  color: #333;
+  font-weight: 500;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 20px;
+  color: #666;
+  cursor: pointer;
+  padding: 4px;
+  line-height: 1;
+  margin-left: 16px;
+
+  &:hover {
+    color: #333;
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .notification {
+    padding: 12px 16px;
+    
+    .notification-text {
+      font-size: 14px;
+    }
+
+    .icon {
+      width: 20px;
+      height: 20px;
+      margin-right: 12px;
+    }
+
+    .checkmark {
+      font-size: 12px;
+    }
+
+    .spinner {
+      width: 10px;
+      height: 10px;
+    }
+
+    .close-button {
+      font-size: 18px;
+      margin-left: 12px;
+    }
+  }
+}
+
 .center-layout {
   background-repeat: no-repeat;
   width: 146px;
@@ -577,6 +782,10 @@ ion-card {
 }
 .error_status{
   color: #F94B4B !important;
+}
+
+.success_status{
+  color: #28a745 !important;
 }
 .position {
   display: flex;

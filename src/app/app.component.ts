@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
-import { IonPopover, MenuController } from '@ionic/angular';
+import { IonPopover, MenuController, ModalController } from '@ionic/angular';
+import { Router } from '@angular/router';
 import { TranslateService } from '@ngx-translate/core';
 import { StorageService } from '../app/services/storage.service';
 import { SettingsService } from './services/settings.service';
@@ -10,6 +11,11 @@ import { environment } from '../environments/environment'; // './esrc/environmen
 import { PingResult, PingService } from './services/ping.service';
 import { IndexedDBService } from './services/indexed-db.service';
 import { SyncService } from './services/sync.service';
+import { WhatsNewService } from './services/whats-new.service';
+import { WhatsNewModalComponent } from './components/whats-new-modal/whats-new-modal.component';
+import { LogoutModalComponent } from './components/logout-modal/logout-modal.component';
+import { HardwareIdService } from './services/hardware-id.service';
+import { SchoolService } from './services/school.service';
 import { Capacitor } from '@capacitor/core';
 import { Browser } from '@capacitor/browser';
 import { FirebaseCrashlytics } from '@capacitor-firebase/crashlytics';
@@ -26,7 +32,10 @@ export class AppComponent {
   languageSearch = '';
   selectedLanguage: string;
   selectedLanguageName: string;
-  isToastOpen = true;
+  isToastOpen = false;
+  toastMessage = '';
+  toastColor = 'success';
+  showCopySuccess = false;
   school: any;
   historyState: any;
   availableSettings: any;
@@ -48,6 +57,7 @@ export class AppComponent {
     { name: 'LAN', ssid: 'SSID', checked: false },
   ];
   networkSelected = false;
+  whatsNewReleases: any[] = [];;
   constructor(
     private menu: MenuController,
     private storage: StorageService,
@@ -58,7 +68,12 @@ export class AppComponent {
     private scheduleService: ScheduleService,
     private pingService: PingService,
     private localStorageService: IndexedDBService,
-    private syncService: SyncService
+    private syncService: SyncService,
+    private whatsNewService: WhatsNewService,
+    private modalController: ModalController,
+    private hardwareIdService: HardwareIdService,
+    private router: Router,
+    private schoolService: SchoolService
   ) {
     this.isNative = Capacitor.isNativePlatform();
     this.filteredOptions = [];
@@ -74,8 +89,13 @@ export class AppComponent {
     };
     this.translate.use(appLang.code);
     this.app_version = environment.app_version;
-    this.device_id = this.storage.get('schoolUserId') || 'unknown-device';
-    this.device_id_short = this.device_id.substring(0, 16) + '...';
+    // Use system hardware ID instead of schoolUserId
+    this.device_id =
+      this.hardwareIdService.getHardwareId() ||
+      this.storage.get('system_hardware_id') ||
+      'unknown-device';
+    // Show the full device ID as requested
+    this.device_id_short = this.device_id;
     if (this.storage.get('schoolId')) {
       this.school = JSON.parse(this.storage.get('schoolInfo'));
     }
@@ -115,6 +135,12 @@ export class AppComponent {
       'history:measurement:change',
       this.refreshHistory.bind(this)
     );
+
+    // Listen for registration completion to update device ID
+    this.sharedService.on(
+      'registration:completed',
+      this.updateDeviceId.bind(this)
+    );
     this.refreshHistory();
     this.initiatePingService();
     console.log('GIGA isNative', this.isNative);
@@ -126,6 +152,26 @@ export class AppComponent {
       this.initCrashlytics();
     }
     this.setPlatformClass();
+
+        // Check for What's New dialog after app initialization
+    this.checkAndShowWhatsNew();
+
+    // Load release notes for help sidebar
+    this.loadWhatsNewReleases();
+
+    // Expose service for testing (development only)
+    if (!environment.production) {
+      (window as any).whatsNewService = this.whatsNewService;
+      (window as any).testWhatsNew = {
+        simulateFreshInstall: () => this.whatsNewService.simulateFreshInstall(),
+        simulateUpdate: (from?: string) =>
+          this.whatsNewService.simulateVersionUpdate(from),
+        forceShow: () => this.whatsNewService.forceShowForCurrentVersion(),
+        showState: () => this.whatsNewService.logDebugState(),
+        triggerCheck: () => this.checkAndShowWhatsNew(),
+      };
+      console.log('🧪 Testing helpers available: window.testWhatsNew');
+    }
   }
 
   private setPlatformClass() {
@@ -164,6 +210,7 @@ export class AppComponent {
 
   isNativeApp(): boolean {
     return Capacitor.isNativePlatform();
+
   }
 
   startSyncingPeriodicProcess() {
@@ -337,12 +384,255 @@ export class AppComponent {
   }
   async copy(text: string): Promise<boolean> {
     try {
-      await navigator.clipboard.writeText(text);
-      this.isToastOpen = true;
+      // Try modern clipboard API first
+      if (navigator.clipboard && window.isSecureContext) {
+        await navigator.clipboard.writeText(text);
+      } else {
+        // Fallback for older browsers or non-secure contexts
+        this.fallbackCopyTextToClipboard(text);
+      }
+
+      // Show temporary success state with checkmark
+      this.showCopySuccess = true;
       console.log('Text copied to clipboard:', text);
+
+      // Hide success state after 3 seconds
+      setTimeout(() => {
+        this.showCopySuccess = false;
+      }, 3000);
+
       return true;
-    } catch {
+    } catch (error) {
+      const errorMessage = this.translate.instant('app.device-id-copy-failed');
+      this.showToast(errorMessage, 'danger');
+      console.error('Failed to copy to clipboard:', error);
       return false;
+    }
+  }
+
+  private fallbackCopyTextToClipboard(text: string): void {
+    const textArea = document.createElement('textarea');
+    textArea.value = text;
+
+    // Avoid scrolling to bottom
+    textArea.style.top = '0';
+    textArea.style.left = '0';
+    textArea.style.position = 'fixed';
+    textArea.style.opacity = '0';
+
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+
+    try {
+      document.execCommand('copy');
+    } catch (err) {
+      throw new Error('Fallback copy method failed');
+    }
+
+    document.body.removeChild(textArea);
+  }
+
+  private showToast(message: string, color: string = 'success') {
+    this.toastMessage = message;
+    this.toastColor = color;
+    this.isToastOpen = true;
+    // Auto-close toast after 3 seconds
+    setTimeout(() => {
+      this.isToastOpen = false;
+    }, 3000);
+  }
+
+  setOpen(isOpen: boolean) {
+    this.isToastOpen = isOpen;
+  }
+
+  /**
+   * Check if What's New dialog should be shown and display it
+   */
+  private async checkAndShowWhatsNew(): Promise<void> {
+    try {
+      // Add a small delay to ensure app is fully initialized
+      setTimeout(async () => {
+        if (this.whatsNewService.shouldShowWhatsNewDialog()) {
+          await this.showWhatsNewDialog();
+        }
+      }, 1000);
+    } catch (error) {
+      console.warn("Error checking What's New dialog:", error);
+    }
+  }
+
+  /**
+   * Display the What's New modal dialog
+   */
+  private async showWhatsNewDialog(): Promise<void> {
+    try {
+      this.whatsNewService
+        .getReleaseDataForCurrentVersion()
+        .subscribe(async (releaseData) => {
+          if (releaseData) {
+            const modal = await this.modalController.create({
+              component: WhatsNewModalComponent,
+              cssClass: 'whats-new-modal',
+              backdropDismiss: true,
+              componentProps: {
+                releaseData: releaseData,
+              },
+            });
+
+            modal.onDidDismiss().then(() => {
+              // Mark dialog as shown after user dismisses it
+              this.whatsNewService.markDialogAsShown();
+            });
+
+            await modal.present();
+          }
+        });
+    } catch (error) {
+      console.error("Error showing What's New dialog:", error);
+      // Mark as shown even if there's an error to prevent infinite retries
+      this.whatsNewService.markDialogAsShown();
+    }
+  }
+
+  /**
+   * Load release notes for the help sidebar
+   */
+  private loadWhatsNewReleases(): void {
+    this.whatsNewService.getReleaseNotes().subscribe({
+      next: (releaseNotes) => {
+        // Convert release notes object to array and sort by version (newest first)
+        this.whatsNewReleases = Object.entries(releaseNotes)
+          .map(([version, data]: [string, any]) => ({
+            version,
+            ...data,
+          }))
+          .sort((a, b) => this.compareVersions(b.version, a.version))
+          .slice(0, 5); // Show only the latest 5 releases
+      },
+      error: (error) => {
+        console.warn('Failed to load release notes for sidebar:', error);
+        this.whatsNewReleases = [];
+      },
+    });
+  }
+
+  /**
+   * Update device ID from storage after registration completion
+   */
+  private updateDeviceId(): void {
+    const newDeviceId = this.storage.get('schoolUserId');
+    if (newDeviceId) {
+      this.device_id = newDeviceId;
+      this.device_id_short = newDeviceId;
+      console.log('Device ID updated after registration:', newDeviceId);
+    }
+  }
+
+  /**
+   * Compare version strings (simple semantic version comparison)
+   */
+  private compareVersions(a: string, b: string): number {
+    const aParts = a.split('.').map(Number);
+    const bParts = b.split('.').map(Number);
+
+    for (let i = 0; i < Math.max(aParts.length, bParts.length); i++) {
+      const aPart = aParts[i] || 0;
+      const bPart = bParts[i] || 0;
+
+      if (aPart > bPart) return 1;
+      if (aPart < bPart) return -1;
+    }
+
+    return 0;
+  }
+
+  /**
+   * Open external release notes page
+   */
+  openReleaseNotes(): void {
+    if (environment.isElectron && window.require) {
+      const { shell } = window.require('electron');
+      shell.openExternal(
+        'https://github.com/unicef/project-connect-daily-check-app/releases'
+      );
+    } else {
+      window.open(
+        'https://github.com/unicef/project-connect-daily-check-app/releases',
+        '_blank'
+      );
+    }
+  }
+
+  /**
+   * Open logout confirmation modal
+   */
+  async openLogoutModal(): Promise<void> {
+    const modal = await this.modalController.create({
+      component: LogoutModalComponent,
+      cssClass: 'logout-modal',
+      backdropDismiss: true,
+    });
+
+    modal.onDidDismiss().then((result) => {
+      if (result.data && result.data.action === 'logout') {
+        this.handleLogout();
+      }
+    });
+
+    await modal.present();
+  }
+
+  /**
+   * Handle logout action - deactivate device, clear localStorage and redirect to home
+   */
+  private async handleLogout(): Promise<void> {
+    try {
+      // Close the settings menu
+      this.closeMenu();
+
+      // Get hardware ID and giga ID before clearing storage
+      const hardwareId = this.hardwareIdService.getHardwareId();
+      const gigaId = this.storage.get('gigaId');
+
+      // Deactivate device on backend if we have the required IDs
+      if (hardwareId && gigaId) {
+        console.log('Deactivating device:', { hardwareId, gigaId });
+        try {
+          await this.schoolService
+            .deactivateDevice(hardwareId, gigaId)
+            .toPromise();
+          console.log('✅ Device marked as inactive on backend');
+        } catch (deactivateError) {
+          console.error(
+            '⚠️ Error deactivating device on backend:',
+            deactivateError
+          );
+          // Continue with logout even if deactivation fails
+        }
+      } else {
+        console.warn(
+          '⚠️ Missing hardware ID or giga ID, skipping backend deactivation'
+        );
+      }
+
+      // Clear all localStorage data
+      await this.storage.clear();
+
+      // Show success toast
+      this.showToast('Logged out successfully', 'success');
+
+      // Navigate to home page after a brief delay
+      setTimeout(() => {
+        this.router.navigate(['/home']).then(() => {
+          // Reload the page to reset the app state
+          window.location.reload();
+        });
+      }, 500);
+    } catch (error) {
+      console.error('Error during logout:', error);
+      this.showToast('Error during logout. Please try again.', 'danger');
     }
   }
 }

@@ -40,6 +40,7 @@ export class TestDetailComponent implements OnInit {
   selectedCountry: any;
   isNative: boolean;
   constructor(
+    
     private storage: StorageService,
     private historyService: HistoryService,
     private countryService: CountryService,
@@ -95,17 +96,27 @@ export class TestDetailComponent implements OnInit {
 
     let historicalData = this.historyService.get();
     if (
+      
       historicalData !== null &&
+     
       historicalData !== undefined &&
+     
       historicalData.measurements.length
+    
     ) {
       this.measurementnetworkServer =
+       
         historicalData.measurements[
+          
           historicalData.measurements.length - 1
+        
         ].mlabInformation.city;
       this.measurementISP =
+       
         historicalData.measurements[
+          
           historicalData.measurements.length - 1
+        
         ].accessInformation.org;
     }
     if (this.storage.get('historicalDataAll')) {
@@ -115,12 +126,49 @@ export class TestDetailComponent implements OnInit {
       // Get the last 10 measurements (sorted by timestamp descending)
       this.measurementsData = allMeasurements
         .sort(
+          
           (
             a: { timestamp: string | number | Date },
             b: { timestamp: string | number | Date }
-          ) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+          ) =>
+            new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+        
         ) // descending order
         .slice(0, 10); // take last 10
     }
+  }
+
+  /**
+   * Map Notes values to display text for Test Trigger column
+   * @param notes The Notes value from measurement data
+   * @returns Mapped display text
+   */
+  getTestTriggerDisplayText(notes: string): string {
+    const triggerMapping = {
+      startup: 'Startup',
+      daily: 'Daily',
+      manual: 'Manual',
+      first: 'First',
+    };
+
+    return triggerMapping[notes] || notes || '-';
+  }
+
+  /**
+   * Get sync status text based on uploaded flag
+   * @param measurement The measurement data
+   * @returns Status text
+   */
+  getSyncStatusText(measurement: any): string {
+    return measurement.uploaded ? 'Success' : '-';
+  }
+
+  /**
+   * Get CSS class for sync status
+   * @param measurement The measurement data
+   * @returns CSS class name
+   */
+  getSyncStatusClass(measurement: any): string {
+    return measurement.uploaded ? 'green_color' : 'orange_color';
   }
 }

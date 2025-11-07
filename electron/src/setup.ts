@@ -30,8 +30,16 @@ import { Capacitor } from '@capacitor/core';
 import { Severity } from '@sentry/node';
 
 import { Console } from 'console';
-var AutoLaunch = require('auto-launch');
 var isQuiting = false;
+
+// Export functions to control quitting state
+export function setIsQuiting(quitting: boolean) {
+  isQuiting = quitting;
+}
+
+export function getIsQuiting(): boolean {
+  return isQuiting;
+}
 
 // Enhanced Sentry configuration
 Sentry.init({
@@ -39,6 +47,7 @@ Sentry.init({
     ? 'https://425388d87bae44d7be09a88dd5548d7e@excubo.unicef.io/77'
     : 'https://e52e97fc558344bc80a218fc22a9a6a9@excubo.unicef.io/47',
   environment: 'production',
+  beforeSend: (event) => {
   beforeSend: (event) => {
     // Add app version to help with debugging
     event.extra = {
@@ -126,9 +135,9 @@ export class ElectronCapacitorApp {
     new MenuItem({
       label: 'Quit App',
       click: function () {
-        isQuiting = true;
+        setIsQuiting(true);
+        // Note: cleanup will be handled by the before-quit event
         app.quit();
-        this.MainWindow.close();
       },
     }),
   ];
@@ -180,6 +189,14 @@ export class ElectronCapacitorApp {
     return this.customScheme;
   }
 
+  // Cleanup method to properly destroy tray icon
+  cleanup(): void {
+    if (this.TrayIcon && !this.TrayIcon.isDestroyed()) {
+      this.TrayIcon.destroy();
+      this.TrayIcon = null;
+    }
+  }
+
   async init(): Promise<void> {
     const icon = nativeImage.createFromPath(
       join(
@@ -193,8 +210,8 @@ export class ElectronCapacitorApp {
       screen.getPrimaryDisplay().workAreaSize;
 
     this.mainWindowState = windowStateKeeper({
-      defaultWidth: Capacitor.isNativePlatform() ? screenWidth : 376,
-      defaultHeight: Capacitor.isNativePlatform() ? screenHeight : 550,
+      defaultWidth: Capacitor.isNativePlatform() ? screenWidth : 390,
+      defaultHeight: Capacitor.isNativePlatform() ? screenHeight : 650,
     });
     // Setup preload script path and construct our main window.
     const preloadPath = join(app?.getAppPath(), 'build', 'src', 'preload.js');
@@ -243,7 +260,7 @@ export class ElectronCapacitorApp {
 
     this.MainWindow?.on('unresponsive', () => {
       Sentry.captureMessage('Window became unresponsive', {
-        level: Severity.Error,
+        level: Sentry.Severity.Error,
         extra: {
           windowId: this.MainWindow?.id,
         },
@@ -268,7 +285,7 @@ export class ElectronCapacitorApp {
 
     this.MainWindow?.setSize(
       Capacitor.isNativePlatform() ? screenWidth : 390,
-      Capacitor.isNativePlatform() ? screenHeight : 700
+      Capacitor.isNativePlatform() ? screenHeight : 650
     );
     this.mainWindowState?.manage(this.MainWindow);
 
@@ -277,6 +294,15 @@ export class ElectronCapacitorApp {
         this.CapacitorFileConfig?.electron?.backgroundColor
       );
     }
+
+    // Handle native close button to minimize to tray instead of closing
+    this.MainWindow?.on('close', (event) => {
+      if (!isQuiting) {
+        event.preventDefault();
+        this.MainWindow?.hide();
+        return false;
+      }
+    });
 
     // If we close the main window with the splashscreen enabled we need to destory the ref.
     this.MainWindow?.on('closed', () => {
@@ -289,6 +315,10 @@ export class ElectronCapacitorApp {
     });
     // When the tray icon is enabled, setup the options.
     if (this.CapacitorFileConfig?.electron?.trayIconAndMenuEnabled) {
+      // Cleanup existing tray icon to prevent duplicates
+      if (this.TrayIcon && !this.TrayIcon.isDestroyed()) {
+        this.TrayIcon.destroy();
+      }
       this.TrayIcon = new Tray(icon);
       this.TrayIcon?.on('double-click', () => {
         if (this.MainWindow) {
@@ -416,26 +446,58 @@ export class ElectronCapacitorApp {
       });
     }
 
-    // Auto lunching code added by Kajal
-    var measureAppAutoLuncher = new AutoLaunch({
-      name: 'Unicef PDCA',
-    });
+    // Auto-launch configuration using Electron's native API
+    // This ensures the app starts on system boot for all users when installed per-machine
+    try {
+      // MIGRATION: Clean up old auto-launch registry entries to prevent duplicates
+      if (process.platform === 'win32') {
+        try {
+          const { execSync } = require('child_process');
+          // Remove old auto-launch entry with the old app name
+          const oldAppNames = ['Unicef PDCA', 'unicef-pdca'];
 
-    measureAppAutoLuncher?.enable();
-    measureAppAutoLuncher
-      ?.isEnabled()
-      .then(function (isEnabled) {
-        if (isEnabled) {
-          return;
+          oldAppNames.forEach((oldName) => {
+            try {
+              execSync(
+                `reg delete "HKCU\\Software\\Microsoft\\Windows\\CurrentVersion\\Run" /v "${oldName}" /f`,
+                { stdio: 'ignore' }
+              );
+              console.log(`🧹 Cleaned up old auto-launch entry: ${oldName}`);
+            } catch (err) {
+              // Entry doesn't exist or already removed - this is fine
+              // Don't log to avoid noise
+            }
+          });
+        } catch (cleanupErr) {
+          // Cleanup is best-effort, don't fail if it doesn't work
+          console.log('ℹ️ Old auto-launch cleanup skipped (not critical)');
         }
-        measureAppAutoLuncher?.enable();
-      })
-      .catch(function (err) {
-        // handle error
-        Sentry.captureException(err);
-        console.log(err);
+      }
+
+      // Set up auto-launch with Electron's native API
+      app.setLoginItemSettings({
+        openAtLogin: true,
+        openAsHidden: false,
+        path: process.execPath,
+        args: [],
       });
-    // End of Auto lunching code
+
+      // Verify it was set correctly
+      const loginItemSettings = app.getLoginItemSettings();
+      console.log('✅ Auto-launch enabled:', loginItemSettings.openAtLogin);
+
+      if (!loginItemSettings.openAtLogin) {
+        console.warn('⚠️ Auto-launch could not be enabled');
+        Sentry.captureMessage('Auto-launch setting failed to enable', {
+          level: 'warning' as any,
+          extra: { loginItemSettings },
+        });
+      }
+    } catch (err) {
+      console.error('❌ Error setting auto-launch:', err);
+      Sentry.captureException(err);
+    }
+    // End of Auto-launch code
   }
 }
 

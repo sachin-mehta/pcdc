@@ -13,9 +13,11 @@ import { Device } from '@capacitor/device';
 import { DatePipe } from '@angular/common';
 import { environment } from 'src/environments/environment';
 import { SettingsService } from '../services/settings.service';
+import { SharedService } from '../services/shared-service.service';
 import { TranslateService } from '@ngx-translate/core';
 import { Capacitor, registerPlugin } from '@capacitor/core';
 import { HistoryService } from '../services/history.service';
+import { HardwareIdService } from '../services/hardware-id.service';
 @Component({
   selector: 'app-confirmschool',
   templateUrl: 'confirmschool.page.html',
@@ -44,7 +46,9 @@ export class ConfirmschoolPage {
     private settings: SettingsService,
     public loading: LoadingService,
     private datePipe: DatePipe,
-    private translate: TranslateService
+    private translate: TranslateService,
+    private sharedService: SharedService,
+    private hardwareIdService: HardwareIdService
   ) {
     const appLang = this.settings.get('applicationLanguage');
     this.translate.use(appLang.code);
@@ -84,6 +88,9 @@ export class ConfirmschoolPage {
     this.getIPAddress().then((c) => {
       this.getDeviceInfo().then((a) => {
         this.getDeviceId().then((b) => {
+          // Get hardware ID for machine-level registration
+          const hardwareId = this.hardwareIdService.getHardwareId();
+
           schoolData = {
             giga_id_school: this.school.giga_id_school,
             mac_address: b.identifier,
@@ -93,6 +100,7 @@ export class ConfirmschoolPage {
             ip_address: c, // c.ip,
             //country_code: c.country,
             country_code: this.selectedCountry,
+            device_hardware_id: hardwareId || null, // Add hardware ID
             //school_id: this.school.school_id
           };
 
@@ -112,7 +120,7 @@ export class ConfirmschoolPage {
               this.storage.set('country_code', this.selectedCountry);
               this.storage.set('school_id', this.school.school_id);
               this.storage.set('schoolInfo', JSON.stringify(this.school));
-              if (this.isNative) {
+  if (this.isNative) {
                 //This we need to pass to native background servie to execute the
                 // api calls to publish speed test data
                 const apiKey = environment.token;
@@ -143,6 +151,18 @@ export class ConfirmschoolPage {
               //   ],
               //   { state: this.school }
               // );
+              // Set first-time visit flags for new registration flow
+              this.storage.setFirstTimeVisit(true);
+              this.storage.setRegistrationCompleted(Date.now());
+
+              this.loading.dismiss();
+
+              // Navigate to starttest page normally
+              this.router.navigate(['/starttest']).then(() => {
+                // Broadcast registration completion event after navigation
+                // This will trigger the first-time flow in StartTest component
+                this.sharedService.broadcast('registration:completed');
+              });
 
               this.settings.setSetting('scheduledTesting', true);
             }),
@@ -153,7 +173,7 @@ export class ConfirmschoolPage {
                 this.schoolId,
                 this.selectedCountry,
                 this.detectedCountry,
-                this.selectedCountryName,
+                this.selectedCountryName,,
               ]);
               /* Redirect to no result found page */
             };

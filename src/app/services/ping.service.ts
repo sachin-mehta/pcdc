@@ -89,7 +89,7 @@ export class PingService {
   }
 
   async getBrowserId() {
-    const browserId = this.storage.get('schoolUserId'); 
+    const browserId = this.storage.get('schoolUserId');
     return { uuid: browserId };
   }
 
@@ -183,7 +183,7 @@ export class PingService {
       this.latency = null;
 
       const configOptions = {
-        measurements: [{ type: 'latency', numPackets: 1 }],
+        measurements: [{ type: 'latency', numPackets: 10 }],
       };
       const speedTest = new SpeedTest(configOptions as any);
 
