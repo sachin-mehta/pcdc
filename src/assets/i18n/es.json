@@ -192,11 +192,11 @@
     "testTrigger": "Activador",
     "testWorking": "Primera prueba completada",
     "total": "Historial de pruebas (últimas 10 mediciones)",
-    "tryAgain": "INTENTAR DE NUEVO",
+    "tryAgain": "INTENTAR\nDE NUEVO",
     "upload": "CARGA",
     "uploadLowerCase": "Carga"
   },
-  "tryAgain": "INTENTAR DE NUEVO",
+  "tryAgain": "INTENTAR\nDE NUEVO",
   "welcome": "Bienvenido a",
   "whatsNew": {
     "checkReleaseNotes": "Ver notas de lanzamiento",
