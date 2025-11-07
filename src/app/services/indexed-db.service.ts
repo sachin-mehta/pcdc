@@ -82,6 +82,7 @@ export class IndexedDBService {
     const store = transaction.objectStore(this.storeName);
     const now = Date.now();
     const retentionPeriod = 30 * 24 * 60 * 60 * 1000; // 30 days in milliseconds
+    const syncedRetentionPeriod = 3 * 24 * 60 * 60 * 1000; // Keep synced records for 7 days
 
     return new Promise((resolve, reject) => {
       const request = store.getAll(); // Get all records from IndexedDB
@@ -89,9 +90,15 @@ export class IndexedDBService {
       request.onsuccess = () => {
         const records = request.result;
 
-        // Delete records that are synced or older than retention period
+        // Delete records that are:
+        // 1. Synced AND older than 7 days, OR
+        // 2. Older than 30 days (regardless of sync status)
         records.forEach((record) => {
-          if (record.isSynced || now - record.createdAt >= retentionPeriod) {
+          const recordAge = now - record.createdAt;
+          if (
+            (record.isSynced && recordAge >= syncedRetentionPeriod) ||
+            recordAge >= retentionPeriod
+          ) {
             store.delete(record.timestamp); // Delete based on primary key
           }
         });

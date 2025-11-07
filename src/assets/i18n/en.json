@@ -177,6 +177,8 @@
     "network": "Device network",
     "ping": "Ping",
     "retrying": "Retry {{attempt}}/{{maxRetries}}",
+    "runningTestDownload": "Running Test (Download)",
+    "runningTestUpload": "Running Test (Upload)",
     "schoolRegistered": "School registered successfully",
     "server": "Nearest server",
     "serverSelected": "Server found",

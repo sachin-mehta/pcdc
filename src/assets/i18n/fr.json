@@ -177,6 +177,8 @@
     "network": "Réseau de l'appareil",
     "ping": "Ping",
     "retrying": "Veuillez réessayer {{attempt}}/{{maxRetries}}",
+    "runningTestDownload": "Test en cours (Téléchargement)",
+    "runningTestUpload": "Test en cours (Téléversement)",
     "schoolRegistered": "École enregistrée avec succès",
     "server": "Serveur le plus proche",
     "serverSelected": "Serveur trouvé",
