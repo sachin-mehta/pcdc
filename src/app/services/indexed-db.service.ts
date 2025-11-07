@@ -29,8 +29,14 @@ export class IndexedDBService {
     const store = transaction.objectStore(this.storeName);
     store.put({ ...result, createdAt: Date.now(), isSynced: false });
     return new Promise((resolve, reject) => {
-      transaction.oncomplete = () => resolve();
-      transaction.onerror = (e) => reject(e);
+      transaction.oncomplete = () => {
+        db.close(); // Close connection after successful transaction
+        resolve();
+      };
+      transaction.onerror = (e) => {
+        db.close(); // Close connection even on error
+        reject(e);
+      };
     });
   }
 
@@ -40,8 +46,14 @@ export class IndexedDBService {
     const store = transaction.objectStore(this.storeName);
     return new Promise((resolve, reject) => {
       const request = store.getAll();
-      request.onsuccess = () => resolve(request.result);
-      request.onerror = (e) => reject(e);
+      request.onsuccess = () => {
+        db.close(); // Close connection after successful read
+        resolve(request.result);
+      };
+      request.onerror = (e) => {
+        db.close(); // Close connection even on error
+        reject(e);
+      };
     });
   }
 
@@ -53,8 +65,14 @@ export class IndexedDBService {
       store.put({ ...synced, isSynced: true });
     });
     return new Promise((resolve, reject) => {
-      transaction.oncomplete = () => resolve();
-      transaction.onerror = (e) => reject(e);
+      transaction.oncomplete = () => {
+        db.close(); // Close connection after successful transaction
+        resolve();
+      };
+      transaction.onerror = (e) => {
+        db.close(); // Close connection even on error
+        reject(e);
+      };
     });
   }
 
@@ -66,36 +84,39 @@ export class IndexedDBService {
     const retentionPeriod = 30 * 24 * 60 * 60 * 1000; // 30 days in milliseconds
 
     return new Promise((resolve, reject) => {
-        const request = store.getAll(); // Get all records from IndexedDB
-        
-        request.onsuccess = () => {
-            const records = request.result;
-            const deletePromises: Promise<void>[] = [];
+      const request = store.getAll(); // Get all records from IndexedDB
 
-            records.forEach((record) => {
-                if (record.isSynced || now - record.createdAt >= retentionPeriod) {
-                    const deleteRequest = store.delete(record.timestamp); // Delete based on primary key
-                    
-                    // Wrap each delete operation in a promise
-                    const deletePromise = new Promise<void>((res, rej) => {
-                        deleteRequest.onsuccess = () => res();
-                        deleteRequest.onerror = () => rej(deleteRequest.error);
-                    });
+      request.onsuccess = () => {
+        const records = request.result;
 
-                    deletePromises.push(deletePromise);
-                }
-            });
+        // Delete records that are synced or older than retention period
+        records.forEach((record) => {
+          if (record.isSynced || now - record.createdAt >= retentionPeriod) {
+            store.delete(record.timestamp); // Delete based on primary key
+          }
+        });
 
-            // Wait for all delete operations to complete before resolving
-            Promise.all(deletePromises)
-                .then(() => resolve())
-                .catch(reject);
-        };
+        // Let the transaction handle completion
+        // No need for nested promises - transaction.oncomplete will fire after all deletes
+      };
 
-        request.onerror = () => reject(request.error);
+      request.onerror = (e) => {
+        db.close(); // Close connection on error
+        reject(request.error);
+      };
+
+      // Wait for the entire transaction to complete
+      transaction.oncomplete = () => {
+        db.close(); // Close connection after successful transaction
+        resolve();
+      };
+
+      transaction.onerror = (e) => {
+        db.close(); // Close connection even on transaction error
+        reject(e);
+      };
     });
-}
-
+  }
 
   async getUnsyncedRecords(): Promise<any[]> {
     const records = await this.getPingResults();
