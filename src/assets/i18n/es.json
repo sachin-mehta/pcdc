@@ -189,7 +189,7 @@
     "testAgain": "INICIAR PRUEBA",
     "testFailed": "PRUEBA FALLIDA",
     "testFailedDesc": "La conexión se interrumpió antes de completar la prueba. Inténtelo de nuevo.",
-    "testTrigger": "Activador",
+    "testTrigger": "Tipo",
     "testWorking": "Primera prueba completada",
     "total": "Historial de pruebas (últimas 10 mediciones)",
     "tryAgain": "INTENTAR\nDE NUEVO",

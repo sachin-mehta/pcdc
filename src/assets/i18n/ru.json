@@ -173,7 +173,7 @@
     "testWorking": "Первый тест завершен",
     "backgroundMessage": "Приложение продолжит работу в фоновом режиме.",
     "closingIn": "Закрытие через",
-    "testTrigger": "Триггер"
+    "testTrigger": "Тип"
   },
   "registerSchoolPage": {
     "title1": "Вы собираетесь зарегистрировать свою школу",

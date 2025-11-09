@@ -189,7 +189,7 @@
     "testAgain": "INICIAR TESTE",
     "testFailed": "Teste falhou",
     "testFailedDesc": "A conexão foi interrompida antes que o teste pudesse ser concluído. Tente novamente.",
-    "testTrigger": "Acionador",
+    "testTrigger": "Tipo",
     "testWorking": "Primeiro teste concluído",
     "total": "Histórico de testes (10 últimas medições)",
     "tryAgain": "TENTAR NOVAMENTE",

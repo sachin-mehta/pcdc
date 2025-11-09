@@ -189,7 +189,7 @@
     "testAgain": "TEST AGAIN",
     "testFailed": "Test failed",
     "testFailedDesc": "The connection was interrupted before testing could be completed. Try again.",
-    "testTrigger": "Trigger",
+    "testTrigger": "Type",
     "testWorking": "Completed first test",
     "total": "Test history (latest 10 measurements)",
     "tryAgain": "TRY AGAIN",

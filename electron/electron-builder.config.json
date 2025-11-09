@@ -20,7 +20,11 @@
   },
   "win": {
     "target": "nsis",
-    "icon": "assets/appIcon.ico"
+    "icon": "assets/appIcon.ico",
+    "signingHashAlgorithms": ["sha256"],
+     "certificateSubjectName": "UNICEF",
+     "rfc3161TimeStampServer": "http://timestamp.digicert.com",
+     "sign": "./resources/sign.js"
   },
   "mac": {
     "category": "your.app.category.type",
