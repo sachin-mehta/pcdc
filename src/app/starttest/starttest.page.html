@@ -33,7 +33,7 @@
 </div> -->
 
 <!-- Registration Banners for First-Time Visit -->
-<div class="notification-container" *ngIf="showRegistrationBanner">
+<div [ngClass]="isNativeApp() ? 'native-notification-container' : 'notification-container'" *ngIf="showRegistrationBanner">
   <!-- Registration Completed Notification -->
   <div class="notification completed">
     <ion-icon

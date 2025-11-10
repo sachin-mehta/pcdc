@@ -147,7 +147,7 @@ export class StarttestPage implements OnInit, OnDestroy {
   ) {
     if (this.storage.get('schoolId')) {
       this.school = JSON.parse(this.storage.get('schoolInfo'));
-      console.log(this.school, 'heheh');;
+      console.log(this.school, 'heheh');
     }
     this.isNative = Capacitor.isNativePlatform();
     if (Capacitor.isNativePlatform()) {
@@ -800,11 +800,12 @@ export class StarttestPage implements OnInit, OnDestroy {
       this.currentRate = undefined; // Reset current rate
       this.isErrorClosed = false; // Reset error closed state
       this.uploadProgressStarted = false;
-      if (this.isNative) {
-        this.gigaAppPlugin.executeManualSpeedTest();
-      } else {
-        this.measurementClientService.runTest(notes);
-      }
+      // if (this.isNative) {
+      //   this.gigaAppPlugin.executeManualSpeedTest();
+      // } else {
+      //   this.measurementClientService.runTest(notes);
+      // }
+      this.measurementClientService.runTest(notes);
     } catch (e) {
       console.log(e);
     }
