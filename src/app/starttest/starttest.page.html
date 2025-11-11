@@ -66,7 +66,7 @@
   </div>
 </div>
 
-<ion-content class="scrollable_content">
+<ion-content [ngClass]="isNativeApp() ? 'native_scrollable_content' : 'scrollable_content'">
   <ion-card class="card_margin">
     <div class="container centerPos">
       <ion-item class="custom-item" lines="none" color="light">

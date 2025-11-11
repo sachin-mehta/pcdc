@@ -451,7 +451,6 @@ ion-breadcrumb::part(native) {
   overflow-y: auto;
   overscroll-behavior: contain;
   -webkit-overflow-scrolling: touch;
-  /* Enables momentum scroll on macOS/iOS */
   touch-action: auto;
   margin-bottom: 32px;
 }
