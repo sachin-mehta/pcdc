@@ -112,13 +112,18 @@ class NetworkTestService : LifecycleService() {
         Sentry.capture(e)
       }
     } else {
-      if (prefs.isTestRunning) {
+      if (!networkChecker.isNetworkAvailable()) {
+        Log.d("GIGA NetworkTestService ", "Device is offline")
+        Sentry.capture("Device is offline, speed test skipped")
+        updateNotification("Device is offline, please check internet connectivity")
+        GigaAppPlugin.sendNoNetworkError()
+      } else if (prefs.isTestRunning) {
         Log.d("GIGA NetworkTestService ", "Already Speed Test Executing")
         Sentry.capture("Already Speed Test Executing")
       } else {
         Log.d("GIGA NetworkTestService ", "Device is offline")
-        Sentry.capture("Device is offline, speed test skipped")
-        updateNotification("Device is offline, please check internet connectivity")
+        Sentry.capture("speed test skipped")
+        updateNotification("Speed test skipped")
       }
     }
     return START_STICKY

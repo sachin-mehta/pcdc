@@ -56,7 +56,7 @@ class AlarmSharedPref(context: Context) {
     set(value) = prefs.edit() { putInt(KEY_LAST_EXECUTION_DAY, value) }
 
   /**
-   * This provides time stamp when last
+   * This provides time stamp when next
    * speed test executed else -1
    */
   var nextExecutionTime: Long
@@ -189,6 +189,8 @@ class AlarmSharedPref(context: Context) {
     first15ExecutedTime = -1
     lastSlotHour = -1
     lastExecutionDay = -1
+    isTestRunning = false
+    nextExecutionTime = -1
   }
 
   /**
@@ -204,6 +206,8 @@ class AlarmSharedPref(context: Context) {
     ipAddress = ""
     oldSpeedTestData = "[]"
     historyDataIndex = 0
+    isTestRunning = false
+    nextExecutionTime = -1
   }
 }
 

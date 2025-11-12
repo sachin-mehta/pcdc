@@ -66,6 +66,23 @@ class GigaAppPlugin : Plugin() {
     }
 
     /**
+     * This function used to pass the last speed test measurements
+     * TO UI
+     * @param downloadSpeed : Download Speed
+     * @param uploadSpeed : Upload Speed
+     * @param testStatus : upload/download
+     */
+    fun sendNoNetworkError() {
+      pluginInstance?.let {
+        val data = JSObject().apply {
+          put("testStatus", "offline")
+        }
+        Log.d("GIGA NetworkTestService", "sendSpeedUpdate: $data")
+        it.notifyListeners("speedTestUpdate", data)
+      }
+    }
+
+    /**
      * This function used to pass the final speed test measurements
      * TO UI
      * @param speedTestData : Speed Test Result Entity contains all
@@ -142,10 +159,12 @@ class GigaAppPlugin : Plugin() {
    */
   @PluginMethod
   fun executeManualSpeedTest(call: PluginCall) {
-    Log.d("GIGA GigaAppPlugin", "Manual Speed Test")
     val context = bridge.context
+    val scheduleType = call.getString(SCHEDULE_TYPE)
+    Log.d("GIGA GigaAppPlugin", "Manual Speed Test ${scheduleType}")
+
     val intent = Intent(context, NetworkTestService::class.java)
-    intent.putExtra(SCHEDULE_TYPE, SCHEDULE_TYPE_MANUAL)
+    intent.putExtra(SCHEDULE_TYPE, scheduleType)
     context.startForegroundService(intent)
     val alarmPrefs = AlarmSharedPref(context)
     if (AlarmHelper.checkIfFutureAlarmScheduled(alarmPrefs)) {

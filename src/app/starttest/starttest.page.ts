@@ -181,6 +181,22 @@ export class StarttestPage implements OnInit, OnDestroy {
             this.currentRateDownload = undefined;
             this.ref.markForCheck();
             console.log('GIGA', 'Executed onstart');
+          } else if (data.testStatus === 'server_discovery') {
+            this.currentState = this.translate.instant(
+              'startTest.discoveringServers'
+            );
+            this.progress = 0.1;
+          } else if (data.testStatus === 'server_chosen') {
+            this.currentState = this.translate.instant(
+              'startTest.serverSelected'
+            );
+            this.progress = 0.2;
+          } else if (data.testStatus === 'retrying') {
+            this.currentState = this.translate.instant('startTest.retrying', {
+              attempt: data.attempt,
+              maxRetries: data.maxRetries,
+            });
+            this.progress = 0.05;
           } else if (data.testStatus === 'upload') {
             console.log('Running Test (Upload)');
             this.downloadStarted = false;
@@ -261,6 +277,7 @@ export class StarttestPage implements OnInit, OnDestroy {
               'GIGA',
               'Executed complete :' + JSON.stringify(data.measurementsItem)
             );
+            this.handleFirstTestCompletion();
             if (data.measurementsItem) {
               this.historyService.add(data.measurementsItem);
               this.sharedService.broadcast(
@@ -270,6 +287,7 @@ export class StarttestPage implements OnInit, OnDestroy {
             }
             this.ref.markForCheck();
             this.refreshHistory();
+
             console.log('GIGA', 'Executed complete');
           } else if (data.testStatus === 'onerror') {
             this.gaugeError();
@@ -329,9 +347,20 @@ export class StarttestPage implements OnInit, OnDestroy {
               );
               this.refreshHistory();
             }
+            this.showRegistrationBanner = false;
+
             this.ref.markForCheck();
 
             console.log('GIGA', 'Executed onerror');
+          } else if (data.testStatus === 'offline') {
+            console.log('GIGA', 'Executed offline');
+            this.onlineStatus = false;
+            this.connectionStatus = 'error';
+            this.currentRate = 'error';
+            this.isErrorClosed = false;
+            // Hide registration banners if an error is shown during first test
+            this.showRegistrationBanner = false;
+            this.ref.markForCheck();
           } else {
             console.log('GIGA', 'Executed Else');
           }
@@ -800,12 +829,14 @@ export class StarttestPage implements OnInit, OnDestroy {
       this.currentRate = undefined; // Reset current rate
       this.isErrorClosed = false; // Reset error closed state
       this.uploadProgressStarted = false;
-      // if (this.isNative) {
-      //   this.gigaAppPlugin.executeManualSpeedTest();
-      // } else {
-      //   this.measurementClientService.runTest(notes);
-      // }
-      this.measurementClientService.runTest(notes);
+      if (this.isNative) {
+        this.gigaAppPlugin.executeManualSpeedTest({
+          SCHEDULE_TYPE: notes,
+        });
+      } else {
+        this.measurementClientService.runTest(notes);
+      }
+      // this.measurementClientService.runTest(notes);
     } catch (e) {
       console.log(e);
     }
@@ -1117,6 +1148,7 @@ export class StarttestPage implements OnInit, OnDestroy {
    * Handle test completion for first-time users
    */
   async handleFirstTestCompletion() {
+    console.log(`Giga ${this.isFirstVisit} and ${this.registrationStatus}`);
     if (this.isFirstVisit && this.registrationStatus === 'testing') {
       this.registrationStatus = 'done';
 

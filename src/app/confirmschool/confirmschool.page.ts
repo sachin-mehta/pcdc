@@ -120,7 +120,7 @@ export class ConfirmschoolPage {
               this.storage.set('country_code', this.selectedCountry);
               this.storage.set('school_id', this.school.school_id);
               this.storage.set('schoolInfo', JSON.stringify(this.school));
-  if (this.isNative) {
+              if (this.isNative) {
                 //This we need to pass to native background servie to execute the
                 // api calls to publish speed test data
                 const apiKey = environment.token;
@@ -173,7 +173,8 @@ export class ConfirmschoolPage {
                 this.schoolId,
                 this.selectedCountry,
                 this.detectedCountry,
-                this.selectedCountryName,,
+                this.selectedCountryName,
+                ,
               ]);
               /* Redirect to no result found page */
             };

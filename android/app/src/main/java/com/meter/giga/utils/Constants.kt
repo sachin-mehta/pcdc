@@ -42,6 +42,7 @@ object Constants {
   const val SCHEDULE_TYPE_DAILY = "daily"
   const val SCHEDULE_TYPE_START = "start"
   const val SCHEDULE_TYPE_MANUAL = "manual"
+  const val SCHEDULE_TYPE_FIRST = "first"
   const val DEVICE_TYPE_ANDROID = "android"
   const val DEVICE_TYPE_CHROMEBOOK = "chromebook"
 
