@@ -54,4 +54,7 @@ export class SchoolnotfoundPage {
         this.selectedCountryName
       ]);
   }
+  redirectToRegistrationForm() {
+    this.router.navigate(['/newschool']);
+  }
 }

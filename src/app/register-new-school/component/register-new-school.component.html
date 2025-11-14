@@ -1,0 +1,135 @@
+<app-pcdc-header></app-pcdc-header>
+
+<ion-content class="font_open_sans">
+  <!-- Back Button -->
+  <ion-button class="button_disable_hover" fill="clear" (click)="backToSaved(school)">
+    <ion-img src="assets/images/back_button.svg" name="arrow-back-outline" class="backIcon"></ion-img>
+  </ion-button>
+
+  <!-- Form -->
+  <form [formGroup]="schoolForm" (ngSubmit)="onRegister()">
+    <div>
+
+      <!-- School ID -->
+      <ion-item lines="none" class="label_top">
+        <ion-label class="font_size">
+          Enter your official school id <span class="required">*</span>
+        </ion-label>
+      </ion-item>
+      <ion-input class="custom-gray-item" formControlName="schoolId" placeholder="BA2323421233"></ion-input>
+
+      <!-- School Name -->
+      <ion-item lines="none" class="label_top">
+        <ion-label class="font_size">
+          Enter school name <span class="required">*</span>
+        </ion-label>
+      </ion-item>
+      <ion-input class="custom-gray-item" formControlName="schoolName" placeholder="Saint Andrews School"></ion-input>
+
+      <!-- School Address -->
+      <ion-item lines="none" class="label_top">
+        <ion-label class="font_size">
+          Enter school address <span class="required">*</span>
+        </ion-label>
+      </ion-item>
+
+      <!-- Normal input (not searchbar) -->
+      <ion-input #schoolAddressInput class="custom-gray-item" formControlName="schoolAddress"
+        placeholder="Type address..." (ionInput)="onSearchChange($event)">
+      </ion-input>
+
+      <ion-list *ngIf="suggestions.length > 0" class="scrollable scrollable_content">
+        <ion-item button="true" class="dropdown_list half-border-bottom" lines="none"
+          *ngFor="let suggestion of suggestions" (click)="selectSuggestion(suggestion)">
+          {{ suggestion.place }}
+        </ion-item>
+      </ion-list>
+
+      <!-- Latitude -->
+      <!-- Latitude -->
+      <span class="editable-input-wrapper" *ngIf="latLngVisible">
+        <ion-item lines="none" class="custom-gray-item lat_long">
+          <ion-input formControlName="latitude" placeholder="Latitude" [readonly]="!isEditingLat">
+          </ion-input>
+
+          <ion-buttons slot="end" class="icon-group">
+            <ion-img *ngIf="!isEditingLat" src="assets/images/edit_icon.svg" (click)="enableEdit('lat')"
+              class="edit-icon"></ion-img>
+
+            <ion-icon *ngIf="isEditingLat" name="close-circle-outline" class="cancel-icon"
+              (click)="cancelEdit('lat')"></ion-icon>
+            <ion-icon *ngIf="isEditingLat" name="checkmark-circle-outline" class="save-icon"
+              (click)="saveEdit('lat')"></ion-icon>
+          </ion-buttons>
+        </ion-item>
+      </span>
+
+      <!-- Longitude -->
+      <span class="editable-input-wrapper" *ngIf="latLngVisible">
+        <ion-item lines="none" class="custom-gray-item lat_long">
+          <ion-input formControlName="longitude" placeholder="Longitude" [readonly]="!isEditingLng">
+          </ion-input>
+
+          <ion-buttons slot="end" class="icon-group">
+
+            <ion-img *ngIf="!isEditingLng" src="assets/images/edit_icon.svg" (click)="enableEdit('lng')"
+              class="edit-icon"></ion-img>
+            <ion-icon *ngIf="isEditingLng" name="close-circle-outline" class="cancel-icon"
+              (click)="cancelEdit('lng')"></ion-icon>
+            <ion-icon *ngIf="isEditingLng" name="checkmark-circle-outline" class="save-icon"
+              (click)="saveEdit('lng')"></ion-icon>
+          </ion-buttons>
+        </ion-item>
+      </span>
+
+
+
+      <!-- Education Level -->
+      <ion-item lines="none" class="label_top">
+        <ion-label class="font_size">
+          Enter education level <span class="required">*</span>
+        </ion-label>
+      </ion-item>
+      <ion-select class="custom-gray-item" formControlName="educationLevel" placeholder="Select">
+        <ion-select-option value="primary">Primary</ion-select-option>
+        <ion-select-option value="secondary">Secondary</ion-select-option>
+        <ion-select-option value="higher">Higher</ion-select-option>
+      </ion-select>
+
+      <!-- Official Email -->
+      <ion-item lines="none" class="label_top">
+        <ion-label class="font_size">Enter official email id</ion-label>
+      </ion-item>
+      <ion-input type="email" class="custom-gray-item" formControlName="officialEmail"
+        placeholder="Enter email id"></ion-input>
+
+      <!-- Register Button -->
+      <ion-button color="primary" expand="block" type="submit" class="register-btn" [disabled]="schoolForm.invalid">
+        Register
+      </ion-button>
+
+    </div>
+  </form>
+  <!-- Confirmation Modal -->
+  <ion-modal [isOpen]="isConfirmModalOpen" backdropDismiss="false" class="confirm-modal">
+    <ng-template>
+      <ion-content class="ion-padding modal-content">
+        <div class="confirm-container">
+          <p class="confirm-message">
+            Are you sure you want to update new {{ confirmType }} coordinates?
+          </p>
+
+          <div class="button-group">
+            <ion-button expand="block" fill="outline" color="medium" (click)="closeConfirmModal(false)">
+              No
+            </ion-button>
+            <ion-button expand="block" color="primary" (click)="closeConfirmModal(true)">
+              Yes
+            </ion-button>
+          </div>
+        </div>
+      </ion-content>
+    </ng-template>
+  </ion-modal>
+
+</ion-content>

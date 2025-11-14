@@ -224,5 +224,8 @@
     "logoutButton": "Logout",
     "cancelButton": "Cancel"
   },
-  "yes": "Yes"
+  "yes": "Yes",
+  "registerNewSchool" : {
+    "schoolNotFound" : "If you don’t find the ID you can register as a new school"
+  }
 }
