@@ -161,9 +161,9 @@ export class HomePage {
         ).then((response) => {
           if (response) {
             this.loading.dismiss();
-              if (this.isNative) {
-                this.getHistoricalDataForNativeApp();
-              }
+            if (this.isNative) {
+              this.getHistoricalDataForNativeApp();
+            }
             this.router.navigate(['/starttest']);
           } else {
             this.loading.dismiss();
@@ -177,9 +177,9 @@ export class HomePage {
           }
         });
       } catch (e) {
-          if (this.isNative) {
-            await this.getHistoricalDataForNativeApp();
-          }
+        if (this.isNative) {
+          await this.getHistoricalDataForNativeApp();
+        }
         this.router.navigate(['/starttest']);
         this.loading.dismiss();
       }

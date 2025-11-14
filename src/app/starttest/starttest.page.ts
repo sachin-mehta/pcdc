@@ -1004,9 +1004,6 @@ export class StarttestPage implements OnInit, OnDestroy {
         // Hide registration banners if an error is shown during first test
         this.showRegistrationBanner = false;
       }
-      if (data.testStatus !== 'complete') {
-        this.progressGaugeState.current = data.progress;
-      }
     }
   }
   async presentTestFailModal() {

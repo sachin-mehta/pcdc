@@ -33,6 +33,57 @@ input,
   -webkit-app-region: no-drag;
 }
 
+.home_about_native {
+  background: white;
+
+  ion-toolbar {
+    --background: white;
+    --border-color: transparent;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 68px; // Standard height
+    padding-top: 8px;
+    padding-bottom: 16px;
+
+  }
+
+  ion-segment {
+    --height: 68px !important;
+    width: 100%;
+    padding-bottom: 16px;
+    justify-content: center;
+    --background: transparent;
+    --indicator-color: #277AFF;
+    --indicator-height: 5px;
+    --color-checked: #277AFF;
+    --padding-bottom: 16px;
+    --min-height: 60px !important;
+  }
+
+  ion-segment-button {
+    flex: 1;
+    max-width: 80px;
+    padding: 0 !important; // reduce inner padding if needed
+
+
+    ion-label {
+      font-size: 14px;
+      font-weight: 600;
+      text-align: center;
+      text-transform: none;
+    }
+
+    &.segment-button-checked,
+    &[aria-checked="true"] {
+      ion-label {
+        color: #000;
+
+      }
+    }
+  }
+}
+
 .home_about {
   background: white;
   ion-toolbar {
