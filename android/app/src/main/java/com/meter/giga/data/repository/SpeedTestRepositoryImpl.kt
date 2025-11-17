@@ -1,6 +1,9 @@
 package com.meter.giga.data.repository
 
 import android.util.Log
+import com.google.gson.GsonBuilder
+import com.meter.giga.data.models.responses.AsnData
+import com.meter.giga.data.util.AsnDataAdapter
 import com.meter.giga.domain.entity.request.SpeedTestResultRequestEntity
 import com.meter.giga.domain.entity.response.ClientInfoResponseEntity
 import com.meter.giga.domain.entity.response.ServerInfoResponseEntity
@@ -27,23 +30,124 @@ class SpeedTestRepositoryImpl : SpeedTestRepository {
    * as Success as ClientInfoResponseEntity instance
    * as Failure as String Message with failure message
    */
-  override suspend fun getClientInfoData(ipInfoToken: String): ResultState<ClientInfoResponseEntity?> {
+//  override suspend fun getClientInfoData(ipInfoToken: String, uploadKey: String, baseUrl: String): ResultState<ClientInfoResponseEntity?> {
+//    try {
+//      Log.d("GIGA SpeedTestRepositoryImpl", "getClientInfoData Invoked")
+//      val response = RetrofitInstanceBuilder.clintInfoApi.getClientInfo(ipInfoToken)
+//      Log.d("GIGA SpeedTestRepositoryImpl", "response $response")
+//      if (response.isSuccessful) {
+//        if (response.body() != null) {
+//          return ResultState.Success(
+//            response.body()!!.toEntity()
+//          )
+//        } else {
+//          val fallbackResponse =
+//            RetrofitInstanceBuilder.clintInfoFallbackApi.getClientInfoFallback()
+//          if (fallbackResponse.isSuccessful) {
+//            return if (fallbackResponse.body() != null) {
+//              ResultState.Success(
+//                response.body()!!.toEntity()
+//              )
+//            } else {
+//              ResultState.Failure(ErrorHandlerImpl().getError(response.errorBody()))
+//            }
+//          }
+//        }
+//      }
+//      return ResultState.Failure(
+//        ErrorEntity.Unknown("Get client info api failed")
+//      )
+//    } catch (e: Exception) {
+//      Log.d("GIGA SpeedTestRepositoryImpl", "Exception $e")
+//      return ResultState.Failure(
+//        ErrorEntity.Unknown("Get client info api failed")
+//      )
+//    }
+//  }
+
+
+  /**
+   * This function provides getClientInfoData function
+   * implementation
+   * @return ResultState<ClientInfoResponseEntity?> : Result State
+   * as Success as ClientInfoResponseEntity instance
+   * as Failure as String Message with failure message
+   */
+  override suspend fun getClientInfoLiteData(
+    ipInfoToken: String,
+    uploadKey: String,
+    baseUrl: String
+  ): ResultState<ClientInfoResponseEntity?> {
     try {
-      Log.d("GIGA SpeedTestRepositoryImpl", "getClientInfoData Invoked")
-      val response = RetrofitInstanceBuilder.clintInfoApi.getClientInfo(ipInfoToken)
-      Log.d("GIGA SpeedTestRepositoryImpl", "response $response")
+      Log.d("GIGA SpeedTestRepositoryImpl", "getClientInfoLiteData Invoked")
+      val response = RetrofitInstanceBuilder.clintInfoLitApi.getClientInfoLite(ipInfoToken)
+      Log.d("GIGA SpeedTestRepositoryImpl getClientInfoLiteData", "response $response")
       if (response.isSuccessful) {
         if (response.body() != null) {
-          return ResultState.Success(
-            response.body()!!.toEntity()
-          )
+          val clintLiteInfo = response.body()
+          if (clintLiteInfo?.ip != null) {
+            // Create custom Gson
+            val gson = GsonBuilder()
+              .registerTypeAdapter(AsnData::class.java, AsnDataAdapter())
+              .create()
+            val ipInfoMetaDataResponse =
+              RetrofitInstanceBuilder.getSpeedTestApiWithCustomAdapter(baseUrl, gson)
+                .getIpInfoMetaData(authorization = "Bearer $uploadKey", ip = clintLiteInfo.ip)
+            Log.d(
+              "GIGA SpeedTestRepositoryImpl getClientInfoLiteData",
+              "ipInfoMetaDataResponse $ipInfoMetaDataResponse"
+            )
+            Log.d(
+              "GIGA SpeedTestRepositoryImpl getClientInfoLiteData",
+              "uploadKey $uploadKey"
+            )
+
+            if (ipInfoMetaDataResponse.isSuccessful) {
+              val clientInfoMetaDataModel = ipInfoMetaDataResponse.body()
+              var asnValue: String? = null
+              when (val asn = clientInfoMetaDataModel?.asn) {
+
+                is AsnData.AsString -> {
+                  Log.d("ASN", "ASN string: ${asn.value}")
+                  asnValue = asn.value
+                }
+
+                is AsnData.AsObject -> {
+                  Log.d("ASN", "ASN object: ${asn.obj.asn}")
+                  asnValue = asn.obj.asn
+                }
+
+                null -> {
+                  asnValue = clientInfoMetaDataModel?.org?.let { org ->
+                    Regex("AS[0-9]+").find(org)?.value
+                  }
+                }
+              }
+              val clientInfoResponseEntity = ClientInfoResponseEntity(
+                asn = asnValue,
+                city = clientInfoMetaDataModel?.city,
+                isp = clientInfoMetaDataModel?.org?.replaceFirst(Regex("^AS\\d+\\s*"), "")
+                  ?: clintLiteInfo.asName,
+                country = clientInfoMetaDataModel?.country,
+                ip = clientInfoMetaDataModel?.ip,
+                loc = clientInfoMetaDataModel?.loc,
+                org = clientInfoMetaDataModel?.org,
+                postal = clientInfoMetaDataModel?.postal,
+                region = clientInfoMetaDataModel?.region,
+                timezone = clientInfoMetaDataModel?.timezone
+              )
+              return ResultState.Success(clientInfoResponseEntity)
+            } else {
+              ResultState.Failure(ErrorHandlerImpl().getError(response.errorBody()))
+            }
+          }
         } else {
           val fallbackResponse =
             RetrofitInstanceBuilder.clintInfoFallbackApi.getClientInfoFallback()
           if (fallbackResponse.isSuccessful) {
             return if (fallbackResponse.body() != null) {
               ResultState.Success(
-                response.body()!!.toEntity()
+                fallbackResponse.body()!!.toEntity()
               )
             } else {
               ResultState.Failure(ErrorHandlerImpl().getError(response.errorBody()))

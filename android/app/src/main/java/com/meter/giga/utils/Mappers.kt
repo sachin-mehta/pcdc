@@ -11,6 +11,7 @@ import com.meter.giga.data.models.requests.SpeedTestMeasurementRequestModel
 import com.meter.giga.data.models.requests.SpeedTestResultRequestModel
 import com.meter.giga.data.models.requests.TCPInfoRequestModel
 import com.meter.giga.data.models.responses.ClientInfoFallbackResponseModel
+import com.meter.giga.data.models.responses.ClientInfoLiteResponseModel
 import com.meter.giga.data.models.responses.ClientInfoResponseModel
 import com.meter.giga.data.models.responses.ServerInfoResponseModel
 import com.meter.giga.domain.entity.request.BBRInfoRequestEntity

@@ -221,6 +221,7 @@ class NetworkTestService : LifecycleService() {
     var ipAddress = prefs.ipAddress
     var countryCode = prefs.countryCode
     var baseUrl = prefs.baseUrl
+    val uploadKey = prefs.mlabUploadKey
     var ipInfoToken = prefs.ipInfoToken
     val s2cRate = arrayListOf<Double>()
     val c2sRate = arrayListOf<Double>()
@@ -370,7 +371,7 @@ class NetworkTestService : LifecycleService() {
           val getClientInfoUseCase = GetClientInfoUseCase()
           val clientInfoState = serviceScope.async {
             runCatching {
-              getClientInfoUseCase.invoke(ipInfoToken)
+              getClientInfoUseCase.invoke(ipInfoToken, uploadKey, baseUrl)
             }.getOrNull()
           }
           val getServerInfoUseCase = GetServerInfoUseCase()
@@ -541,7 +542,6 @@ class NetworkTestService : LifecycleService() {
           "Existing Speed Test Data $existingSpeedTestData"
         )
         val postSpeedTestUseCase = PostSpeedTestUseCase()
-        val uploadKey = prefs.mlabUploadKey
         if (speedTestResultRequestEntity != null) {
           try {
             val postSpeedTestResultState =

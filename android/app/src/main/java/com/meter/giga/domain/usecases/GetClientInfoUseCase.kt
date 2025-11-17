@@ -16,9 +16,13 @@ class GetClientInfoUseCase() {
    * as Success as ClientInfoResponseEntity instance
    * as Failure as String Message with failure message
    */
-  suspend fun invoke(ipInfoToken: String): ResultState<ClientInfoResponseEntity?> {
+  suspend fun invoke(
+    ipInfoToken: String,
+    uploadKey: String,
+    baseUrl: String
+  ): ResultState<ClientInfoResponseEntity?> {
     val speedTestRepository = SpeedTestRepositoryImpl()
     Log.d("GIGA GetClientInfoUseCase", "speedTestRepository $speedTestRepository")
-    return speedTestRepository.getClientInfoData(ipInfoToken)
+    return speedTestRepository.getClientInfoLiteData(ipInfoToken, uploadKey, baseUrl)
   }
 }

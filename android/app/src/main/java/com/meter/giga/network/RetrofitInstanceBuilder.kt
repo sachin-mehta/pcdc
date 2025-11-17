@@ -1,8 +1,10 @@
 package com.meter.giga.network
 
+import com.google.gson.Gson
 import com.meter.giga.network.api.ApiService
 import com.meter.giga.utils.Constants.CLIENT_INFO_END_URL
 import com.meter.giga.utils.Constants.CLIENT_INFO_FALLBACK_END_URL
+import com.meter.giga.utils.Constants.CLIENT_LITE_INFO_END_URL
 import com.meter.giga.utils.Constants.SERVER_INFO_END_URL
 import io.sentry.Sentry
 import retrofit2.Retrofit
@@ -22,6 +24,18 @@ object RetrofitInstanceBuilder {
   val clintInfoApi: ApiService by lazy {
     Retrofit.Builder()
       .baseUrl(CLIENT_INFO_END_URL)
+      .addConverterFactory(GsonConverterFactory.create())
+      .build()
+      .create(ApiService::class.java)
+  }
+
+  /**
+   * Creates ApiService service instance to
+   * fetch the client info data
+   */
+  val clintInfoLitApi: ApiService by lazy {
+    Retrofit.Builder()
+      .baseUrl(CLIENT_LITE_INFO_END_URL)
       .addConverterFactory(GsonConverterFactory.create())
       .build()
       .create(ApiService::class.java)
@@ -60,6 +74,14 @@ object RetrofitInstanceBuilder {
     return Retrofit.Builder()
       .baseUrl(baseUrl)
       .addConverterFactory(GsonConverterFactory.create())
+      .build()
+      .create(ApiService::class.java)
+  }
+
+  fun getSpeedTestApiWithCustomAdapter(baseUrl: String, gson: Gson): ApiService {
+    return Retrofit.Builder()
+      .baseUrl(baseUrl)
+      .addConverterFactory(GsonConverterFactory.create(gson))
       .build()
       .create(ApiService::class.java)
   }
