@@ -224,5 +224,15 @@
     "logoutButton": "Encerrar sessão",
     "cancelButton": "Cancelar"
   },
-  "yes": "Sim"
+  "yes": "Sim",
+  "registerNewSchool": {
+    "schoolNotFound": "Se não encontrar o ID, você pode se registrar como uma nova escola",
+    "schoolId": "Insira o ID oficial da escola",
+    "schoolName": "Insira o nome da escola",
+    "schoolAddress": "Insira o endereço da escola",
+    "education": "Insira o nível de educação",
+    "otherEducation": "Insira outro nível de educação",
+    "email": "Insira o e-mail oficial",
+    "register": "Registrar"
+  }
 }

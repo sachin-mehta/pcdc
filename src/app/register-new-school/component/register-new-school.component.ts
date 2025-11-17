@@ -1,5 +1,5 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators } from '@angular/forms';
 import { IonInput } from '@ionic/angular';
 
 @Component({
@@ -14,24 +14,36 @@ export class RegisterNewSchoolComponent implements OnInit {
   isEditingLng = false;
   private originalLat = '';
   private originalLng = '';
-isConfirmModalOpen = false;
-confirmType: 'latitude' | 'longitude' | '' = '';
+  isConfirmModalOpen = false;
+  confirmType: 'latitude' | 'longitude' | '' = '';
   schoolForm!: FormGroup;
   suggestions: any[] = [];
   latLngVisible = false;
   searchTimeout: any;
+  showOtherInput = false;
+
 
   constructor(private fb: FormBuilder) { }
 
   ngOnInit() {
     this.schoolForm = this.fb.group({
-      schoolId: ['', Validators.required],
-      schoolName: ['', Validators.required],
+      schoolId: ['', [Validators.required, Validators.maxLength(15)]],
+      schoolName: ['', [Validators.required, Validators.maxLength(15)]],
       schoolAddress: ['', Validators.required],
       latitude: [''],
       longitude: [''],
       educationLevel: ['', Validators.required],
+      otherEducationLevel: [{ value: '', disabled: true }],
       officialEmail: ['', [Validators.email]]
+    });
+    this.schoolForm.get('officialEmail')?.valueChanges.subscribe((value: string) => {
+      const emailControl = this.schoolForm.get('officialEmail');
+      if (value && value.length >= 1) {
+        emailControl?.setValidators([this.emailDomainValidator]);
+      } else {
+        emailControl?.clearValidators();
+      }
+      emailControl?.updateValueAndValidity({ emitEvent: false });
     });
   }
 
@@ -73,12 +85,20 @@ confirmType: 'latitude' | 'longitude' | '' = '';
   }
 
   onRegister() {
-    if (this.schoolForm.valid) {
-      console.log('✅ Form Data:', this.schoolForm.value);
-    } else {
+    if (this.schoolForm.invalid) {
       this.schoolForm.markAllAsTouched();
+      return;
     }
+
+    const formData = { ...this.schoolForm.value };
+
+    if (formData.educationLevel === 'others') {
+      formData.educationLevel = formData.otherEducationLevel;
+    }
+
+    console.log("Final Data:", formData);
   }
+
 
   backToSaved(school: any) {
     console.log('Go back clicked', school);
@@ -113,31 +133,55 @@ confirmType: 'latitude' | 'longitude' | '' = '';
   //   console.log('✅ Saved values:', this.schoolForm.value);
   // }
   async saveEdit(type: 'lat' | 'lng') {
-  this.confirmType = type === 'lat' ? 'latitude' : 'longitude';
-  this.isConfirmModalOpen = true;
-}
+    this.confirmType = type === 'lat' ? 'latitude' : 'longitude';
+    this.isConfirmModalOpen = true;
+  }
 
-closeConfirmModal(confirm: boolean) {
-  if (confirm) {
-    if (this.confirmType === 'latitude') {
-      this.isEditingLat = false;
+  closeConfirmModal(confirm: boolean) {
+    if (confirm) {
+      if (this.confirmType === 'latitude') {
+        this.isEditingLat = false;
+      } else {
+        this.isEditingLng = false;
+      }
+      console.log('✅ Saved values:', this.schoolForm.value);
     } else {
-      this.isEditingLng = false;
+      // Revert if cancelled
+      if (this.confirmType === 'latitude') {
+        this.schoolForm.patchValue({ latitude: this.originalLat });
+        this.isEditingLat = false;
+      } else {
+        this.schoolForm.patchValue({ longitude: this.originalLng });
+        this.isEditingLng = false;
+      }
     }
-    console.log('✅ Saved values:', this.schoolForm.value);
-  } else {
-    // Revert if cancelled
-    if (this.confirmType === 'latitude') {
-      this.schoolForm.patchValue({ latitude: this.originalLat });
-      this.isEditingLat = false;
+
+    this.isConfirmModalOpen = false;
+    this.confirmType = '';
+  }
+  onEducationChange(event: any) {
+    const value = event.detail.value;
+
+    if (value === 'others') {
+      this.showOtherInput = true;
+      this.schoolForm.get('otherEducationLevel')?.enable();
+      this.schoolForm.get('otherEducationLevel')?.setValidators([Validators.required]);
+      this.schoolForm.get('otherEducationLevel')?.updateValueAndValidity();
     } else {
-      this.schoolForm.patchValue({ longitude: this.originalLng });
-      this.isEditingLng = false;
+      this.showOtherInput = false;
+
+      this.schoolForm.get('otherEducationLevel')?.setValue('');
+      this.schoolForm.get('otherEducationLevel')?.disable();
+      this.schoolForm.get('otherEducationLevel')?.clearValidators();
+      this.schoolForm.get('otherEducationLevel')?.updateValueAndValidity();
     }
   }
 
-  this.isConfirmModalOpen = false;
-  this.confirmType = '';
-}
+  emailDomainValidator(control: AbstractControl): ValidationErrors | null {
+    const value = control.value;
+    const emailPattern =
+      /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9-]+\.[a-zA-Z]{2,}$/;
 
+    return emailPattern.test(value) ? null : { invalidEmail: true };
+  }
 }

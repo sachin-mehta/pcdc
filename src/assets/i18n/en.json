@@ -226,6 +226,13 @@
   },
   "yes": "Yes",
   "registerNewSchool" : {
-    "schoolNotFound" : "If you don’t find the ID you can register as a new school"
+    "schoolNotFound" : "If you don’t find the ID you can register as a new school",
+    "schoolId" : "Enter your official school id",
+    "schoolName": "Enter school name",
+    "schoolAddress" : "Enter school address",
+    "education": "Enter education level",
+    "otherEducation": "Enter other education level",
+    "email" : "Enter official email id",
+    "register": "Register"
   }
 }

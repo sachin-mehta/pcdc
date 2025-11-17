@@ -4,7 +4,7 @@ import { PcdcHeaderComponent } from '../pcdc-header/pcdc-header.component';
 import { SharedModule } from '../shared/shared.module';
 import { IonicModule } from '@ionic/angular';
 import { EnterKeyClickDirective } from '../shared/directives/enter-key-click.directive';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 import { RegisterNewSchoolComponent } from './component/register-new-school.component';
 import { RegisterNewSchoolRoutingModule } from './register-new-school-routing.module';
 

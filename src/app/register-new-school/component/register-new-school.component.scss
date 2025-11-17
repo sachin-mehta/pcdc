@@ -214,60 +214,71 @@
 }
 
 .confirm-modal::part(content) {
-  --border-radius: 16px 16px 0 0;
-  --width: 100%;
-  --height: auto;
-  --min-height: 180px;
-  --max-height: 40%;
-  --background: #fff;
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
-  animation: slideUp 0.3s ease-out;
-  ion-page{
-    position: none;
-  }
+    --border-radius: 16px 16px 0 0;
+    --width: 100%;
+    --height: auto;
+    --min-height: 180px;
+    --max-height: 40%;
+    --background: #fff;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
+    animation: slideUp 0.3s ease-out;
+
+    ion-page {
+        position: none;
+    }
 }
 
 @keyframes slideUp {
-  from {
-    transform: translateY(100%);
-  }
-  to {
-    transform: translateY(0);
-  }
+    from {
+        transform: translateY(100%);
+    }
+
+    to {
+        transform: translateY(0);
+    }
 }
 
 .modal-content {
-  padding: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .confirm-container {
-  text-align: center;
-  width: 100%;
+    text-align: center;
+    width: 100%;
 }
 
 .confirm-title {
-  font-size: 1.2rem;
-  font-weight: 600;
-  margin-bottom: 6px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 6px;
 }
 
 .confirm-message {
-  font-size: 0.95rem;
-  color: #555;
-  margin-bottom: 20px;
-  padding: 0 10px;
+    font-size: 0.95rem;
+    color: #555;
+    margin-bottom: 20px;
+    padding: 0 10px;
 }
 
 .button-group {
-  display: flex;
-  justify-content: space-between;
-  gap: 10px;
-  padding: 0 10px;
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 0 10px;
 }
 
+.education {
+    background: #E5E5E5;
+    padding: 8px;
+}
+.error-msg {
+    color: red;
+    font-size: 13px;
+    margin-top: 4px;
+}

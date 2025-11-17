@@ -13,23 +13,42 @@
       <!-- School ID -->
       <ion-item lines="none" class="label_top">
         <ion-label class="font_size">
-          Enter your official school id <span class="required">*</span>
+           {{ 'registerNewSchool.schoolId' | translate }} <span class="required">*</span>
         </ion-label>
       </ion-item>
       <ion-input class="custom-gray-item" formControlName="schoolId" placeholder="BA2323421233"></ion-input>
+      <div class="error-msg" *ngIf="schoolForm.get('schoolId')?.touched && schoolForm.get('schoolId')?.invalid">
+        <span *ngIf="schoolForm.get('schoolId')?.errors?.['required']">
+          School ID is required.
+        </span>
 
+        <span *ngIf="schoolForm.get('schoolId')?.errors?.['maxlength']">
+          Maximum 15 characters allowed.
+        </span>
+
+      </div>
       <!-- School Name -->
       <ion-item lines="none" class="label_top">
         <ion-label class="font_size">
-          Enter school name <span class="required">*</span>
+          {{ 'registerNewSchool.schoolName' | translate }} <span class="required">*</span>
         </ion-label>
       </ion-item>
       <ion-input class="custom-gray-item" formControlName="schoolName" placeholder="Saint Andrews School"></ion-input>
+      <div class="error-msg" *ngIf="schoolForm.get('schoolName')?.touched && schoolForm.get('schoolName')?.invalid">
 
+        <span *ngIf="schoolForm.get('schoolName')?.errors?.['required']">
+          School name is required.
+        </span>
+
+        <span *ngIf="schoolForm.get('schoolName')?.errors?.['maxlength']">
+          Maximum 15 characters allowed.
+        </span>
+
+      </div>
       <!-- School Address -->
       <ion-item lines="none" class="label_top">
         <ion-label class="font_size">
-          Enter school address <span class="required">*</span>
+          {{ 'registerNewSchool.schoolAddress' | translate }} <span class="required">*</span>
         </ion-label>
       </ion-item>
 
@@ -37,7 +56,14 @@
       <ion-input #schoolAddressInput class="custom-gray-item" formControlName="schoolAddress"
         placeholder="Type address..." (ionInput)="onSearchChange($event)">
       </ion-input>
+      <div class="error-msg"
+        *ngIf="schoolForm.get('schoolAddress')?.touched && schoolForm.get('schoolAddress')?.invalid">
 
+        <span *ngIf="schoolForm.get('schoolAddress')?.errors?.['required']">
+          School address is required.
+        </span>
+
+      </div>
       <ion-list *ngIf="suggestions.length > 0" class="scrollable scrollable_content">
         <ion-item button="true" class="dropdown_list half-border-bottom" lines="none"
           *ngFor="let suggestion of suggestions" (click)="selectSuggestion(suggestion)">
@@ -87,25 +113,44 @@
       <!-- Education Level -->
       <ion-item lines="none" class="label_top">
         <ion-label class="font_size">
-          Enter education level <span class="required">*</span>
+           {{ 'registerNewSchool.education' | translate }} <span class="required">*</span>
         </ion-label>
       </ion-item>
-      <ion-select class="custom-gray-item" formControlName="educationLevel" placeholder="Select">
+      <ion-select class="custom-gray-item education" (ionChange)="onEducationChange($event)"
+        formControlName="educationLevel" placeholder="Select">
         <ion-select-option value="primary">Primary</ion-select-option>
         <ion-select-option value="secondary">Secondary</ion-select-option>
         <ion-select-option value="higher">Higher</ion-select-option>
+        <ion-select-option value="others">Others</ion-select-option>
       </ion-select>
+      <div class="error-msg"
+        *ngIf="schoolForm.get('educationLevel')?.touched && schoolForm.get('educationLevel')?.invalid">
+        <span *ngIf="schoolForm.get('educationLevel')?.errors?.['required']">
+          Education level is required.
+        </span>
+      </div>
 
+      <div *ngIf="showOtherInput">
+        <ion-item lines="none" class="label_top">
+          <ion-label class="font_size"> {{ 'registerNewSchool.otherEducation' | translate }}<span class="required">*</span></ion-label>
+        </ion-item>
+
+        <ion-input class="custom-gray-item" placeholder="Enter custom level" formControlName="otherEducationLevel">
+        </ion-input>
+      </div>
       <!-- Official Email -->
       <ion-item lines="none" class="label_top">
-        <ion-label class="font_size">Enter official email id</ion-label>
+        <ion-label class="font_size"> {{ 'registerNewSchool.email' | translate }}</ion-label>
       </ion-item>
       <ion-input type="email" class="custom-gray-item" formControlName="officialEmail"
         placeholder="Enter email id"></ion-input>
-
+      <div class="error-msg" *ngIf="schoolForm.get('officialEmail')?.invalid">
+        <span *ngIf="schoolForm.get('officialEmail')?.invalid" [translate]="'saveEmail.validEmail'"></span>
+      </div>
       <!-- Register Button -->
-      <ion-button color="primary" expand="block" type="submit" class="register-btn" [disabled]="schoolForm.invalid">
-        Register
+      <ion-button color="primary" expand="block" type="submit" class="register-btn" [disabled]="schoolForm.invalid"
+        [disabled]="schoolForm.invalid">
+         {{ 'registerNewSchool.register' | translate }}
       </ion-button>
 
     </div>
