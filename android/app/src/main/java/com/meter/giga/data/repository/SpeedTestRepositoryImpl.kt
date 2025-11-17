@@ -93,14 +93,6 @@ class SpeedTestRepositoryImpl : SpeedTestRepository {
             val ipInfoMetaDataResponse =
               RetrofitInstanceBuilder.getSpeedTestApiWithCustomAdapter(baseUrl, gson)
                 .getIpInfoMetaData(authorization = "Bearer $uploadKey", ip = clintLiteInfo.ip)
-            Log.d(
-              "GIGA SpeedTestRepositoryImpl getClientInfoLiteData",
-              "ipInfoMetaDataResponse $ipInfoMetaDataResponse"
-            )
-            Log.d(
-              "GIGA SpeedTestRepositoryImpl getClientInfoLiteData",
-              "uploadKey $uploadKey"
-            )
 
             if (ipInfoMetaDataResponse.isSuccessful) {
               val clientInfoMetaDataModel = ipInfoMetaDataResponse.body()
@@ -138,7 +130,26 @@ class SpeedTestRepositoryImpl : SpeedTestRepository {
               )
               return ResultState.Success(clientInfoResponseEntity)
             } else {
-              ResultState.Failure(ErrorHandlerImpl().getError(response.errorBody()))
+              val response = RetrofitInstanceBuilder.clintInfoApi.getClientInfo(ipInfoToken)
+              if (response.isSuccessful) {
+                if (response.body() != null) {
+                  return ResultState.Success(
+                    response.body()!!.toEntity()
+                  )
+                }
+              } else {
+                val fallbackResponse =
+                  RetrofitInstanceBuilder.clintInfoFallbackApi.getClientInfoFallback()
+                if (fallbackResponse.isSuccessful) {
+                  return if (fallbackResponse.body() != null) {
+                    ResultState.Success(
+                      fallbackResponse.body()!!.toEntity()
+                    )
+                  } else {
+                    ResultState.Failure(ErrorHandlerImpl().getError(response.errorBody()))
+                  }
+                }
+              }
             }
           }
         } else {
