@@ -216,9 +216,10 @@
 .confirm-modal::part(content) {
     --border-radius: 16px 16px 0 0;
     --width: 100%;
-    --height: auto;
-    --min-height: 180px;
-    --max-height: 40%;
+    --height: 160px !important; // customize here
+    --max-height: 160px !important;
+    --min-height: 160px;
+
     --background: #fff;
     position: absolute;
     bottom: 0;
@@ -246,6 +247,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    --padding-top: 0px;
+    --padding-bottom: 0px;
 }
 
 .confirm-container {
@@ -260,25 +263,56 @@
 }
 
 .confirm-message {
-    font-size: 0.95rem;
-    color: #555;
-    margin-bottom: 20px;
-    padding: 0 10px;
+    font-size: 20px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: 24px;
+    color: #1C1C1C;
+    text-align: left;
+    margin-block-end: 24px;
+    margin-block-start: 24px;
 }
 
 .button-group {
     display: flex;
     justify-content: space-between;
-    gap: 10px;
-    padding: 0 10px;
 }
 
 .education {
     background: #E5E5E5;
     padding: 8px;
 }
+
 .error-msg {
     color: red;
     font-size: 13px;
     margin-top: 4px;
+}
+
+::ng-deep .confirm-modal .ion-page {
+    position: absolute !important;
+
+}
+
+.nobtn,
+.yesbtn {
+    margin-bottom: 0;
+    height: 40px;
+    border: 0;
+    display: flex;
+    border-radius: 6px; // or 40px if you want a pill shape
+    align-items: center;
+    justify-content: center;
+    font-weight: 400 !important;
+    font-size: 14px !important;
+    border-radius: 40px !important;
+    overflow: hidden;
+    color: #fff !important;
+    --border-width: 0px;
+
+}
+
+.nobtn {
+    border: 2px solid #277AFF !important;
+
 }

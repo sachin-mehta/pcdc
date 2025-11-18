@@ -164,12 +164,12 @@
           <p class="confirm-message">
             Are you sure you want to update new {{ confirmType }} coordinates?
           </p>
-
           <div class="button-group">
-            <ion-button expand="block" fill="outline" color="medium" (click)="closeConfirmModal(false)">
+            <ion-button class="nobtn" fill="outline" block fill="outline" color="medium"
+              (click)="closeConfirmModal(false)">
               No
             </ion-button>
-            <ion-button expand="block" color="primary" (click)="closeConfirmModal(true)">
+            <ion-button block class="yesbtn" (click)="closeConfirmModal(true)">
               Yes
             </ion-button>
           </div>
