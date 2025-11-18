@@ -13,7 +13,7 @@
       <!-- School ID -->
       <ion-item lines="none" class="label_top">
         <ion-label class="font_size">
-           {{ 'registerNewSchool.schoolId' | translate }} <span class="required">*</span>
+          {{ 'registerNewSchool.schoolId' | translate }} <span class="required">*</span>
         </ion-label>
       </ion-item>
       <ion-input class="custom-gray-item" formControlName="schoolId" placeholder="BA2323421233"></ion-input>
@@ -113,7 +113,7 @@
       <!-- Education Level -->
       <ion-item lines="none" class="label_top">
         <ion-label class="font_size">
-           {{ 'registerNewSchool.education' | translate }} <span class="required">*</span>
+          {{ 'registerNewSchool.education' | translate }} <span class="required">*</span>
         </ion-label>
       </ion-item>
       <ion-select class="custom-gray-item education" (ionChange)="onEducationChange($event)"
@@ -132,7 +132,8 @@
 
       <div *ngIf="showOtherInput">
         <ion-item lines="none" class="label_top">
-          <ion-label class="font_size"> {{ 'registerNewSchool.otherEducation' | translate }}<span class="required">*</span></ion-label>
+          <ion-label class="font_size"> {{ 'registerNewSchool.otherEducation' | translate }}<span
+              class="required">*</span></ion-label>
         </ion-item>
 
         <ion-input class="custom-gray-item" placeholder="Enter custom level" formControlName="otherEducationLevel">
@@ -150,7 +151,7 @@
       <!-- Register Button -->
       <ion-button color="primary" expand="block" type="submit" class="register-btn" [disabled]="schoolForm.invalid"
         [disabled]="schoolForm.invalid">
-         {{ 'registerNewSchool.register' | translate }}
+        {{ 'registerNewSchool.register' | translate }}
       </ion-button>
 
     </div>
