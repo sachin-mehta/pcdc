@@ -64,8 +64,8 @@ interface ApiService {
 
   /**
    * postSpeedTestData to submit the speed test data on backend
-   * @param token : Access Token for backend
-   * @param body : SPeed Test Result data
+   * @param authorization : Access Token for backend
+   * @param ip : ip address
    * @return : Instance of Response as Success or error
    */
 

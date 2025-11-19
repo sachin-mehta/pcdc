@@ -26,56 +26,62 @@ class SpeedTestRepositoryImpl : SpeedTestRepository {
   /**
    * This function provides getClientInfoData function
    * implementation
+   * @param ipInfoToken: access token
    * @return ResultState<ClientInfoResponseEntity?> : Result State
    * as Success as ClientInfoResponseEntity instance
    * as Failure as String Message with failure message
    */
-//  override suspend fun getClientInfoData(ipInfoToken: String, uploadKey: String, baseUrl: String): ResultState<ClientInfoResponseEntity?> {
-//    try {
-//      Log.d("GIGA SpeedTestRepositoryImpl", "getClientInfoData Invoked")
-//      val response = RetrofitInstanceBuilder.clintInfoApi.getClientInfo(ipInfoToken)
-//      Log.d("GIGA SpeedTestRepositoryImpl", "response $response")
-//      if (response.isSuccessful) {
-//        if (response.body() != null) {
-//          return ResultState.Success(
-//            response.body()!!.toEntity()
-//          )
-//        } else {
-//          val fallbackResponse =
-//            RetrofitInstanceBuilder.clintInfoFallbackApi.getClientInfoFallback()
-//          if (fallbackResponse.isSuccessful) {
-//            return if (fallbackResponse.body() != null) {
-//              ResultState.Success(
-//                response.body()!!.toEntity()
-//              )
-//            } else {
-//              ResultState.Failure(ErrorHandlerImpl().getError(response.errorBody()))
-//            }
-//          }
-//        }
-//      }
-//      return ResultState.Failure(
-//        ErrorEntity.Unknown("Get client info api failed")
-//      )
-//    } catch (e: Exception) {
-//      Log.d("GIGA SpeedTestRepositoryImpl", "Exception $e")
-//      return ResultState.Failure(
-//        ErrorEntity.Unknown("Get client info api failed")
-//      )
-//    }
-//  }
+  override suspend fun getClientInfoData(
+    ipInfoToken: String,
+  ): ResultState<ClientInfoResponseEntity?> {
+    try {
+      Log.d("GIGA SpeedTestRepositoryImpl", "getClientInfoData Invoked")
+      val response = RetrofitInstanceBuilder.clintInfoApi.getClientInfo(ipInfoToken)
+      Log.d("GIGA SpeedTestRepositoryImpl", "response $response")
+      if (response.isSuccessful) {
+        if (response.body() != null) {
+          return ResultState.Success(
+            response.body()!!.toEntity()
+          )
+        } else {
+          val fallbackResponse =
+            RetrofitInstanceBuilder.clintInfoFallbackApi.getClientInfoFallback()
+          if (fallbackResponse.isSuccessful) {
+            return if (fallbackResponse.body() != null) {
+              ResultState.Success(
+                response.body()!!.toEntity()
+              )
+            } else {
+              ResultState.Failure(ErrorHandlerImpl().getError(response.errorBody()))
+            }
+          }
+        }
+      }
+      return ResultState.Failure(
+        ErrorEntity.Unknown("Get client info api failed")
+      )
+    } catch (e: Exception) {
+      Log.d("GIGA SpeedTestRepositoryImpl", "Exception $e")
+      return ResultState.Failure(
+        ErrorEntity.Unknown("Get client info api failed")
+      )
+    }
+  }
 
 
   /**
-   * This function provides getClientInfoData function
+   * This function provides getClientInfoLiteData function
    * implementation
+   * @param ipInfoToken : IP info token to get ip details
+   * @param authKey : Authentication key to access backend
+   * @param baseUrl : Base Url based on env
    * @return ResultState<ClientInfoResponseEntity?> : Result State
    * as Success as ClientInfoResponseEntity instance
    * as Failure as String Message with failure message
    */
   override suspend fun getClientInfoLiteData(
     ipInfoToken: String,
-    uploadKey: String,
+    authKey: String,
     baseUrl: String
   ): ResultState<ClientInfoResponseEntity?> {
     try {
@@ -92,7 +98,7 @@ class SpeedTestRepositoryImpl : SpeedTestRepository {
               .create()
             val ipInfoMetaDataResponse =
               RetrofitInstanceBuilder.getSpeedTestApiWithCustomAdapter(baseUrl, gson)
-                .getIpInfoMetaData(authorization = "Bearer $uploadKey", ip = clintLiteInfo.ip)
+                .getIpInfoMetaData(authorization = "Bearer $authKey", ip = clintLiteInfo.ip)
 
             if (ipInfoMetaDataResponse.isSuccessful) {
               val clientInfoMetaDataModel = ipInfoMetaDataResponse.body()

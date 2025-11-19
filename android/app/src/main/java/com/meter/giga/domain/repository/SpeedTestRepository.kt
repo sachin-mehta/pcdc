@@ -12,14 +12,14 @@ import com.meter.giga.utils.ResultState
  */
 interface SpeedTestRepository {
 
-//  /**
-//   * This function provides getClientInfoData abstract definition
-//   * to fetch the client info
-//   * @return ResultState<ClientInfoResponseEntity?> : Result State
-//   * as Success as ClientInfoResponseEntity instance
-//   * as Failure as String Message with failure message
-//   */
-//  suspend fun getClientInfoData(ipInfoToken: String): ResultState<ClientInfoResponseEntity?>
+  /**
+   * This function provides getClientInfoData abstract definition
+   * to fetch the client info
+   * @return ResultState<ClientInfoResponseEntity?> : Result State
+   * as Success as ClientInfoResponseEntity instance
+   * as Failure as String Message with failure message
+   */
+  suspend fun getClientInfoData(ipInfoToken: String): ResultState<ClientInfoResponseEntity?>
 
   /**
    * This function provides getClientInfoData abstract definition
