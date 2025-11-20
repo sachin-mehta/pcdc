@@ -13,6 +13,7 @@ import com.meter.giga.utils.Constants.NEXT_SLOT
 import com.meter.giga.utils.Constants.SCHEDULE_TYPE
 import com.meter.giga.utils.Constants.SCHEDULE_TYPE_DAILY
 import com.meter.giga.utils.Constants.SCHEDULE_TYPE_START
+import com.meter.giga.utils.GigaUtil
 import io.capawesome.capacitorjs.plugins.firebase.crashlytics.FirebaseCrashlytics
 import io.sentry.Sentry
 import java.util.Calendar
@@ -48,7 +49,15 @@ class ScheduleBroadcastReceiver : BroadcastReceiver() {
           }
         )
       }
-      ContextCompat.startForegroundService(context, serviceIntent)
+      if (intent?.getStringExtra(SCHEDULE_TYPE) == FIRST_15_MIN) {
+        ContextCompat.startForegroundService(context, serviceIntent)
+      } else if (today != lastExecutionDate && intent?.getStringExtra(SCHEDULE_TYPE) != FIRST_15_MIN && GigaUtil.isBefore8AM()
+      ) {
+        Log.d("GIGA ScheduleBroadcastReceiver", "Schedule for 8 AM to 12 PM Slot")
+      } else {
+        ContextCompat.startForegroundService(context, serviceIntent)
+      }
+
       val type = intent?.getStringExtra(SCHEDULE_TYPE) ?: return
       val now = System.currentTimeMillis()
       var currentSlotStartHour = AlarmHelper.getSlotStartHour(now)

@@ -28,7 +28,9 @@ import net.measurementlab.ndt7.android.models.ConnectionInfo
 import net.measurementlab.ndt7.android.models.Measurement
 import net.measurementlab.ndt7.android.models.TCPInfo
 import org.json.JSONArray
+import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
 import java.util.Locale
@@ -96,6 +98,16 @@ object GigaUtil {
     return instant.toString() // this gives you the "Z" (Zulu/UTC) format
   }
 
+  /**
+   * This function used to check the current time is less than 8 AM
+   * @return Boolean
+   */
+  fun isBefore8AM(): Boolean {
+    val now = LocalDateTime.now()
+    val eightAMToday = LocalDateTime.of(LocalDate.now(), LocalTime.of(8, 0))
+
+    return now.isBefore(eightAMToday)
+  }
 
   /**
    * Used to get the current time in format: M_D_YYYY_H_MM_SS_A
