@@ -78,10 +78,9 @@
           <ion-row  *ngFor="let data of measurementsData">
             <ion-col size="3">{{ data.timestamp | date:'dd-MM-yyyy HH:mm' }}
             </ion-col>
-            <ion-col size="3">{{data.results['NDTResult.S2C'].LastClientMeasurement.MeanClientMbps | number:'1.2-2'}}</ion-col>
-            <ion-col size="2">{{data.results['NDTResult.C2S'].LastClientMeasurement.MeanClientMbps | number:'1.2-2'}}</ion-col>
-            <ion-col size="2">{{(data.results['NDTResult.S2C'].LastServerMeasurement.BBRInfo.MinRTT +
-              data.results['NDTResult.C2S'].LastServerMeasurement.BBRInfo.MinRTT) / 2 / 1000 | number:'1.2-2'}}</ion-col>
+            <ion-col size="3">{{data.download | number:'1.2-2'}}</ion-col>
+            <ion-col size="2">{{data.upload | number:'1.2-2'}}</ion-col>
+            <ion-col size="2">{{(data.latency) | number:'1.2-2'}}</ion-col>
             <ion-col  class="green_color" size="2">Success</ion-col>
   
           </ion-row>

@@ -214,9 +214,9 @@ export class MeasurementClientService {
 
     const dataUsage = this.calculateDataUsage(measurementRecord.results);
     measurementRecord.dataUsage = dataUsage;
-
     if (this.settingsService.get('uploadEnabled')) {
       try {
+        measurementRecord.provider = 'mlab';
         this.historyService.add(measurementRecord);
         this.sharedService.broadcast('history:measurement:change', 'history:measurement:change');
         await this.uploadService
