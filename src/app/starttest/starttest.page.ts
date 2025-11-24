@@ -186,11 +186,13 @@ export class StarttestPage implements OnInit, OnDestroy {
               'startTest.discoveringServers'
             );
             this.progress = 0.1;
+            this.ref.markForCheck();
           } else if (data.testStatus === 'server_chosen') {
             this.currentState = this.translate.instant(
               'startTest.serverSelected'
             );
             this.progress = 0.2;
+            this.ref.markForCheck();
           } else if (data.testStatus === 'retrying') {
             this.currentState = this.translate.instant('startTest.retrying', {
               attempt: data.attempt,

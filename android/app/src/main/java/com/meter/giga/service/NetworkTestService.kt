@@ -40,6 +40,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import net.measurementlab.ndt7.android.NDTTest
+import net.measurementlab.ndt7.android.ServerDiscoveryHelper
 import net.measurementlab.ndt7.android.models.ClientResponse
 import net.measurementlab.ndt7.android.models.Measurement
 import net.measurementlab.ndt7.android.utils.DataConverter
@@ -107,6 +108,18 @@ class NetworkTestService : LifecycleService() {
           secureDataStore
         )
         GigaAppPlugin.sendSpeedTestStarted()
+        client.setServerDiscoveryHelper(object : ServerDiscoveryHelper {
+          override fun onServerDiscovery() {
+            Log.d("GIGA NetworkTestService Server Discovery", "Server Discovery in progress")
+            GigaAppPlugin.sendServerDiscoveryStarted()
+          }
+
+          override fun onServerChosen() {
+            Log.d("GIGA NetworkTestService Server Discovery", "Server Discovered")
+            GigaAppPlugin.sendServerDiscoveryCompleted()
+          }
+
+        })
         client.startTest(NDTTest.TestType.DOWNLOAD_AND_UPLOAD)
       } catch (e: Exception) {
         Sentry.capture(e)

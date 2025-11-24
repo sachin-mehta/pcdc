@@ -5,6 +5,7 @@ package net.measurementlab.ndt7.android
 import android.util.Log
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
+import kotlinx.coroutines.delay
 import net.measurementlab.ndt7.android.models.CallbackRegistry
 import net.measurementlab.ndt7.android.models.HostnameResponse
 import net.measurementlab.ndt7.android.models.Urls
@@ -27,11 +28,20 @@ abstract class NDTTest(private var httpClient: OkHttpClient? = null) : DataPubli
   private var downloader: Downloader? = null
   private var executorService: ExecutorService? = null
   private var runLock: Semaphore = Semaphore(1)
+  private var serverDiscoveryHelper: ServerDiscoveryHelper? = null
 
   init {
     if (httpClient == null) {
       httpClient = HttpClientFactory.createHttpClient()
     }
+  }
+
+  fun setServerDiscoveryHelper(serverDiscoveryHelper: ServerDiscoveryHelper) {
+    this.serverDiscoveryHelper = serverDiscoveryHelper
+  }
+
+  fun resetServerDiscoveryHelper() {
+    this.serverDiscoveryHelper = null
   }
 
   fun startTest(testType: TestType) {
@@ -40,11 +50,12 @@ abstract class NDTTest(private var httpClient: OkHttpClient? = null) : DataPubli
       return
     }
     val speedtestLock = Semaphore(1)
+    serverDiscoveryHelper?.onServerDiscovery()
     executorService = Executors.newSingleThreadScheduledExecutor()
-
     getHostname()?.enqueue(
       object : Callback {
         override fun onFailure(call: Call, e: IOException) {
+          serverDiscoveryHelper = null
           onFinished(null, e, testType)
           executorService?.shutdown()
           runLock.release()
@@ -55,17 +66,18 @@ abstract class NDTTest(private var httpClient: OkHttpClient? = null) : DataPubli
             val hostInfo: HostnameResponse =
               Gson().fromJson(response.body?.string(), HostnameResponse::class.java)
             val numUrls = hostInfo.results?.size!!
+            serverDiscoveryHelper?.onServerChosen()
             for (i in 0 until numUrls) {
               try {
-//                selectTestType(testType, hostInfo.results[i].urls, speedtestLock)
-//                return
-                if (!hostInfo.results[i].urls.ndt7DownloadWSS.contains(".deenet.autojoin.")) {
-                  selectTestType(testType, hostInfo.results[i].urls, speedtestLock)
-                  return
-                } else if (numUrls == 1) {
-                  selectTestType(testType, hostInfo.results[i].urls, speedtestLock)
-                  return
-                }
+                selectTestType(testType, hostInfo.results[i].urls, speedtestLock)
+                return
+//                if (!hostInfo.results[i].urls.ndt7DownloadWSS.contains(".deenet.autojoin.")) {
+//                  selectTestType(testType, hostInfo.results[i].urls, speedtestLock)
+//                  return
+//                } else if (numUrls == 1) {
+//                  selectTestType(testType, hostInfo.results[i].urls, speedtestLock)
+//                  return
+//                }
               } catch (e: Exception) {
                 Log.d("GIGA", e.toString())
                 if (i == numUrls - 1) throw e
@@ -74,6 +86,7 @@ abstract class NDTTest(private var httpClient: OkHttpClient? = null) : DataPubli
           } catch (e: Exception) {
             Log.d("MainActivity  $testType", e.toString())
             onFinished(null, e, testType)
+            serverDiscoveryHelper = null
             executorService?.shutdown()
             runLock.release()
           }

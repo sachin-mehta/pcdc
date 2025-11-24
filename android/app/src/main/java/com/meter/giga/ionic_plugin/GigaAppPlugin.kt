@@ -145,6 +145,34 @@ class GigaAppPlugin : Plugin() {
         it.notifyListeners("speedTestUpdate", data)
       }
     }
+
+    /**
+     * This function used to pass the speed test measurements started
+     * TO UI
+     */
+    fun sendServerDiscoveryStarted() {
+      pluginInstance?.let {
+        Log.d("GIGA NetworkTestService", "server_discovery")
+        val data = JSObject().apply {
+          put("testStatus", "server_discovery")
+        }
+        it.notifyListeners("speedTestUpdate", data)
+      }
+    }
+
+    /**
+     * This function used to pass the speed test measurements started
+     * TO UI
+     */
+    fun sendServerDiscoveryCompleted() {
+      pluginInstance?.let {
+        Log.d("GIGA NetworkTestService", "server_chosen")
+        val data = JSObject().apply {
+          put("testStatus", "server_chosen")
+        }
+        it.notifyListeners("speedTestUpdate", data)
+      }
+    }
   }
 
   override fun load() {
