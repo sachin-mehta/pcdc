@@ -1,4 +1,5 @@
 <div role="button" class="circular-progress-container" (click)="handleClick()">
+
   <div class="ping-animation" *ngIf="(progressValue === 0 || secondLabel === 'TEST AGAIN') && !error"></div>
 
   <svg class="circular-progress-svg" viewBox="0 0 100 100">
@@ -6,10 +7,11 @@
 
 <foreignObject x="4" y="4" width="92" height="92">
   <div
-    class="spinner-background"
-  [style.opacity]="(secondLabel === 'DOWNLOAD' || secondLabel === 'UPLOAD') ? 1 : 0">
-  </div>
+  class="spinner-background"
+  [class.visible]="isSpinnerVisible">
+</div>
 </foreignObject>
+
 
 
     <image *ngIf="secondLabel === 'DOWNLOAD'" href="assets/images/download_meter.svg" width="8" height="8" x="15" y="36" />
