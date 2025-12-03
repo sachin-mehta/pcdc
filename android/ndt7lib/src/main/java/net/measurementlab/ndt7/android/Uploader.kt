@@ -75,7 +75,6 @@ class Uploader(
   }
 
   fun beginUpload(url: String, httpClient: OkHttpClient?) {
-    Log.d("GIGA", "beginUpload")
     val ws: WebSocket = SocketFactory.establishSocketConnection(url, httpClient, this)
     startTime = currentTimeInMicroseconds()
     previous = startTime

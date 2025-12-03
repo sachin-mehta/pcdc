@@ -79,12 +79,10 @@ abstract class NDTTest(private var httpClient: OkHttpClient? = null) : DataPubli
 //                  return
 //                }
               } catch (e: Exception) {
-                Log.d("GIGA", e.toString())
                 if (i == numUrls - 1) throw e
               }
             }
           } catch (e: Exception) {
-            Log.d("MainActivity  $testType", e.toString())
             onFinished(null, e, testType)
             serverDiscoveryHelper = null
             executorService?.shutdown()

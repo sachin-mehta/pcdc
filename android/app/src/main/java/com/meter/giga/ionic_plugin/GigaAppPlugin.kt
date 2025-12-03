@@ -21,6 +21,7 @@ import com.meter.giga.domain.entity.request.SpeedTestResultRequestEntity
 import com.meter.giga.prefrences.AlarmSharedPref
 import com.meter.giga.prefrences.SecureDataStore
 import com.meter.giga.service.NetworkTestService
+import com.meter.giga.utils.AppLogger
 import com.meter.giga.utils.Constants.BASE_URL
 import com.meter.giga.utils.Constants.ENV_TYPE
 import com.meter.giga.utils.Constants.IP_INFO_TOKEN
@@ -32,6 +33,7 @@ import com.meter.giga.utils.Constants.REGISTRATION_IP_ADDRESS
 import com.meter.giga.utils.Constants.REGISTRATION_SCHOOL_ID
 import com.meter.giga.utils.Constants.SCHEDULE_TYPE
 import com.meter.giga.utils.Constants.SCHEDULE_TYPE_MANUAL
+import com.meter.giga.utils.GigaUtil
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -60,7 +62,7 @@ class GigaAppPlugin : Plugin() {
           put("uploadSpeed", uploadSpeed)
           put("testStatus", testStatus)
         }
-        Log.d("GIGA NetworkTestService", "sendSpeedUpdate: $data")
+        AppLogger.d("GIGA NetworkTestService", "sendSpeedUpdate: $data")
         it.notifyListeners("speedTestUpdate", data)
       }
     }
@@ -77,7 +79,7 @@ class GigaAppPlugin : Plugin() {
         val data = JSObject().apply {
           put("testStatus", "offline")
         }
-        Log.d("GIGA NetworkTestService", "sendSpeedUpdate: $data")
+        AppLogger.d("GIGA NetworkTestService", "sendSpeedUpdate: $data")
         it.notifyListeners("speedTestUpdate", data)
       }
     }
@@ -93,7 +95,7 @@ class GigaAppPlugin : Plugin() {
       measurementsItem: MeasurementsItem
     ) {
       pluginInstance?.let {
-        Log.d("GIGA NetworkTestService", "sendSpeedTestCompleted")
+        AppLogger.d("GIGA NetworkTestService", "sendSpeedTestCompleted")
         val speedTestResultEntity = SpeedTestResultEntity(
           speedTestData = speedTestData,
           testStatus = "complete",
@@ -103,7 +105,7 @@ class GigaAppPlugin : Plugin() {
           .serializeNulls()
           .create().toJson(speedTestResultEntity)
         val data = JSObject(jsonString)
-        Log.d("GIGA NetworkTestService", "sendSpeedTestCompleted $data")
+        AppLogger.d("GIGA NetworkTestService", "sendSpeedTestCompleted $data")
         it.notifyListeners("speedTestUpdate", data as JSObject?)
       }
     }
@@ -117,7 +119,7 @@ class GigaAppPlugin : Plugin() {
       measurementsItem: MeasurementsItem?
     ) {
       pluginInstance?.let {
-        Log.d("GIGA NetworkTestService", "sendSpeedTestCompletedWithError")
+        AppLogger.d("GIGA NetworkTestService", "sendSpeedTestCompletedWithError")
         val speedTestResultEntity = SpeedTestResultEntity(
           speedTestData = speedTestData,
           testStatus = "onerror",
@@ -127,7 +129,7 @@ class GigaAppPlugin : Plugin() {
           .serializeNulls()
           .create().toJson(speedTestResultEntity)
         val data = JSObject(jsonString)
-        Log.d("GIGA NetworkTestService", "sendSpeedTestCompletedWithError $data")
+        AppLogger.d("GIGA NetworkTestService", "sendSpeedTestCompletedWithError $data")
         it.notifyListeners("speedTestUpdate", data as JSObject?)
       }
     }
@@ -138,7 +140,7 @@ class GigaAppPlugin : Plugin() {
      */
     fun sendSpeedTestStarted() {
       pluginInstance?.let {
-        Log.d("GIGA NetworkTestService", "sendSpeedTestStarted")
+        AppLogger.d("GIGA NetworkTestService", "sendSpeedTestStarted")
         val data = JSObject().apply {
           put("testStatus", "onstart")
         }
@@ -152,7 +154,7 @@ class GigaAppPlugin : Plugin() {
      */
     fun sendServerDiscoveryStarted() {
       pluginInstance?.let {
-        Log.d("GIGA NetworkTestService", "server_discovery")
+        AppLogger.d("GIGA NetworkTestService", "server_discovery")
         val data = JSObject().apply {
           put("testStatus", "server_discovery")
         }
@@ -166,7 +168,7 @@ class GigaAppPlugin : Plugin() {
      */
     fun sendServerDiscoveryCompleted() {
       pluginInstance?.let {
-        Log.d("GIGA NetworkTestService", "server_chosen")
+        AppLogger.d("GIGA NetworkTestService", "server_chosen")
         val data = JSObject().apply {
           put("testStatus", "server_chosen")
         }
@@ -189,16 +191,16 @@ class GigaAppPlugin : Plugin() {
   fun executeManualSpeedTest(call: PluginCall) {
     val context = bridge.context
     val scheduleType = call.getString(SCHEDULE_TYPE)
-    Log.d("GIGA GigaAppPlugin", "Manual Speed Test ${scheduleType}")
+    AppLogger.d("GIGA GigaAppPlugin", "Manual Speed Test ${scheduleType}")
 
     val intent = Intent(context, NetworkTestService::class.java)
     intent.putExtra(SCHEDULE_TYPE, scheduleType)
     context.startForegroundService(intent)
     val alarmPrefs = AlarmSharedPref(context)
-    if (AlarmHelper.checkIfFutureAlarmScheduled(alarmPrefs)) {
-      Log.d("GIGA GigaAppPlugin", "Alarm is already scheduled")
+    if (GigaUtil.checkIfFutureAlarmScheduled(alarmPrefs)) {
+      AppLogger.d("GIGA GigaAppPlugin", "Alarm is already scheduled")
     } else {
-      Log.d(
+      AppLogger.d(
         "GIGA GigaAppPlugin",
         "Schedule the next alarm as fallback if no future scheduled speed test."
       )
@@ -220,13 +222,13 @@ class GigaAppPlugin : Plugin() {
       val alarmPrefs = AlarmSharedPref(context)
       val speedTestHistoricalData = alarmPrefs.oldSpeedTestData
       val jsonArray = JSONArray(speedTestHistoricalData)
-      Log.d("GIGA GigaAppPlugin jsonArray", "$jsonArray")
+      AppLogger.d("GIGA GigaAppPlugin jsonArray", "$jsonArray")
       // Convert JSONArray to JSArray
       val jsArray = JSArray()
       for (i in 0 until jsonArray.length()) {
         val jsonObjectString = jsonArray.getString(i)
         val innerJsonObject = JSONObject(jsonObjectString)
-        Log.d("GIGA GigaAppPlugin jsonArray", "$innerJsonObject")
+        AppLogger.d("GIGA GigaAppPlugin jsonArray", "$innerJsonObject")
         jsArray.put(innerJsonObject)
       }
       val measurements = JSObject()
@@ -248,7 +250,7 @@ class GigaAppPlugin : Plugin() {
    */
   @PluginMethod
   fun storeAndScheduleSpeedTest(call: PluginCall) {
-    Log.d("GIGA GigaAppPlugin", "Start Command Via Plugin")
+    AppLogger.d("GIGA GigaAppPlugin", "Start Command Via Plugin")
     val context = bridge.context
     val browserId = call.getString(REGISTRATION_BROWSER_ID)
     val schoolId = call.getString(REGISTRATION_SCHOOL_ID)
@@ -258,7 +260,7 @@ class GigaAppPlugin : Plugin() {
     val mlabUploadKey = call.getString(MLAB_UPLOAD_KEY)
     val baseUrl = call.getString(BASE_URL)
     val ipInfoToken = call.getString(IP_INFO_TOKEN)
-    Log.d("GIGA GigaAppPlugin mlabUploadKey", "$mlabUploadKey")
+    AppLogger.d("GIGA GigaAppPlugin mlabUploadKey", "$mlabUploadKey")
     val alarmPrefs = AlarmSharedPref(context)
     //Reset the existing stored data from shared preferences
     alarmPrefs.resetAllData()
@@ -284,7 +286,7 @@ class GigaAppPlugin : Plugin() {
    */
   @PluginMethod
   fun storeEnvironment(call: PluginCall) {
-    Log.d("GIGA GigaAppPlugin", "Start Command Via Plugin")
+    AppLogger.d("GIGA GigaAppPlugin", "Start Command Via Plugin")
     val context = bridge.context
     val env = call.getString(ENV_TYPE)
     val alarmPrefs = AlarmSharedPref(context)
@@ -309,13 +311,13 @@ class GigaAppPlugin : Plugin() {
       alarmPrefs.resetForNewDay()
       val randomIn15Min = now + (Math.random() * (15 * 60 * 1000L)).toLong()
       alarmPrefs.first15ScheduledTime = randomIn15Min
-      Log.d("GIGA GigaAppPlugin", "On New Registraion New Day 15 Min $randomIn15Min")
+      AppLogger.d("GIGA GigaAppPlugin", "On New Registraion New Day 15 Min $randomIn15Min")
       alarmPrefs.nextExecutionTime = randomIn15Min
       AlarmHelper.scheduleExactAlarm(context, randomIn15Min, "FIRST_15_MIN")
     } else if (alarmPrefs.first15ExecutedTime == -1L) {
       val randomIn15Min = now + (Math.random() * (15 * 60 * 1000L)).toLong()
       alarmPrefs.first15ScheduledTime = randomIn15Min
-      Log.d("GIGA GigaAppPlugin", "Not Executed 15 Min $randomIn15Min")
+      AppLogger.d("GIGA GigaAppPlugin", "Not Executed 15 Min $randomIn15Min")
       alarmPrefs.nextExecutionTime = randomIn15Min
       AlarmHelper.scheduleExactAlarm(context, randomIn15Min, "FIRST_15_MIN")
     } else {
@@ -326,7 +328,7 @@ class GigaAppPlugin : Plugin() {
       val start: Long = range.first!!
       val end: Long = range.second!!
       val nextAlarmTime = start + (Math.random() * (end - start)).toLong()
-      Log.d("GIGA GigaAppPlugin", "For New Slot $nextAlarmTime")
+      AppLogger.d("GIGA GigaAppPlugin", "For New Slot $nextAlarmTime")
       alarmPrefs.nextExecutionTime = nextAlarmTime
       AlarmHelper.scheduleExactAlarm(context, nextAlarmTime, "NEXT_SLOT")
     }

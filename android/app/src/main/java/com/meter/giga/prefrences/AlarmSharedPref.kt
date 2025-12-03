@@ -206,8 +206,6 @@ class AlarmSharedPref(context: Context) {
     ipAddress = ""
     oldSpeedTestData = "[]"
     historyDataIndex = 0
-    isTestRunning = false
-    nextExecutionTime = -1
   }
 }
 

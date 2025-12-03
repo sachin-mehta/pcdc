@@ -3,6 +3,7 @@ package com.meter.giga
 import android.app.Application
 import android.util.Log
 import com.meter.giga.prefrences.AlarmSharedPref
+import com.meter.giga.utils.AppLogger
 import io.sentry.Sentry
 import io.sentry.android.AndroidSentryClientFactory
 import java.util.Properties
@@ -37,7 +38,7 @@ class GigaApp : Application() {
     val alarmPrefs = AlarmSharedPref(this.applicationContext)
     val environment = props.getProperty("ENVIRONMENT", "development")
     alarmPrefs.environment = environment
-    Log.d("GIGA App environment : ", environment)
+    AppLogger.d("GIGA App environment : ", environment)
     // Initialize Sentry with legacy Android factory
     Sentry.init(
       getString(R.string.sentry_dsn),

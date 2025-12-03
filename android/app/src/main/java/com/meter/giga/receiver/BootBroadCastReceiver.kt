@@ -5,7 +5,9 @@ import android.content.Context
 import android.content.Intent
 import android.util.Log
 import com.meter.giga.ararm_scheduler.AlarmHelper
+import com.meter.giga.ararm_scheduler.AlarmHelperType
 import com.meter.giga.prefrences.AlarmSharedPref
+import com.meter.giga.utils.AppLogger
 import com.meter.giga.utils.Constants.FIRST_15_MIN
 import com.meter.giga.utils.Constants.NEXT_SLOT
 import com.meter.giga.utils.GigaUtil
@@ -18,7 +20,11 @@ import kotlin.random.Random
  * This is native Broadcast Receiver component and registered in Manifest files
  * as well as Boot Broadcast Receiver
  */
-class BootBroadCastReceiver : BroadcastReceiver() {
+class BootBroadCastReceiver(
+  private val prefProvider: (Context) -> AlarmSharedPref = { ctx -> AlarmSharedPref(ctx) },
+  private val alarmHelper: AlarmHelperType = AlarmHelper // Inject interface
+
+) : BroadcastReceiver() {
 
   /**
    * BroadcastReceiver overridden method onReceive method implementation
@@ -26,11 +32,9 @@ class BootBroadCastReceiver : BroadcastReceiver() {
    * @param intent: instance of Intent, contains the data
    */
   override fun onReceive(context: Context, intent: Intent?) {
-    Log.d("GIGA BootBroadCastReceiver", "On Boot")
+    AppLogger.d("GIGA BootBroadCastReceiver", "On Boot")
     try {
-
-
-      val prefs = AlarmSharedPref(context)
+      val prefs = prefProvider(context)
       val schoolId = prefs.schoolId
       if (schoolId != "" && intent?.action == Intent.ACTION_BOOT_COMPLETED && GigaUtil.isExactAlarmPermissionGranted(
           context
@@ -39,14 +43,14 @@ class BootBroadCastReceiver : BroadcastReceiver() {
         try {
           scheduleAlarmOnRestart(context)
         } catch (e: Exception) {
-          Log.d("BootBroadCastReceiver", "Failed to schedule due to ${e.toString()}")
+          AppLogger.d("BootBroadCastReceiver", "Failed to schedule due to ${e.toString()}")
           scheduleAlarmOnRestart(context)
         }
       } else {
         if (schoolId == "") {
-          Log.d("BootBroadCastReceiver", "Failed to schedule due no school is registered")
+          AppLogger.d("BootBroadCastReceiver", "Failed to schedule due no school is registered")
         } else {
-          Log.d("BootBroadCastReceiver", "Failed to schedule due to No permission granted")
+          AppLogger.d("BootBroadCastReceiver", "Failed to schedule due to No permission granted")
 
         }
       }
@@ -63,8 +67,7 @@ class BootBroadCastReceiver : BroadcastReceiver() {
    * @param context : Context of app, used to access the Shared Preferences
    */
   private fun scheduleAlarmOnRestart(context: Context) {
-    val alarmPrefs = AlarmSharedPref(context)
-
+    val alarmPrefs = prefProvider(context)
     /**
      * This check used to check if speed test need to schedule for the
      * new day
@@ -74,9 +77,9 @@ class BootBroadCastReceiver : BroadcastReceiver() {
       val now = System.currentTimeMillis()
       val randomIn15Min = now + Random.nextLong(0, 15 * 60 * 1000L)
       alarmPrefs.first15ScheduledTime = randomIn15Min
-      Log.d("GIGA BootBroadCastReceiver", "On Boot New Day 15 Min $randomIn15Min")
-      alarmPrefs.nextExecutionTime - randomIn15Min
-      AlarmHelper.scheduleExactAlarm(context, randomIn15Min, FIRST_15_MIN)
+      AppLogger.d("GIGA BootBroadCastReceiver", "On Boot New Day 15 Min $randomIn15Min")
+      alarmPrefs.nextExecutionTime = randomIn15Min
+      alarmHelper.scheduleExactAlarm(context, randomIn15Min, FIRST_15_MIN)
     }
     /**
      * This check used to check if first 15 min speed test was scheduled
@@ -86,9 +89,9 @@ class BootBroadCastReceiver : BroadcastReceiver() {
       val now = System.currentTimeMillis()
       val randomIn15Min = now + Random.nextLong(0, 15 * 60 * 1000L)
       alarmPrefs.first15ScheduledTime = randomIn15Min
-      Log.d("GIGA BootBroadCastReceiver", "On Boot Not Executed 15 Min $randomIn15Min")
-      alarmPrefs.nextExecutionTime - randomIn15Min
-      AlarmHelper.scheduleExactAlarm(context, randomIn15Min, FIRST_15_MIN)
+      AppLogger.d("GIGA BootBroadCastReceiver", "On Boot Not Executed 15 Min $randomIn15Min")
+      alarmPrefs.nextExecutionTime = randomIn15Min
+      alarmHelper.scheduleExactAlarm(context, randomIn15Min, FIRST_15_MIN)
     }
     /**
      * This schedules slot speed test based on current time
@@ -98,16 +101,16 @@ class BootBroadCastReceiver : BroadcastReceiver() {
     else {
       val executedTime = alarmPrefs.first15ExecutedTime
       val lastExecutionDate = alarmPrefs.lastExecutionDay
-      val currentSlotStartHour = AlarmHelper.getSlotStartHour(executedTime)
-      val (start, end) = AlarmHelper.getNextSlotRange(
+      val currentSlotStartHour = alarmHelper.getSlotStartHour(executedTime)
+      val (start, end) = alarmHelper.getNextSlotRange(
         executedTime,
         currentSlotStartHour,
         lastExecutionDate
       )
       val nextAlarmTime = Random.nextLong(start, end)
-      Log.d("GIGA BootBroadCastReceiver", "On Boot For Slot $nextAlarmTime")
-      alarmPrefs.nextExecutionTime - nextAlarmTime
-      AlarmHelper.scheduleExactAlarm(context, nextAlarmTime, NEXT_SLOT)
+      AppLogger.d("GIGA BootBroadCastReceiver", "On Boot For Slot $nextAlarmTime")
+      alarmPrefs.nextExecutionTime = nextAlarmTime
+      alarmHelper.scheduleExactAlarm(context, nextAlarmTime, NEXT_SLOT)
     }
   }
 }

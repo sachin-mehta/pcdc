@@ -11,6 +11,7 @@ import com.meter.giga.domain.repository.SpeedTestRepository
 import com.meter.giga.error_handler.ErrorEntity
 import com.meter.giga.error_handler.ErrorHandlerImpl
 import com.meter.giga.network.RetrofitInstanceBuilder
+import com.meter.giga.utils.AppLogger
 import com.meter.giga.utils.ResultState
 import com.meter.giga.utils.toEntity
 import com.meter.giga.utils.toModel
@@ -35,9 +36,9 @@ class SpeedTestRepositoryImpl : SpeedTestRepository {
     ipInfoToken: String,
   ): ResultState<ClientInfoResponseEntity?> {
     try {
-      Log.d("GIGA SpeedTestRepositoryImpl", "getClientInfoData Invoked")
+      AppLogger.d("GIGA SpeedTestRepositoryImpl", "getClientInfoData Invoked")
       val response = RetrofitInstanceBuilder.clintInfoApi.getClientInfo(ipInfoToken)
-      Log.d("GIGA SpeedTestRepositoryImpl", "response $response")
+      AppLogger.d("GIGA SpeedTestRepositoryImpl", "response $response")
       if (response.isSuccessful) {
         if (response.body() != null) {
           return ResultState.Success(
@@ -61,7 +62,7 @@ class SpeedTestRepositoryImpl : SpeedTestRepository {
         ErrorEntity.Unknown("Get client info api failed")
       )
     } catch (e: Exception) {
-      Log.d("GIGA SpeedTestRepositoryImpl", "Exception $e")
+      AppLogger.d("GIGA SpeedTestRepositoryImpl", "Exception $e")
       return ResultState.Failure(
         ErrorEntity.Unknown("Get client info api failed")
       )
@@ -85,9 +86,9 @@ class SpeedTestRepositoryImpl : SpeedTestRepository {
     baseUrl: String
   ): ResultState<ClientInfoResponseEntity?> {
     try {
-      Log.d("GIGA SpeedTestRepositoryImpl", "getClientInfoLiteData Invoked")
+      AppLogger.d("GIGA SpeedTestRepositoryImpl", "getClientInfoLiteData Invoked")
       val response = RetrofitInstanceBuilder.clintInfoLitApi.getClientInfoLite(ipInfoToken)
-      Log.d("GIGA SpeedTestRepositoryImpl getClientInfoLiteData", "response $response")
+      AppLogger.d("GIGA SpeedTestRepositoryImpl getClientInfoLiteData", "response $response")
       if (response.isSuccessful) {
         if (response.body() != null) {
           val clintLiteInfo = response.body()
@@ -106,12 +107,12 @@ class SpeedTestRepositoryImpl : SpeedTestRepository {
               when (val asn = clientInfoMetaDataModel?.asn) {
 
                 is AsnData.AsString -> {
-                  Log.d("ASN", "ASN string: ${asn.value}")
+                  AppLogger.d("ASN", "ASN string: ${asn.value}")
                   asnValue = asn.value
                 }
 
                 is AsnData.AsObject -> {
-                  Log.d("ASN", "ASN object: ${asn.obj.asn}")
+                  AppLogger.d("ASN", "ASN object: ${asn.obj.asn}")
                   asnValue = asn.obj.asn
                 }
 
@@ -176,7 +177,7 @@ class SpeedTestRepositoryImpl : SpeedTestRepository {
         ErrorEntity.Unknown("Get client info api failed")
       )
     } catch (e: Exception) {
-      Log.d("GIGA SpeedTestRepositoryImpl", "Exception $e")
+      AppLogger.d("GIGA SpeedTestRepositoryImpl", "Exception $e")
       return ResultState.Failure(
         ErrorEntity.Unknown("Get client info api failed")
       )
@@ -192,13 +193,13 @@ class SpeedTestRepositoryImpl : SpeedTestRepository {
    * as Failure as String Message with failure message
    */
   override suspend fun getServerInfoData(metro: String?): ResultState<ServerInfoResponseEntity?> {
-    Log.d("GIGA SpeedTestRepositoryImpl", "getClientInfoData Invoked")
+    AppLogger.d("GIGA SpeedTestRepositoryImpl", "getClientInfoData Invoked")
     val response = if (metro != null && metro != "automatic") {
       RetrofitInstanceBuilder.serverInfoApi.getServerMetroInfo(metro = metro)
     } else {
       RetrofitInstanceBuilder.serverInfoApi.getServerInfoNoPolicy()
     }
-    Log.d("GIGA SpeedTestRepositoryImpl", "response $response")
+    AppLogger.d("GIGA SpeedTestRepositoryImpl", "response $response")
     if (response.isSuccessful) {
       if (response.body() != null) {
         return ResultState.Success(
@@ -250,9 +251,9 @@ class SpeedTestRepositoryImpl : SpeedTestRepository {
       body = speedTestData.toModel(),
       authorization = "Bearer $uploadKey"
     )
-    Log.d("GIGA SpeedTestRepositoryImpl Response", "$response")
+    AppLogger.d("GIGA SpeedTestRepositoryImpl Response", "$response")
     if (response.isSuccessful) {
-      Log.d("GIGA SpeedTestRepositoryImpl Success", "$response")
+      AppLogger.d("GIGA SpeedTestRepositoryImpl Success", "$response")
       return if (response.body() != null) {
         ResultState.Success(
           response.body()!!
@@ -266,9 +267,12 @@ class SpeedTestRepositoryImpl : SpeedTestRepository {
         val attemptNo = retryAttemptCount + 1;
         Sentry.capture("Sync data re attempt count : $attemptNo")
         syncSpeedTestData(speedTestData, uploadKey, baseUrl, attemptNo)
-        Log.d("GIGA SpeedTestRepositoryImpl Failed with attempt No: ", "$retryAttemptCount")
+        AppLogger.d("GIGA SpeedTestRepositoryImpl Failed with attempt No: ", "$retryAttemptCount")
       } else {
-        Log.d("GIGA SpeedTestRepositoryImpl Failed after no of attempts", "$retryAttemptCount")
+        AppLogger.d(
+          "GIGA SpeedTestRepositoryImpl Failed after no of attempts",
+          "$retryAttemptCount"
+        )
         Sentry.capture("Sync retry failed with $response")
       }
     }

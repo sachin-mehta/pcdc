@@ -23,6 +23,7 @@ import com.meter.giga.network.util.NetworkCheckerImpl
 import com.meter.giga.prefrences.AlarmSharedPref
 // import com.meter.giga.prefrences.AlarmSharedPref
 import com.meter.giga.prefrences.SecureDataStore
+import com.meter.giga.utils.AppLogger
 import com.meter.giga.utils.Constants.CHANNEL_ID
 import com.meter.giga.utils.Constants.DEVICE_TYPE_ANDROID
 import com.meter.giga.utils.Constants.DEVICE_TYPE_CHROMEBOOK
@@ -87,7 +88,7 @@ class NetworkTestService : LifecycleService() {
     val networkChecker = NetworkCheckerImpl(this)
     val prefs = AlarmSharedPref(this)
     if (networkChecker.isNetworkAvailable() && !prefs.isTestRunning) {
-      Log.d("GIGA NetworkTestService ", "Device is online")
+      AppLogger.d("GIGA NetworkTestService ", "Device is online")
 
       try {
         // Example logging
@@ -95,7 +96,7 @@ class NetworkTestService : LifecycleService() {
 
         secureDataStore = SecureDataStore(this)
         val scheduleType = intent?.getStringExtra(SCHEDULE_TYPE) ?: SCHEDULE_TYPE_DAILY
-        Log.d("GIGA NetworkTestService SCHEDULE_TYPE", scheduleType)
+        AppLogger.d("GIGA NetworkTestService SCHEDULE_TYPE", scheduleType)
         val appVersion = GigaUtil.getAppVersionName(this)
         val isRunningOnChromebook = GigaUtil.isRunningOnChromebook(this)
         prefs.isTestRunning = true
@@ -110,12 +111,12 @@ class NetworkTestService : LifecycleService() {
         GigaAppPlugin.sendSpeedTestStarted()
         client.setServerDiscoveryHelper(object : ServerDiscoveryHelper {
           override fun onServerDiscovery() {
-            Log.d("GIGA NetworkTestService Server Discovery", "Server Discovery in progress")
+            AppLogger.d("GIGA NetworkTestService Server Discovery", "Server Discovery in progress")
             GigaAppPlugin.sendServerDiscoveryStarted()
           }
 
           override fun onServerChosen() {
-            Log.d("GIGA NetworkTestService Server Discovery", "Server Discovered")
+            AppLogger.d("GIGA NetworkTestService Server Discovery", "Server Discovered")
             GigaAppPlugin.sendServerDiscoveryCompleted()
           }
 
@@ -126,15 +127,15 @@ class NetworkTestService : LifecycleService() {
       }
     } else {
       if (!networkChecker.isNetworkAvailable()) {
-        Log.d("GIGA NetworkTestService ", "Device is offline")
+        AppLogger.d("GIGA NetworkTestService ", "Device is offline")
         Sentry.capture("Device is offline, speed test skipped")
         updateNotification("Device is offline, please check internet connectivity")
         GigaAppPlugin.sendNoNetworkError()
       } else if (prefs.isTestRunning) {
-        Log.d("GIGA NetworkTestService ", "Already Speed Test Executing")
+        AppLogger.d("GIGA NetworkTestService ", "Already Speed Test Executing")
         Sentry.capture("Already Speed Test Executing")
       } else {
-        Log.d("GIGA NetworkTestService ", "Device is offline")
+        AppLogger.d("GIGA NetworkTestService ", "Device is offline")
         Sentry.capture("speed test skipped")
         updateNotification("Speed test skipped")
       }
@@ -183,7 +184,7 @@ class NetworkTestService : LifecycleService() {
 
   override fun onDestroy() {
     isRunning = false
-    Log.d("GIGA NetworkTestService", "Stop Command")
+    AppLogger.d("GIGA NetworkTestService", "Stop Command")
 
     super.onDestroy()
   }
@@ -212,7 +213,7 @@ class NetworkTestService : LifecycleService() {
    * Inner class implementation of NDTTest class this provides
    * the callback implementation for the download, upload progress
    */
-  private inner class NDTTestImpl(
+  public inner class NDTTestImpl(
     okHttpClient: OkHttpClient?,
     private val scheduleType: String,
     private val appVersion: String,
@@ -245,7 +246,7 @@ class NetworkTestService : LifecycleService() {
      */
     override fun onMeasurementDownloadProgress(measurement: Measurement) {
       super.onMeasurementDownloadProgress(measurement)
-      Log.d(
+      AppLogger.d(
         "GIGA NetworkTestService",
         "DownLoad progress onMeasurementDownloadProgress: $measurement"
       )
@@ -258,7 +259,10 @@ class NetworkTestService : LifecycleService() {
      */
     override fun onMeasurementUploadProgress(measurement: Measurement) {
       super.onMeasurementUploadProgress(measurement)
-      Log.d("GIGA NetworkTestService", "Upload progress onMeasurementUploadProgress: $measurement")
+      AppLogger.d(
+        "GIGA NetworkTestService",
+        "Upload progress onMeasurementUploadProgress: $measurement"
+      )
       lastUploadMeasurement = measurement
     }
 
@@ -268,12 +272,12 @@ class NetworkTestService : LifecycleService() {
      */
     override fun onDownloadProgress(clientResponse: ClientResponse) {
       super.onDownloadProgress(clientResponse)
-      Log.d("GIGA NetworkTestService", "download progress: $clientResponse")
+      AppLogger.d("GIGA NetworkTestService", "download progress: $clientResponse")
 
       val speed = DataConverter.convertToMbps(clientResponse)
       downloadSpeed = speed.toDouble()
-      Log.d("GIGA NetworkTestService", "uploadSpeed speed: $uploadSpeed")
-      Log.d("GIGA NetworkTestService", "downloadSpeed speed: $downloadSpeed")
+      AppLogger.d("GIGA NetworkTestService", "uploadSpeed speed: $uploadSpeed")
+      AppLogger.d("GIGA NetworkTestService", "downloadSpeed speed: $downloadSpeed")
       val msg = "DL: %.2f Mbps | UL: %.2f Mbps".format(downloadSpeed, uploadSpeed)
       lastDownloadResponse = clientResponse
       updateNotification(msg)
@@ -283,7 +287,7 @@ class NetworkTestService : LifecycleService() {
           0.0
         } else {
           if ((it.numBytes / (it.elapsedTime / 1000)).isInfinite()) {
-            Log.d("GIGA", "Got infinite value")
+            AppLogger.d("GIGA", "Got infinite value")
             0.0
           } else {
             (it.numBytes / (it.elapsedTime / 1000)) * 0.008
@@ -302,12 +306,12 @@ class NetworkTestService : LifecycleService() {
      */
     override fun onUploadProgress(clientResponse: ClientResponse) {
       super.onUploadProgress(clientResponse)
-      Log.d("GIGA NetworkTestService", "upload stuff: $clientResponse")
+      AppLogger.d("GIGA NetworkTestService", "upload stuff: $clientResponse")
 
       val speed = DataConverter.convertToMbps(clientResponse)
       uploadSpeed = speed.toDouble();
-      Log.d("GIGA NetworkTestService", "uploadSpeed speed: $uploadSpeed")
-      Log.d("GIGA NetworkTestService", "downloadSpeed speed: $downloadSpeed")
+      AppLogger.d("GIGA NetworkTestService", "uploadSpeed speed: $uploadSpeed")
+      AppLogger.d("GIGA NetworkTestService", "downloadSpeed speed: $downloadSpeed")
       val msg = "DL: %.2f Mbps | UL: %.2f Mbps".format(downloadSpeed, uploadSpeed)
       lastUploadResponse = clientResponse
       updateNotification(msg)
@@ -317,7 +321,7 @@ class NetworkTestService : LifecycleService() {
           0.0
         } else {
           if ((it.numBytes / (it.elapsedTime / 1000)).isInfinite()) {
-            Log.d("GIGA", "Got infinite value")
+            AppLogger.d("GIGA", "Got infinite value")
             0.0
           } else {
             (it.numBytes / (it.elapsedTime / 1000)) * 0.008
@@ -344,9 +348,9 @@ class NetworkTestService : LifecycleService() {
       super.onFinished(clientResponse, error, testType)
       try {
         val speed = clientResponse?.let { DataConverter.convertToMbps(it) }
-        Log.d("GIGA NetworkTestService", "ALL DONE: $speed ")
+        AppLogger.d("GIGA NetworkTestService", "ALL DONE: $speed ")
         allDoneInvoked = allDoneInvoked + 1
-        Log.d("GIGA NetworkTestService", "ALL DONE: $allDoneInvoked ")
+        AppLogger.d("GIGA NetworkTestService", "ALL DONE: $allDoneInvoked ")
         if (allDoneInvoked == 2) {
           publishSpeedTestData(
             scheduleType,
@@ -378,7 +382,7 @@ class NetworkTestService : LifecycleService() {
       appVersion: String,
       isRunningOnChromebook: Boolean,
     ) {
-      Log.d("GIGA NetworkTestService", "publishSpeedTestData Invoked")
+      AppLogger.d("GIGA NetworkTestService", "publishSpeedTestData Invoked")
       lifecycleScope.launch(Dispatchers.IO) {
         try {
           val getClientInfoUseCase = GetClientInfoUseCase()
@@ -426,7 +430,7 @@ class NetworkTestService : LifecycleService() {
               }
 
               is ResultState.Failure -> {
-                Log.d(
+                AppLogger.d(
                   "GIGA NetworkTestService",
                   "Get Client Info API Failed: ${clientInfo.error}"
                 )
@@ -434,7 +438,7 @@ class NetworkTestService : LifecycleService() {
               }
 
               ResultState.Loading -> {
-                Log.d(
+                AppLogger.d(
                   "GIGA NetworkTestService",
                   "Fetching Client Info"
                 )
@@ -459,7 +463,7 @@ class NetworkTestService : LifecycleService() {
               }
 
               is ResultState.Failure -> {
-                Log.d(
+                AppLogger.d(
                   "GIGA NetworkTestService",
                   "Get Client Info API Failed: ${serverInfo.error}"
                 )
@@ -467,7 +471,7 @@ class NetworkTestService : LifecycleService() {
               }
 
               ResultState.Loading -> {
-                Log.d(
+                AppLogger.d(
                   "GIGA NetworkTestService",
                   "Fetching Client Info"
                 )
@@ -502,7 +506,7 @@ class NetworkTestService : LifecycleService() {
 
         } finally {
           delay(5000)
-          Log.d("GIGA NetworkTestService", "Speed Test Completed}")
+          AppLogger.d("GIGA NetworkTestService", "Speed Test Completed}")
         }
       }
     }
@@ -550,7 +554,7 @@ class NetworkTestService : LifecycleService() {
           historyDataIndex
         )
         prefs.historyDataIndex = historyDataIndex + 1
-        Log.d(
+        AppLogger.d(
           "GIGA NetworkTestService",
           "Existing Speed Test Data $existingSpeedTestData"
         )
@@ -561,7 +565,7 @@ class NetworkTestService : LifecycleService() {
               postSpeedTestUseCase.invoke(speedTestResultRequestEntity, uploadKey, baseUrl)
             when (postSpeedTestResultState) {
               is ResultState.Failure -> {
-                Log.d(
+                AppLogger.d(
                   "GIGA NetworkTestService",
                   "Speed Test Not Published Successfully Due to ${postSpeedTestResultState.error}"
                 )
@@ -570,7 +574,7 @@ class NetworkTestService : LifecycleService() {
                   existingSpeedTestData,
                   Gson().toJson(measurementsItem)
                 )
-                Log.d(
+                AppLogger.d(
                   "GIGA NetworkTestService",
                   "Updated Speed Test Data $updateSpeedTestData"
                 )
@@ -586,18 +590,18 @@ class NetworkTestService : LifecycleService() {
               }
 
               ResultState.Loading -> {
-                Log.d(
+                AppLogger.d(
                   "GIGA NetworkTestService",
                   "Uploading Speed Test Data"
                 )
               }
 
               is ResultState.Success<*> -> {
-                Log.d(
+                AppLogger.d(
                   "GIGA NetworkTestService",
                   "Speed Test Data Published Successfully"
                 )
-                Log.d(
+                AppLogger.d(
                   "GIGA NetworkTestService",
                   "Measurement Instance : ${measurementsItem}"
                 )
@@ -607,7 +611,7 @@ class NetworkTestService : LifecycleService() {
                   existingSpeedTestData,
                   Gson().toJson(measurementsItem)
                 )
-                Log.d(
+                AppLogger.d(
                   "GIGA NetworkTestService",
                   "Updated Speed Test Data $updateSpeedTestData"
                 )
@@ -627,7 +631,7 @@ class NetworkTestService : LifecycleService() {
               existingSpeedTestData,
               Gson().toJson(measurementsItem)
             )
-            Log.d(
+            AppLogger.d(
               "GIGA NetworkTestService",
               "Updated Speed Test Data $updateSpeedTestData"
             )
@@ -646,7 +650,7 @@ class NetworkTestService : LifecycleService() {
             existingSpeedTestData,
             Gson().toJson(measurementsItem)
           )
-          Log.d(
+          AppLogger.d(
             "GIGA NetworkTestService",
             "Updated Speed Test Data $updateSpeedTestData"
           )

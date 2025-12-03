@@ -19,6 +19,7 @@ import com.meter.giga.domain.entity.request.SpeedTestMeasurementRequestEntity
 import com.meter.giga.domain.entity.request.SpeedTestResultRequestEntity
 import com.meter.giga.domain.entity.response.ClientInfoResponseEntity
 import com.meter.giga.domain.entity.response.ServerInfoResponseEntity
+import com.meter.giga.prefrences.AlarmSharedPref
 import com.meter.giga.utils.Constants.M_D_YYYY_H_MM_SS_A
 import io.sentry.Sentry
 import net.measurementlab.ndt7.android.models.AppInfo
@@ -33,6 +34,7 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
+import java.util.Calendar
 import java.util.Locale
 
 /**
@@ -223,12 +225,15 @@ object GigaUtil {
   }
 
   fun addJsonItem(existingArrayStr: String, jsonString: String): String {
-    val jsonArray = JSONArray(existingArrayStr)
+
+    val gson = Gson()
+    val listType = object : TypeToken<List<String>>() {}.type
+    val list: List<String> = gson.fromJson(existingArrayStr, listType)
 
     // Convert to mutable list of strings
     val itemList = mutableListOf<String>()
-    for (i in 0 until jsonArray.length()) {
-      itemList.add(jsonArray.getString(i))
+    for (i in 0 until list.size) {
+      itemList.add(list[i])
     }
 
     // Enforce FIFO max size = 10
@@ -239,7 +244,7 @@ object GigaUtil {
     itemList.add(jsonString) // Add new item
 
     // Store updated array
-    val updatedArray = JSONArray(itemList)
+    val updatedArray = gson.toJson(itemList)
     return updatedArray.toString()
   }
 
@@ -329,11 +334,14 @@ object GigaUtil {
       gson.fromJson(json, MeasurementsItem::class.java)
     }
 
-// Now you have List<MeasurementsItem>
-    Log.d("Giga : Parsed", " ${modelList.size} items")
-
     val notUploadedItems = modelList.filter { it.uploaded == false }
 
     return notUploadedItems
+  }
+
+  fun checkIfFutureAlarmScheduled(alarmPrefs: AlarmSharedPref): Boolean {
+    val nextScheduleTime = alarmPrefs.nextExecutionTime
+    val currentTime = Calendar.getInstance().timeInMillis
+    return nextScheduleTime > currentTime
   }
 }

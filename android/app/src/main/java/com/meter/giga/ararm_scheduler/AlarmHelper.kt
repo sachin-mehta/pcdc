@@ -9,7 +9,9 @@ import android.util.Log
 import com.meter.giga.prefrences.AlarmSharedPref
 
 import com.meter.giga.receiver.ScheduleBroadcastReceiver
+import com.meter.giga.utils.AppLogger
 import com.meter.giga.utils.Constants.SCHEDULE_TYPE
+import com.meter.giga.utils.Logger
 import java.util.Calendar
 import java.util.Date
 import kotlin.jvm.java
@@ -19,7 +21,9 @@ import kotlin.jvm.java
  * This class is used to schedule the next Speed Test
  * Also getting used to calculate the next speed test slot
  */
-object AlarmHelper {
+object AlarmHelper : AlarmHelperType {
+
+  var logger: Logger = AppLogger
 
   /**
    * This function is getting used to schedule the speed test
@@ -28,10 +32,9 @@ object AlarmHelper {
    * @param triggerAtMillis: Time at which need to schedule the speed test
    * @param tag: Defines if scheduled test is of start or daily one
    */
-  @JvmStatic
   @SuppressLint("ScheduleExactAlarm")
-  fun scheduleExactAlarm(context: Context, triggerAtMillis: Long, tag: String) {
-    Log.d("GIGA AlarmHelper", "scheduleExactAlarm at $triggerAtMillis")
+  override fun scheduleExactAlarm(context: Context, triggerAtMillis: Long, tag: String) {
+    logger.d("GIGA AlarmHelper", "scheduleExactAlarm at $triggerAtMillis")
 
     val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
     val intent = Intent(context, ScheduleBroadcastReceiver::class.java).apply {
@@ -58,8 +61,8 @@ object AlarmHelper {
    * @param lastExecutionDay : When the last scheduled speed test performed
    * @return Pair of start and end of slot time
    */
-  @JvmStatic
-  fun getNextSlotRange(
+
+  override fun getNextSlotRange(
     afterMillis: Long,
     lastSlotHour: Int,
     lastExecutionDay: Int
@@ -85,28 +88,28 @@ object AlarmHelper {
       }.timeInMillis
 
       if (isExecutedInCurrentSlot) {
-        Log.d("GIGA AlarmHelper", "Slot scheduling in next slot time")
+        logger.d("GIGA AlarmHelper", "Slot scheduling in next slot time")
         isExecutedInCurrentSlot = false
         return start to end
       }
       val today = Calendar.getInstance().get(Calendar.DAY_OF_YEAR)
-      Log.d("GIGA AlarmHelper", "today at $today")
+      logger.d("GIGA AlarmHelper", "today at $today")
       if (afterMillis in start until end) {
         return if (lastSlotHour == startHour && today == lastExecutionDay) {
-          Log.d("GIGA AlarmHelper", "Already Executed for Slot")
+          logger.d("GIGA AlarmHelper", "Already Executed for Slot")
           isExecutedInCurrentSlot = true
           // Already executed in this slot, go to next
           continue
         } else {
           // Still inside current slot and not executed
-          Log.d("GIGA AlarmHelper", "Deciding slot time")
+          logger.d("GIGA AlarmHelper", "Deciding slot time")
           val adjustedStart = maxOf(afterMillis + 60_000L, start)
           return adjustedStart to end
         }
       }
     }
 
-    Log.d("GIGA AlarmHelper", "getNextSlotRange scheduling for next day")
+    logger.d("GIGA AlarmHelper", "getNextSlotRange scheduling for next day")
 
     // Move to next day's 6 AM - 8 PM
     val tomorrowStart = Calendar.getInstance().apply {
@@ -133,8 +136,7 @@ object AlarmHelper {
    * @param millis : time instance in milliseconds
    * @return Slot start time
    */
-  @JvmStatic
-  fun getSlotStartHour(millis: Long): Int {
+  override fun getSlotStartHour(millis: Long): Int {
     val hour = Calendar.getInstance().apply {
       timeInMillis = millis
     }.get(Calendar.HOUR_OF_DAY)
@@ -145,12 +147,5 @@ object AlarmHelper {
       in 16 until 20 -> 16
       else -> -1
     }
-  }
-
-  @JvmStatic
-  fun checkIfFutureAlarmScheduled(alarmPrefs: AlarmSharedPref): Boolean {
-    val nextScheduleTime = alarmPrefs.nextExecutionTime
-    val currentTime = Calendar.getInstance().timeInMillis
-    return nextScheduleTime > currentTime
   }
 }

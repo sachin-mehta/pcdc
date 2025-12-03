@@ -8,6 +8,7 @@ import androidx.core.content.ContextCompat
 import com.meter.giga.ararm_scheduler.AlarmHelper
 import com.meter.giga.prefrences.AlarmSharedPref
 import com.meter.giga.service.NetworkTestService
+import com.meter.giga.utils.AppLogger
 import com.meter.giga.utils.Constants.FIRST_15_MIN
 import com.meter.giga.utils.Constants.NEXT_SLOT
 import com.meter.giga.utils.Constants.SCHEDULE_TYPE
@@ -53,7 +54,7 @@ class ScheduleBroadcastReceiver : BroadcastReceiver() {
         ContextCompat.startForegroundService(context, serviceIntent)
       } else if (today != lastExecutionDate && intent?.getStringExtra(SCHEDULE_TYPE) != FIRST_15_MIN && GigaUtil.isBefore8AM()
       ) {
-        Log.d("GIGA ScheduleBroadcastReceiver", "Schedule for 8 AM to 12 PM Slot")
+        AppLogger.d("GIGA ScheduleBroadcastReceiver", "Schedule for 8 AM to 12 PM Slot")
       } else {
         ContextCompat.startForegroundService(context, serviceIntent)
       }
@@ -65,7 +66,7 @@ class ScheduleBroadcastReceiver : BroadcastReceiver() {
         timeInMillis = now
       }.get(Calendar.HOUR_OF_DAY)
       if (type == FIRST_15_MIN) {
-        Log.d("GIGA ScheduleBroadcastReceiver", "FIRST_15_MIN at $FIRST_15_MIN")
+        AppLogger.d("GIGA ScheduleBroadcastReceiver", "FIRST_15_MIN at $FIRST_15_MIN")
         currentSlotStartHour = -1
         prefs.first15ExecutedTime = now
       }

@@ -38,12 +38,10 @@ class Downloader(
   override fun onMessage(webSocket: WebSocket, text: String) {
     numBytes += text.length.toDouble()
     tryToUpdateClient()
-    Log.d("GIGA Downloader", "onMessage $text")
     try {
       val measurement = gson.fromJson(text, Measurement::class.java)
       cbRegistry.measurementProgressCbk(measurement)
     } catch (e: Exception) {
-      Log.d("GIGA Downloader", "onMessage ${e.message}")
       return
     }
   }
@@ -81,7 +79,6 @@ class Downloader(
   }
 
   fun beginDownload(url: String, httpClient: OkHttpClient?) {
-    Log.d("GIGA", "beginDownload $url")
     webSocket = SocketFactory.establishSocketConnection(url, httpClient, this)
   }
 

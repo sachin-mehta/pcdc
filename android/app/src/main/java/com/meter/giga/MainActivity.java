@@ -27,13 +27,14 @@ import androidx.core.view.WindowCompat;
 
 import com.getcapacitor.BridgeActivity;
 import com.meter.giga.ionic_plugin.GigaAppPlugin;
+import com.meter.giga.utils.AppLogger;
 
 public class MainActivity extends BridgeActivity {
 
   private final ActivityResultLauncher<Intent> alarmPermissionLauncher =
     registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
       r -> {
-        Log.d("GIGA MainActivity", "Alarm Permission Status : " + r.toString());
+        AppLogger.INSTANCE.d("GIGA MainActivity", "Alarm Permission Status : " + r.toString());
         AlarmManager am = (AlarmManager) getSystemService(ALARM_SERVICE);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !am.canScheduleExactAlarms()) {
           showPermissionDialog();
