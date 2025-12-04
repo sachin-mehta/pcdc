@@ -2,6 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'org.jetbrains.kotlin.android'
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.crashlytics'
+apply plugin: 'jacoco'
 android {
   namespace "com.meter.giga"
   compileSdk rootProject.ext.compileSdkVersion
@@ -31,6 +32,7 @@ android {
   }
   buildTypes {
     debug {
+      testCoverageEnabled true
       debuggable true
       minifyEnabled false
       applicationIdSuffix ".debug"
@@ -68,6 +70,10 @@ android {
   buildFeatures {
     buildConfig true
   }
+
+  jacoco {
+    version = "0.8.12"
+  }
 }
 
 repositories {
@@ -103,7 +109,8 @@ dependencies {
   testImplementation 'org.mockito.kotlin:mockito-kotlin:5.2.1'
   testImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.7.3"
   testImplementation "junit:junit:4.13.2" // or your version
-  // Mockito for instrumented tests (uses DexMaker)
+  testImplementation "org.jetbrains.kotlin:kotlin-reflect"
+  testImplementation "com.squareup.okhttp3:okhttp:4.12.0"
   androidTestImplementation 'com.linkedin.dexmaker:dexmaker-mockito:2.28.3'
   implementation project(':capacitor-cordova-android-plugins')
   implementation "org.jetbrains.kotlin:kotlin-test:2.1.21"
@@ -119,4 +126,48 @@ try {
   }
 } catch (Exception e) {
   logger.info("google-services.json not found, google-services plugin not applied. Push Notifications won't work")
+}
+
+// Use tasks.register for modern Gradle versions, which is the standard now.
+tasks.register('jacocoTestReport', JacocoReport) {
+  // Group and description for the task (good practice)
+  group = "Reporting"
+  description = "Generate Jacoco code coverage report for the debug build."
+
+  // Specify which tests should be included in the report
+  dependsOn("testDebugUnitTest")
+
+  // --- Configuration for the report ---
+
+  reports {
+    xml.required = true   // Often needed for CI/CD tools like SonarQube, Jenkins
+    html.required = true  // Generates a human-readable HTML report
+  }
+
+  // --- Defining what code to analyze ---
+
+  // A list of all your source code directories
+  def sourceDirs = [
+    "src/main/java",
+    "src/main/kotlin"
+    // Add other source directories if you have them, e.g., "src/debug/java"
+  ]
+  sourceDirectories.setFrom(files(sourceDirs))
+
+  // A list of all compiled .class files. We target the debug build.
+  def classDirs = fileTree(
+    dir: "${buildDir}/tmp/kotlin-classes/debug",
+    excludes: [
+      '**/R.class',
+      '**/R$*.class',
+      '**/BuildConfig.*',
+      '**/Manifest*.*',
+      '**/*Test*.*',
+      'android/**/*.*'
+    ]
+  )
+  classDirectories.setFrom(files([classDirs]))
+
+  // The location of the test execution data
+  executionData.setFrom(files("${buildDir}/outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec"))
 }

@@ -2,7 +2,9 @@ package com.meter.giga.domain.usecases
 
 import android.util.Log
 import com.meter.giga.data.repository.SpeedTestRepositoryImpl
+import com.meter.giga.data.util.RetrofitInstanceProviderImpl
 import com.meter.giga.domain.entity.response.ClientInfoResponseEntity
+import com.meter.giga.network.util.RetrofitProvider
 import com.meter.giga.utils.AppLogger
 import com.meter.giga.utils.ResultState
 
@@ -22,7 +24,9 @@ class GetClientInfoUseCase() {
     uploadKey: String,
     baseUrl: String
   ): ResultState<ClientInfoResponseEntity?> {
-    val speedTestRepository = SpeedTestRepositoryImpl()
+    val speedTestRepository = SpeedTestRepositoryImpl(
+      retrofitProvider = RetrofitInstanceProviderImpl()
+    )
     AppLogger.d("GIGA GetClientInfoUseCase", "speedTestRepository $speedTestRepository")
     return speedTestRepository.getClientInfoLiteData(ipInfoToken, uploadKey, baseUrl)
   }
