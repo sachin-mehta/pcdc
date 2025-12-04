@@ -21,7 +21,7 @@ export class LocationService {
   resolveGeolocation(wifiAccessPoints: any) {
   return this.http.post(
     `${environment.restAPI}geolocation/geolocate`,
-    { wifiAccessPoints }
+    { "considerIp":false, wifiAccessPoints }
   ).pipe(
     map(response => ({
       ...response,
