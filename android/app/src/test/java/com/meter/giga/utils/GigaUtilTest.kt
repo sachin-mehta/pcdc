@@ -638,6 +638,214 @@ class GigaUtilTest {
   }
 
   @Test
+  fun `getMeasurementItem maps all fields correctly when null`() {
+
+    val clientInfo: ClientInfoResponseEntity? = null
+
+    val c2s = Measurement(
+      tcpInfo = TCPInfo(
+        bytesReceived = 100, bytesAcked = 50,
+        state = 0,
+        caState = 0,
+        retransmits = 0,
+        probes = 0,
+        backoff = 0,
+        options = 0,
+        wScale = 0,
+        appLimited = 0,
+        rto = 0,
+        ato = 0,
+        sndMss = 0,
+        rcvMss = 0,
+        unacked = 0,
+        sacked = 0,
+        lost = 0,
+        retrans = 0,
+        fackets = 0,
+        lastDataSent = 0,
+        lastAckSent = 0,
+        lastDataRecv = 0,
+        lastAckRecv = 0,
+        pmtu = 0,
+        rcvSsThresh = 0,
+        rtt = 0,
+        rttVar = 0,
+        sndSsThresh = 0,
+        sndCwnd = 0,
+        advMss = 0,
+        reordering = 0,
+        rcvRtt = 0,
+        rcvSpace = 0,
+        totalRetrans = 0,
+        pacingRate = 0,
+        maxPacingRate = 0,
+        segsOut = 0,
+        segsIn = 0,
+        notSentBytes = 0,
+        minRtt = 0,
+        dataSegsIn = 0,
+        dataSegsOut = 0,
+        deliveryRate = 0,
+        busyTime = 0,
+        rWndLimited = 0,
+        sndBufLimited = 0,
+        delivered = 0,
+        deliveredCE = 0,
+        bytesSent = 0,
+        bytesRetrans = 0,
+        dSackDups = 0,
+        reordSeen = 0,
+        elapsedTime = 0
+      ),
+      connectionInfo = ConnectionInfo(
+        client = "",
+        server = "",
+        uuid = "uuid-123"
+      ),
+      bbrInfo = BBRInfo(
+        bw = 0,
+        minRtt = 0,
+        pacingGain = 0,
+        cwndGain = 0,
+        elapsedTime = 0
+      )
+    )
+
+    val s2c = Measurement(
+      tcpInfo = TCPInfo(
+        bytesReceived = 200, bytesAcked = 150,
+        state = 0,
+        caState = 0,
+        retransmits = 0,
+        probes = 0,
+        backoff = 0,
+        options = 0,
+        wScale = 0,
+        appLimited = 0,
+        rto = 0,
+        ato = 0,
+        sndMss = 0,
+        rcvMss = 0,
+        unacked = 0,
+        sacked = 0,
+        lost = 0,
+        retrans = 0,
+        fackets = 0,
+        lastDataSent = 0,
+        lastAckSent = 0,
+        lastDataRecv = 0,
+        lastAckRecv = 0,
+        pmtu = 0,
+        rcvSsThresh = 0,
+        rtt = 0,
+        rttVar = 0,
+        sndSsThresh = 0,
+        sndCwnd = 0,
+        advMss = 0,
+        reordering = 0,
+        rcvRtt = 0,
+        rcvSpace = 0,
+        totalRetrans = 0,
+        pacingRate = 0,
+        maxPacingRate = 0,
+        segsOut = 0,
+        segsIn = 0,
+        notSentBytes = 0,
+        minRtt = 0,
+        dataSegsIn = 0,
+        dataSegsOut = 0,
+        deliveryRate = 0,
+        busyTime = 0,
+        rWndLimited = 0,
+        sndBufLimited = 0,
+        delivered = 0,
+        deliveredCE = 0,
+        bytesSent = 0,
+        bytesRetrans = 0,
+        dSackDups = 0,
+        reordSeen = 0,
+        elapsedTime = 0
+      ),
+      connectionInfo = ConnectionInfo(
+        client = "",
+        server = "",
+        uuid = "uuid-123"
+      ),
+      bbrInfo = BBRInfo(
+        bw = 0,
+        minRtt = 0,
+        pacingGain = 0,
+        cwndGain = 0,
+        elapsedTime = 0
+      )
+    )
+
+    val serverInfo: ServerInfoResponseEntity? = null
+
+    val results = ResultsRequestEntity(
+      ndtResultS2C = null,
+      ndtResultC2S = null
+    )
+
+    val c2sRate = arrayListOf(1.0, 2.0)
+    val s2cRate = arrayListOf(3.0, 4.0)
+
+    val item = GigaUtil.getMeasurementItem(
+      clientInfoResponse = clientInfo,
+      c2sLastServerManagement = c2s,
+      s2cLastServerManagement = s2c,
+      serverInfoResponse = serverInfo,
+      scheduleType = "DAILY",
+      results = results,
+      c2sRate = c2sRate,
+      s2cRate = s2cRate,
+      historyDataIndex = 5
+    )
+
+    // Access Information
+    assertNull(item.accessInformation?.asn)
+    assertNull(item.accessInformation?.city)
+    assertNull(item.accessInformation?.country)
+    assertNull(item.accessInformation?.hostname)
+    assertNull(item.accessInformation?.ip)
+    assertNull(item.accessInformation?.loc)
+
+    // Data Usage
+    assertEquals(300L, item.dataUsage?.download)   // 200 + 100
+    assertEquals(200L, item.dataUsage?.upload)     // 150 + 50
+
+    // Index increment
+    assertEquals(6, item.index) // 5 + 1
+
+    // Mlab Information
+    assertNull(item.mlabInformation?.city)
+    assertEquals(listOf("", ""), item.mlabInformation?.ip)
+
+    // Notes
+    assertEquals("DAILY", item.notes)
+
+    // Results
+    assertEquals(results, item.results)
+
+    // Snaplog
+    assertEquals(c2sRate, item.snapLog?.c2sRate)
+    assertEquals(s2cRate, item.snapLog?.s2cRate)
+
+    // UUID
+    assertEquals("uuid-123", item.uuid)
+
+    // Uploaded always false
+    assertFalse(item.uploaded == true)
+
+    // Version always 1
+    assertEquals(1, item.version)
+
+    // Timestamp sanity check
+    item.timestamp?.let { assertTrue(it > 0) }
+  }
+
+
+  @Test
   fun `checkDataPendingForSync returns only items with uploaded false`() {
     val gson = Gson()
     val item1 = MeasurementsItem(
