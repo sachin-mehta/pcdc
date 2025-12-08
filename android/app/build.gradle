@@ -74,6 +74,9 @@ android {
   jacoco {
     version = "0.8.12"
   }
+  testOptions {
+    unitTests.includeAndroidResources = true
+  }
 }
 
 repositories {
@@ -101,6 +104,7 @@ dependencies {
   testImplementation "junit:junit:$junitVersion"
   androidTestImplementation "androidx.test.ext:junit:$androidxJunitVersion"
   androidTestImplementation "androidx.test.espresso:espresso-core:$androidxEspressoCoreVersion"
+  testImplementation "org.robolectric:robolectric:4.12.1"
   // Mockito Core
   testImplementation 'org.mockito:mockito-core:5.14.1'
   testImplementation "io.mockk:mockk:1.13.10"
@@ -170,4 +174,9 @@ tasks.register('jacocoTestReport', JacocoReport) {
 
   // The location of the test execution data
   executionData.setFrom(files("${buildDir}/outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec"))
+}
+
+tasks.withType(Test).configureEach {
+  jacoco.includeNoLocationClasses = true
+  jacoco.excludes = ['jdk.internal.*']
 }

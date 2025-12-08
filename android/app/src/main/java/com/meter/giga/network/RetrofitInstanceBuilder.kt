@@ -17,15 +17,20 @@ import retrofit2.converter.gson.GsonConverterFactory
  * based on environment in future
  */
 object RetrofitInstanceBuilder {
+
+  internal fun createRetrofit(baseUrl: String): Retrofit {
+    return Retrofit.Builder()
+      .baseUrl(baseUrl)
+      .addConverterFactory(GsonConverterFactory.create())
+      .build()
+  }
+
   /**
    * Creates ApiService service instance to
    * fetch the client info data
    */
   val clintInfoApi: ApiService by lazy {
-    Retrofit.Builder()
-      .baseUrl(CLIENT_INFO_END_URL)
-      .addConverterFactory(GsonConverterFactory.create())
-      .build()
+    createRetrofit(CLIENT_INFO_END_URL)
       .create(ApiService::class.java)
   }
 
@@ -34,10 +39,7 @@ object RetrofitInstanceBuilder {
    * fetch the client info data
    */
   val clintInfoLitApi: ApiService by lazy {
-    Retrofit.Builder()
-      .baseUrl(CLIENT_LITE_INFO_END_URL)
-      .addConverterFactory(GsonConverterFactory.create())
-      .build()
+    createRetrofit(CLIENT_LITE_INFO_END_URL)
       .create(ApiService::class.java)
   }
 
@@ -46,10 +48,7 @@ object RetrofitInstanceBuilder {
    * fetch the client info data from fallback base url
    */
   val clintInfoFallbackApi: ApiService by lazy {
-    Retrofit.Builder()
-      .baseUrl(CLIENT_INFO_FALLBACK_END_URL)
-      .addConverterFactory(GsonConverterFactory.create())
-      .build()
+    createRetrofit(CLIENT_INFO_FALLBACK_END_URL)
       .create(ApiService::class.java)
   }
 
@@ -91,10 +90,7 @@ object RetrofitInstanceBuilder {
    * fetch the server info data
    */
   val serverInfoApi: ApiService by lazy {
-    Retrofit.Builder()
-      .baseUrl(SERVER_INFO_END_URL)
-      .addConverterFactory(GsonConverterFactory.create())
-      .build()
+    createRetrofit(SERVER_INFO_END_URL)
       .create(ApiService::class.java)
   }
 }
