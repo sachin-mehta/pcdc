@@ -6,6 +6,7 @@ import android.content.Intent
 import android.util.Log
 import androidx.core.content.ContextCompat
 import com.meter.giga.ararm_scheduler.AlarmHelper
+import com.meter.giga.ararm_scheduler.AlarmHelperType
 import com.meter.giga.prefrences.AlarmSharedPref
 import com.meter.giga.service.NetworkTestService
 import com.meter.giga.utils.AppLogger
@@ -27,7 +28,10 @@ import kotlin.random.Random
  * This is native Broadcast Receiver component and registered in Manifest files
  * as well as Normal Broadcast Receiver
  */
-class ScheduleBroadcastReceiver : BroadcastReceiver() {
+class ScheduleBroadcastReceiver(
+  private val prefProvider: (Context) -> AlarmSharedPref = { ctx -> AlarmSharedPref(ctx) },
+  private val alarmHelper: AlarmHelperType = AlarmHelper // Inject interface
+) : BroadcastReceiver() {
   /**
    * BroadcastReceiver overridden method onReceive method implementation
    * @param context: Context of the app
@@ -36,7 +40,7 @@ class ScheduleBroadcastReceiver : BroadcastReceiver() {
   override fun onReceive(context: Context, intent: Intent?) {
     try {
 
-      val prefs = AlarmSharedPref(context)
+      val prefs = prefProvider(context)
       val lastExecutionDate = prefs.lastExecutionDay
       val today = Calendar.getInstance().get(Calendar.DAY_OF_YEAR)
       val serviceIntent = Intent(context, NetworkTestService::class.java).apply {
@@ -61,7 +65,7 @@ class ScheduleBroadcastReceiver : BroadcastReceiver() {
 
       val type = intent?.getStringExtra(SCHEDULE_TYPE) ?: return
       val now = System.currentTimeMillis()
-      var currentSlotStartHour = AlarmHelper.getSlotStartHour(now)
+      var currentSlotStartHour = alarmHelper.getSlotStartHour(now)
       val currentHour = Calendar.getInstance().apply {
         timeInMillis = now
       }.get(Calendar.HOUR_OF_DAY)
@@ -93,11 +97,11 @@ class ScheduleBroadcastReceiver : BroadcastReceiver() {
         nextSlotStart to nextSlotEnd
 
       } else {
-        AlarmHelper.getNextSlotRange(now, currentSlotStartHour, lastExecutionDate)
+        alarmHelper.getNextSlotRange(now, currentSlotStartHour, lastExecutionDate)
       }
       val nextAlarmTime = Random.nextLong(start, end)
       prefs.nextExecutionTime = nextAlarmTime
-      AlarmHelper.scheduleExactAlarm(context, nextAlarmTime, NEXT_SLOT)
+      alarmHelper.scheduleExactAlarm(context, nextAlarmTime, NEXT_SLOT)
     } catch (e: Exception) {
       Sentry.capture(e)
     }

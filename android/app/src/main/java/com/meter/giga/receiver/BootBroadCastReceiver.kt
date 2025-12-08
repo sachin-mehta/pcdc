@@ -23,7 +23,6 @@ import kotlin.random.Random
 class BootBroadCastReceiver(
   private val prefProvider: (Context) -> AlarmSharedPref = { ctx -> AlarmSharedPref(ctx) },
   private val alarmHelper: AlarmHelperType = AlarmHelper // Inject interface
-
 ) : BroadcastReceiver() {
 
   /**

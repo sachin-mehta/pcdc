@@ -213,7 +213,7 @@ class NetworkTestService : LifecycleService() {
    * Inner class implementation of NDTTest class this provides
    * the callback implementation for the download, upload progress
    */
-  public inner class NDTTestImpl(
+  inner class NDTTestImpl(
     okHttpClient: OkHttpClient?,
     private val scheduleType: String,
     private val appVersion: String,
