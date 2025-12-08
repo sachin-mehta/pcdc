@@ -62,7 +62,7 @@
       </ion-list> -->
     </div>
   </ion-card>
-  <ion-card class="last_location_card">
+  <ion-card class="last_location_card" *ngIf="locationDetail?.accuracy">
     <div class="last_location_content">
       <div class="left_section">
         <div class="label_row">

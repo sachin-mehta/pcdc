@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
-import { map } from 'rxjs';
+import { from, map, Observable, switchMap, tap } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -21,7 +21,7 @@ export class LocationService {
   resolveGeolocation(wifiAccessPoints: any) {
   return this.http.post(
     `${environment.restAPI}geolocation/geolocate`,
-    { "considerIp":false, wifiAccessPoints }
+    { "considerIp":false,  wifiAccessPoints }
   ).pipe(
     map(response => ({
       ...response,
@@ -39,5 +39,18 @@ export class LocationService {
   getSavedGeolocation(): { latitude: number; longitude: number } | null {
     const data = localStorage.getItem('geolocation');
     return data ? JSON.parse(data) : null;
+  }
+
+
+  fetchAndSaveGeolocation(): Observable<{ latitude: number; longitude: number }> {
+    return from(this.getWifiAccessPoints()).pipe(
+      switchMap(wifiList => this.resolveGeolocation(wifiList)),
+      tap((geo: any) => {
+        // Save only lat/lng
+        console.log('geolocation', geo)
+        this.saveGeolocation(geo);
+      }),
+      map((geo: any) => (geo))
+    );
   }
 }
