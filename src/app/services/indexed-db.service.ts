@@ -9,7 +9,7 @@ export class IndexedDBService {
   private measurementDbName = 'connectivity_measurements_db';
   private measurementStoreName = 'measurements';
 
-  constructor() {}
+  constructor() { }
 
   private openDatabase(): Promise<IDBDatabase> {
     return new Promise((resolve, reject) => {
@@ -78,42 +78,53 @@ export class IndexedDBService {
     });
   }
 
-  
+
   async cleanupOldRecords(): Promise<void> {
     const db = await this.openDatabase();
     const transaction = db.transaction(this.storeName, 'readwrite');
     const store = transaction.objectStore(this.storeName);
     const now = Date.now();
     const retentionPeriod = 30 * 24 * 60 * 60 * 1000; // 30 days in milliseconds
+    const syncedRetentionPeriod = 3 * 24 * 60 * 60 * 1000; // Keep synced records for 7 days
 
     return new Promise((resolve, reject) => {
       const request = store.getAll(); // Get all records from IndexedDB
 
       request.onsuccess = () => {
         const records = request.result;
-        const deletePromises: Promise<void>[] = [];
 
+        // Delete records that are:
+        // 1. Synced AND older than 7 days, OR
+        // 2. Older than 30 days (regardless of sync status)
         records.forEach((record) => {
-          if (record.isSynced || now - record.createdAt >= retentionPeriod) {
-            const deleteRequest = store.delete(record.timestamp); // Delete based on primary key
-
-            // Wrap each delete operation in a promise
-            const deletePromise = new Promise<void>((res, rej) => {
-              deleteRequest.onsuccess = () => res();
-              deleteRequest.onerror = () => rej(deleteRequest.error);
-            });
-
-            deletePromises.push(deletePromise);
+          const recordAge = now - record.createdAt;
+          if (
+            (record.isSynced && recordAge >= syncedRetentionPeriod) ||
+            recordAge >= retentionPeriod
+          ) {
+            store.delete(record.timestamp); // Delete based on primary key
           }
         });
 
-        // Wait for all delete operations to complete before resolving
-        Promise.all(deletePromises)
-          .then(() => resolve())
-          .catch(reject);
+        // Let the transaction handle completion
+        // No need for nested promises - transaction.oncomplete will fire after all deletes
       };
 
-      request.onerror = () => reject(request.error);
+      request.onerror = (e) => {
+        db.close(); // Close connection on error
+        reject(request.error);
+      };
+
+      // Wait for the entire transaction to complete
+      transaction.oncomplete = () => {
+        db.close(); // Close connection after successful transaction
+        resolve();
+      };
+
+      transaction.onerror = (e) => {
+        db.close(); // Close connection even on transaction error
+        reject(e);
+      };
     });
   }
 
@@ -185,38 +196,38 @@ export class IndexedDBService {
   }
 
   async cleanupOldMeasurements(): Promise<void> {
-  const db = await this.openMeasurementDatabase();
-  const tx = db.transaction('measurements', 'readwrite');
-  const store = tx.objectStore('measurements');
-  const now = Date.now();
-  const retentionPeriod = 30 * 24 * 60 * 60 * 1000; // 30 days
+    const db = await this.openMeasurementDatabase();
+    const tx = db.transaction('measurements', 'readwrite');
+    const store = tx.objectStore('measurements');
+    const now = Date.now();
+    const retentionPeriod = 30 * 24 * 60 * 60 * 1000; // 30 days
 
-  return new Promise((resolve, reject) => {
-    const request = store.getAll();
+    return new Promise((resolve, reject) => {
+      const request = store.getAll();
 
-    request.onsuccess = () => {
-      const records = request.result;
-      const deletePromises: Promise<void>[] = [];
+      request.onsuccess = () => {
+        const records = request.result;
+        const deletePromises: Promise<void>[] = [];
 
-      records.forEach((record) => {
-        if (record.status === 'synced' || now - record.createdAt >= retentionPeriod) {
-          const deleteRequest = store.delete(record.id);
+        records.forEach((record) => {
+          if (record.status === 'synced' || now - record.createdAt >= retentionPeriod) {
+            const deleteRequest = store.delete(record.id);
 
-          const deletePromise = new Promise<void>((res, rej) => {
-            deleteRequest.onsuccess = () => res();
-            deleteRequest.onerror = () => rej(deleteRequest.error);
-          });
+            const deletePromise = new Promise<void>((res, rej) => {
+              deleteRequest.onsuccess = () => res();
+              deleteRequest.onerror = () => rej(deleteRequest.error);
+            });
 
-          deletePromises.push(deletePromise);
-        }
-      });
+            deletePromises.push(deletePromise);
+          }
+        });
 
-      Promise.all(deletePromises)
-        .then(() => resolve())
-        .catch(reject);
-    };
+        Promise.all(deletePromises)
+          .then(() => resolve())
+          .catch(reject);
+      };
 
-    request.onerror = () => reject(request.error);
-  });
-}
+      request.onerror = () => reject(request.error);
+    });
+  }
 }
