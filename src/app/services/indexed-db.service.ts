@@ -6,12 +6,10 @@ import { Injectable } from '@angular/core';
 export class IndexedDBService {
   private dbName = 'connectivity_ping_db';
   private storeName = 'pingResults';
-
   private measurementDbName = 'connectivity_measurements_db';
   private measurementStoreName = 'measurements';
 
-
-  constructor() { }
+  constructor() {}
 
   private openDatabase(): Promise<IDBDatabase> {
     return new Promise((resolve, reject) => {
@@ -33,8 +31,14 @@ export class IndexedDBService {
     const store = transaction.objectStore(this.storeName);
     store.put({ ...result, createdAt: Date.now(), isSynced: false });
     return new Promise((resolve, reject) => {
-      transaction.oncomplete = () => resolve();
-      transaction.onerror = (e) => reject(e);
+      transaction.oncomplete = () => {
+        db.close(); // Close connection after successful transaction
+        resolve();
+      };
+      transaction.onerror = (e) => {
+        db.close(); // Close connection even on error
+        reject(e);
+      };
     });
   }
 
@@ -44,8 +48,14 @@ export class IndexedDBService {
     const store = transaction.objectStore(this.storeName);
     return new Promise((resolve, reject) => {
       const request = store.getAll();
-      request.onsuccess = () => resolve(request.result);
-      request.onerror = (e) => reject(e);
+      request.onsuccess = () => {
+        db.close(); // Close connection after successful read
+        resolve(request.result);
+      };
+      request.onerror = (e) => {
+        db.close(); // Close connection even on error
+        reject(e);
+      };
     });
   }
 
@@ -57,11 +67,18 @@ export class IndexedDBService {
       store.put({ ...synced, isSynced: true });
     });
     return new Promise((resolve, reject) => {
-      transaction.oncomplete = () => resolve();
-      transaction.onerror = (e) => reject(e);
+      transaction.oncomplete = () => {
+        db.close(); // Close connection after successful transaction
+        resolve();
+      };
+      transaction.onerror = (e) => {
+        db.close(); // Close connection even on error
+        reject(e);
+      };
     });
   }
 
+  
   async cleanupOldRecords(): Promise<void> {
     const db = await this.openDatabase();
     const transaction = db.transaction(this.storeName, 'readwrite');
@@ -99,7 +116,6 @@ export class IndexedDBService {
       request.onerror = () => reject(request.error);
     });
   }
-
 
   async getUnsyncedRecords(): Promise<any[]> {
     const records = await this.getPingResults();
@@ -203,6 +219,4 @@ export class IndexedDBService {
     request.onerror = () => reject(request.error);
   });
 }
-
-
 }

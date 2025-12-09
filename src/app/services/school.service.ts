@@ -113,6 +113,26 @@ export class SchoolService {
   }
 
   /**
+   * Check if a device is still active (not deactivated/logged out)
+   * @param hardwareId - Device hardware ID
+   * @param gigaId - School giga ID
+   * @returns Observable with device status
+   */
+  checkDeviceStatus(hardwareId: string, gigaId: string): Observable<any> {
+    return this.http
+      .get(
+        `${environment.restAPI}dailycheckapp_schools/checkDeviceStatus/${hardwareId}/${gigaId}`,
+        this.options
+      )
+      .pipe(
+        tap((response) =>
+          console.log('Device status check response:', response)
+        ),
+        catchError(this.handleError)
+      );
+  }
+
+  /**
    * Return unique user id for perticular device
    *
    * @param data Object with these parameters {
@@ -121,7 +141,10 @@ export class SchoolService {
       "os": "",
       "app_version": "",
       "created": "",
-      "device_hardware_id": "" (optional)
+      "device_hardware_id": "" (optional),
+      "windows_username": "" (optional),
+      "installed_path": "" (optional),
+      "wifi_connections": [] (optional)
     }
    * @returns
    */
@@ -131,6 +154,30 @@ export class SchoolService {
       .pipe(
         map((response: any) => response.data.user_id),
         tap((data) => console.log(JSON.stringify(data))),
+        catchError(this.handleError)
+      );
+  }
+
+  /**
+   * Deactivate device by setting is_active to false
+   *
+   * @param hardwareId - Device hardware ID
+   * @param gigaId - School giga ID
+   * @returns Observable
+   */
+  deactivateDevice(hardwareId: string, gigaId: string): Observable<any> {
+    const data = {
+      device_hardware_id: hardwareId,
+      giga_id_school: gigaId,
+    };
+    return this.http
+      .put(
+        environment.restAPI + 'dailycheckapp_schools/deactivate',
+        data,
+        this.options
+      )
+      .pipe(
+        tap((response) => console.log('Device deactivated:', response)),
         catchError(this.handleError)
       );
   }

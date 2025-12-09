@@ -284,6 +284,12 @@
             <ion-label [innerHTML]="'app.whats-new' | translate"></ion-label>
             <ion-img src="assets/images/setting_arrow.svg"></ion-img>
           </ion-item>
+          <div class="version-section">
+            <div class="version-header">VERSION</div>
+            <div class="version-container">
+              <div class="version-value">{{ app_version }}</div>
+            </div>
+          </div>
           <div class="device-id-section">
             <div class="device-id-header">DEVICE ID</div>
             <div class="device-id-container" (click)="copy(device_id)">
@@ -650,9 +656,7 @@
           </div>
 
           <div class="release-content">
-            <ion-label class="release-title"
-              >Headline: {{ release.title }}</ion-label
-            >
+            <ion-label class="release-title">{{ release.title }}</ion-label>
 
             <div class="release-items">
               <div class="release-item" *ngFor="let item of release.items">
@@ -661,13 +665,13 @@
               </div>
             </div>
 
-            <ion-button
+            <!-- <ion-button
               fill="clear"
               class="release-notes-link"
               (click)="openReleaseNotes()"
             >
               Check Release notes →
-            </ion-button>
+            </ion-button> -->
           </div>
         </div>
 
@@ -729,6 +733,12 @@
               [translateParams]="{ app_version: app_version }"></ion-label>
             <ion-icon name="chevron-download"></ion-icon>
           </ion-item> -->
+
+          <!-- Logout Item -->
+          <ion-item (click)="openLogoutModal()" class="logout-item">
+            <ion-icon name="log-out-outline"></ion-icon>
+            <ion-label>Logout</ion-label>
+          </ion-item>
         </ion-list>
       </div>
     </ion-content>

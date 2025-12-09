@@ -199,8 +199,8 @@ export class ElectronCapacitorApp {
       )
     );
     this.mainWindowState = windowStateKeeper({
-      defaultWidth: 376,
-      defaultHeight: 550,
+      defaultWidth: 390,
+      defaultHeight: 650,
     });
     // Setup preload script path and construct our main window.
     const preloadPath = join(app?.getAppPath(), 'build', 'src', 'preload.js');
@@ -213,7 +213,7 @@ export class ElectronCapacitorApp {
       height: this.mainWindowState?.height,
       // titleBarStyle: 'hidden',
       maximizable: false,
-      minimizable: false,
+      minimizable: true,
       resizable: false,
       frame: true,
       useContentSize: true, //Make content area exactly 390x700
@@ -266,7 +266,7 @@ export class ElectronCapacitorApp {
       }
     );
 
-    this.MainWindow?.setSize(390, 700);
+    this.MainWindow?.setSize(390, 650);
     this.mainWindowState?.manage(this.MainWindow);
 
     if (this.CapacitorFileConfig?.backgroundColor) {
