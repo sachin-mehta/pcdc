@@ -1,18 +1,13 @@
 package com.meter.giga.utils
 
-import com.meter.giga.data.models.requests.*
 import com.meter.giga.data.models.responses.*
 import com.meter.giga.domain.entity.request.*
-import com.meter.giga.domain.entity.response.*
 import net.measurementlab.ndt7.android.models.*
 import org.junit.Assert.*
 import org.junit.Test
 
 class MappersTest {
 
-  // ---------------------------------------------------------------------------------------------
-  // ClientInfoResponseModel.toEntity
-  // ---------------------------------------------------------------------------------------------
   @Test
   fun `ClientInfoResponseModel toEntity maps data correctly`() {
     val model = ClientInfoResponseModel(
@@ -72,9 +67,6 @@ class MappersTest {
     assertEquals("1.1.1.1", entity.ip)
   }
 
-  // ---------------------------------------------------------------------------------------------
-  // ClientInfoResponseModel.toEntity
-  // ---------------------------------------------------------------------------------------------
   @Test
   fun `ClientInfoResponseModel toEntity maps data correctly for null`() {
     val model = ClientInfoResponseModel(
@@ -102,9 +94,6 @@ class MappersTest {
     assertEquals("0", entity.ip)
   }
 
-  // ---------------------------------------------------------------------------------------------
-  // ServerInfoResponseModel.toEntity
-  // ---------------------------------------------------------------------------------------------
   @Test
   fun `ServerInfoResponseModel toEntity maps IPs correctly`() {
     val model = ServerInfoResponseModel(
@@ -138,9 +127,6 @@ class MappersTest {
     assertEquals("0", entity.ipv6)
   }
 
-  // ---------------------------------------------------------------------------------------------
-  // ClientInfoFallbackResponseModel.toEntity
-  // ---------------------------------------------------------------------------------------------
   @Test
   fun `ClientInfoFallbackResponseModel toEntity maps organization correctly`() {
     val model = ClientInfoFallbackResponseModel(
@@ -167,9 +153,6 @@ class MappersTest {
     assertEquals("VI", entity.org)
   }
 
-  // ---------------------------------------------------------------------------------------------
-  // SpeedTestResultRequestEntity.toModel
-  // ---------------------------------------------------------------------------------------------
   @Test
   fun `SpeedTestResultRequestEntity toModel maps basic fields`() {
     val entity = SpeedTestResultRequestEntity(
@@ -200,9 +183,6 @@ class MappersTest {
     assertEquals(20.0, model.upload!!, 0.01)
   }
 
-  // ---------------------------------------------------------------------------------------------
-  // Measurement.toEntity
-  // ---------------------------------------------------------------------------------------------
   @Test
   fun `Measurement toEntity maps nested fields correctly`() {
     val measurement = Measurement(
@@ -279,9 +259,6 @@ class MappersTest {
     assertEquals(48L, entity.tcpInfo.sndMSS)
   }
 
-  // ---------------------------------------------------------------------------------------------
-  // BBRInfoRequestEntity.toModel
-  // ---------------------------------------------------------------------------------------------
   @Test
   fun `BBRInfoRequestEntity toModel maps fields`() {
     val entity = BBRInfoRequestEntity(1L, 2L, 3L, 4L, 5L)
@@ -289,9 +266,6 @@ class MappersTest {
     assertEquals(1L, model.bW)
   }
 
-  // ---------------------------------------------------------------------------------------------
-  // ConnectionInfoRequestEntity.toModel
-  // ---------------------------------------------------------------------------------------------
   @Test
   fun `ConnectionInfoRequestEntity toModel maps fields`() {
     val entity = ConnectionInfoRequestEntity("c", "s", "u")
@@ -299,9 +273,6 @@ class MappersTest {
     assertEquals("c", model.client)
   }
 
-  // ---------------------------------------------------------------------------------------------
-  // TCPInfoRequestEntity.toModel
-  // ---------------------------------------------------------------------------------------------
   @Test
   fun `TCPInfoRequestEntity toModel maps fields`() {
     val entity = TCPInfoRequestEntity(
@@ -367,9 +338,6 @@ class MappersTest {
     assertEquals(48L, model.sndMSS)
   }
 
-  // -------------------------------
-  // ClientInfoRequestEntity.toModel()
-  // -------------------------------
   @Test
   fun `toModel maps all non-null fields correctly for ClientInfoRequestEntity`() {
     val entity = ClientInfoRequestEntity(
@@ -429,9 +397,6 @@ class MappersTest {
     assertNull(model.longitude)
   }
 
-  // ---------------------------------
-  // ResultsRequestEntity.toModel()
-  // ---------------------------------
   @Test
   fun `ResultsRequestEntity maps nested models correctly`() {
     val entity = ResultsRequestEntity(
@@ -594,9 +559,6 @@ class MappersTest {
     assertNull(model.ndtResultC2S)
   }
 
-  // ---------------------------------------------------------
-  // SpeedTestMeasurementRequestEntity.toModel()
-  // ---------------------------------------------------------
   @Test
   fun `SpeedTestMeasurementRequestEntity maps nested model correctly`() {
 
@@ -689,9 +651,6 @@ class MappersTest {
     assertNull(model.lastServerMeasurement)
   }
 
-  // ---------------------------------------------------------
-  // LastClientMeasurementRequestEntity.toModel()
-  // ---------------------------------------------------------
   @Test
   fun `LastClientMeasurementRequestEntity maps properly`() {
     val entity = LastClientMeasurementRequestEntity(

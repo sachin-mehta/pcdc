@@ -71,7 +71,7 @@
       </ion-slide>
     </ion-slides>
 
-    <div class="middle-layout" *ngIf="isLast">
+    <div [ngClass]="isNativeApp() ? 'middle-layout-native' : 'middle-layout'" *ngIf="isLast">
       <div class="read_content">
         <!-- <div class="register_readMore" (click)="openExternalUrl('https://www.unicef.org/legal#privacy-policy')"
           [translate]="'registerSchoolPage.readMore' | translate">
@@ -122,7 +122,7 @@
         </div>
       </label>
     </div>
-    <div class="bottom-layout">
+    <div [ngClass]="isNativeApp() ? 'bottom-layout-native' : 'bottom-layout'">
       <div class="swiper-pagination"></div>
 
       <ion-button

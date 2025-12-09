@@ -75,6 +75,14 @@ ion-header {
   transform: translateX(-50%);
   text-align: center;
 }
+.bottom-layout-native{
+  position: fixed;
+  bottom: 48px;
+  left: 50%;
+  width: 100%;
+  transform: translateX(-50%);
+  text-align: center;
+}
 .sc-ion-input-ios-h {
   --padding-top: 10px;
   --padding-end: 10px;

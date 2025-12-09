@@ -116,6 +116,11 @@ ion-label {
   bottom: 24px !important;
 }
 
+.bottom-layout-native {
+  padding: 0px 0px;
+  bottom: 48px !important;
+}
+
 
 .btn_margin {
   margin-inline-end: 0;
@@ -203,6 +208,42 @@ ion-label {
   font-weight: 400;
   letter-spacing: 0.32px;
 
+}
+
+.middle-layout-native {
+  flex-direction: column;
+  text-align: left;
+  background-color: #ffffff;
+  display: flex;
+  bottom: 144px;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 0 0;
+  color: #E2E2E2;
+  position: absolute;
+  left: 0;
+}
+
+.middle-layout-native .learnmore {
+  /* Allow text to take available space */
+  font-size: 12px;
+  padding: 0;
+  line-height: 16px;
+  /* Ensure text is aligned properly */
+  color: #222222;
+  font-weight: 400;
+  letter-spacing: 0.32px;
+
+}
+
+.middle-layout-native ion-checkbox {
+  --size: 20px;
+
+  /* Align checkbox with text */
+  flex-shrink: 0;
+  /* Prevent checkbox from shrinking */
+  border: solid rgba(255, 255, 255, 0.51) 2px;
+  border-radius: 4px;
 }
 
 .checkbox {

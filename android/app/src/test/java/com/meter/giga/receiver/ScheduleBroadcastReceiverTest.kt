@@ -56,9 +56,6 @@ class ScheduleBroadcastReceiverTest {
     every { ContextCompat.startForegroundService(any(), any()) } returns mockk()
   }
 
-  // ---------------------------------------------------------
-  // TEST CASE 1: FIRST 15 MIN TEST TRIGGER
-  // ---------------------------------------------------------
   @Test
   fun `onReceive - FIRST_15_MIN - triggers start service and schedules next slot`() {
 
@@ -82,9 +79,6 @@ class ScheduleBroadcastReceiverTest {
     }
   }
 
-  // ---------------------------------------------------------
-  // TEST CASE 2: SAME DAY, NOT FIRST 15 → STARTS FOREGROUND SERVICE
-  // ---------------------------------------------------------
   @Test
   fun `onReceive - same day - triggers daily schedule`() {
 
@@ -107,9 +101,6 @@ class ScheduleBroadcastReceiverTest {
     }
   }
 
-  // ---------------------------------------------------------
-  // TEST CASE 3: NEW DAY BEFORE 8 AM → PRINT LOG ONLY
-  // ---------------------------------------------------------
   @Test
   fun `onReceive - new day before 8AM - does NOT start service`() {
 
@@ -134,9 +125,6 @@ class ScheduleBroadcastReceiverTest {
     }
   }
 
-  // ---------------------------------------------------------
-  // TEST CASE 4: NEXT SLOT SCHEDULING
-  // ---------------------------------------------------------
   @Test
   fun `onReceive - schedules next slot`() {
     val intent = Intent().apply {
@@ -150,9 +138,6 @@ class ScheduleBroadcastReceiverTest {
     }
   }
 
-  // ---------------------------------------------------------
-  // TEST CASE 5: FIRST_15_MIN updates prefs first15ExecutedTime
-  // ---------------------------------------------------------
   @Test
   fun `onReceive - FIRST_15_MIN - updates prefs first15ExecutedTime`() {
 

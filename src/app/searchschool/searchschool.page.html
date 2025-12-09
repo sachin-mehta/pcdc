@@ -57,7 +57,7 @@
             </ion-list>
           </ion-accordion> -->
         </ion-accordion-group>
-        <ion-button color="primary" appEnterKeyClick  type="submit" [innerHTML]="'faq.search-id' | translate" class="searchButton submit_button_size dailycheck_btn"
+        <ion-button color="primary" appEnterKeyClick  type="submit" [innerHTML]="'faq.search-id' | translate" [ngClass]="isNativeApp() ? 'searchButtonNative submit_button_size dailycheck_btn' : 'searchButton submit_button_size dailycheck_btn'"
           (click)="searchSchoolBySchooIdAndCountryCode()" [disabled]="isDisabled"></ion-button>
 
       </div>

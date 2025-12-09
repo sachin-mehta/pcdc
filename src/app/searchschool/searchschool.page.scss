@@ -113,7 +113,22 @@ ion-label {
   position: absolute;
   left: 0;
   bottom: 24px;
+}
 
+.searchButtonNative {
+  text-transform: unset;
+  border: 1px solid;
+  border-color: #2779FF;
+  background: #2779FF;
+  text-align: center;
+  color: #fff;
+  border-radius: 41px;
+  cursor: pointer;
+  width: 100%;
+  overflow: hidden;
+  position: absolute;
+  left: 0;
+  bottom: 48px;
 }
 
 .provide_id {
@@ -135,10 +150,19 @@ ion-label {
   .accordion-sec {
     padding: 20px 0;
   }
-
-
 }
 
+.bottom-layout-native {
+  position: static;
+  bottom: 64px;
+  left: 50%;
+  width: 100%;
+  transform: none;
+
+  .accordion-sec {
+    padding: 20px 0;
+  }
+}
 .accordion-sec .label_padding {
   padding-left: 15px;
 }

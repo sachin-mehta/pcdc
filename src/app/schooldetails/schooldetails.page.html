@@ -66,7 +66,7 @@
     </div>
 
     <!-- Display the "Select" button only if there are multiple schools -->
-    <div class="bottom-layout">
+    <div [ngClass]="isNativeApp() ? 'bottom-layout-native' : 'bottom-layout'">
       <ion-button color="primary" appEnterKeyClick  class="searchButton btn_margin" (click)="confirmSchool(selectedSchool.school_id ? selectedSchool  : schools[0])" [disabled]="!selectedSchool.school_id && schools?.length > 1"  [translate]="'schoolDetails.select' | translate">
       </ion-button>
     </div>

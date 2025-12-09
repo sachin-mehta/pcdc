@@ -166,10 +166,6 @@ class AlarmSharedPrefTest {
     assertTrue(alarmPrefs.isTestRunning)
   }
 
-  // --------------------------
-  // isNewDay()
-  // --------------------------
-
   @Test
   fun `isNewDay returns true when lastExecutionDay is different`() {
     val today = java.util.Calendar.getInstance().get(Calendar.DAY_OF_YEAR)
@@ -180,15 +176,12 @@ class AlarmSharedPrefTest {
 
   @Test
   fun `isNewDay returns false when lastExecutionDay is today`() {
-    val today = java.util.Calendar.getInstance().get(Calendar.DAY_OF_YEAR)
+    val today = Calendar.getInstance().get(Calendar.DAY_OF_YEAR)
     whenever(prefs.getInt(any(), any())).thenReturn(today)
 
     assertFalse(alarmPrefs.isNewDay())
   }
 
-  // --------------------------
-  // resetForNewDay()
-  // --------------------------
 
   @Test
   fun `resetForNewDay writes expected values`() {
@@ -201,10 +194,6 @@ class AlarmSharedPrefTest {
     verify(editor).putBoolean(eq(KEY_IS_TEST_RUNNING), eq(false))
     verify(editor).putLong(eq(KEY_NEXT_EXECUTION_TIME), eq(-1L))
   }
-
-  // --------------------------
-  // resetAllData()
-  // --------------------------
 
   @Test
   fun `resetAllData writes expected values`() {

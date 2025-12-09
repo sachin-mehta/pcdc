@@ -95,7 +95,7 @@
           [translate]="'searchCountry.please-double-check'"
         ></div> -->
       </div>
-      <div class="bottom-layout">
+      <div [ngClass]="isNativeApp() ? 'bottom-layout-native' : 'bottom-layout'">
         <div *ngIf="isCheckingEligibility" class="search-label">
           <ion-spinner
             name="crescent"

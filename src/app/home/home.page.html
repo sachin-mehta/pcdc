@@ -19,7 +19,7 @@
          
         </div>
       </div>
-      <div class="bottom-layout">
+     <div [ngClass]="isNativeApp() ? 'bottom-layout-native' : 'bottom-layout'">
         <ion-button color="primary" appEnterKeyClick  block [routerLink]="['/register-school']"
           class="dailycheck_btn"><span class="submit_button_size" [translate]="'home.next'"></span></ion-button>
       </div>

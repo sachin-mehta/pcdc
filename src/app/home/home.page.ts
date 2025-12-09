@@ -68,6 +68,10 @@ export class HomePage {
     }
   }
 
+  isNativeApp(): boolean {
+    return Capacitor.isNativePlatform();
+  }
+
   /**
    * Check device status and proceed if active, or clear if deactivated
    */

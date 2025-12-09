@@ -63,9 +63,6 @@ class SpeedTestRepositoryImplTest {
 
   private lateinit var repo: SpeedTestRepositoryImpl
 
-  // ------------------------------------------------------------
-// Helpers for any() with generics
-// ------------------------------------------------------------
   private fun <T> any(): T = Mockito.any<T>()
 
   @Before
@@ -79,9 +76,6 @@ class SpeedTestRepositoryImplTest {
     repo = SpeedTestRepositoryImpl(mockProvider, logger)
   }
 
-  // -------------------------
-  // TEST #1 — client info success
-  // -------------------------
   @Test
   fun `getClientInfoData returns Success when API returns body`() = runBlocking {
 
@@ -235,10 +229,6 @@ class SpeedTestRepositoryImplTest {
     assertTrue(result is ResultState.Failure)
   }
 
-
-  // -------------------------
-  // TEST #2 — client info failure
-  // -------------------------
   @Test
   fun `getClientInfoData returns Failure when API fails`() = runBlocking {
     val response = Response.error<ClientInfoResponseModel>(
@@ -253,9 +243,6 @@ class SpeedTestRepositoryImplTest {
     assertTrue(result is ResultState.Failure)
   }
 
-  // ------------------------------------------------------------
-  // 1) SUCCESS — ASN is STRING
-  // ------------------------------------------------------------
   @Test
   fun `getClientInfoLiteData success with ASN string`() = runBlocking {
 
@@ -299,9 +286,6 @@ class SpeedTestRepositoryImplTest {
     assertEquals("Mumbai", entity.city)
   }
 
-  // ------------------------------------------------------------
-  // 2) SUCCESS — ASN is OBJECT
-  // ------------------------------------------------------------
   @Test
   fun `getClientInfoLiteData success with ASN object`() = runBlocking {
 
@@ -345,9 +329,6 @@ class SpeedTestRepositoryImplTest {
     assertEquals("AS1234", entity.asn)
   }
 
-  // ------------------------------------------------------------
-  // 3) SUCCESS — ASN null → extracted from ORG
-  // ------------------------------------------------------------
   @Test
   fun `getClientInfoLiteData ASN null extracted from org`() = runBlocking {
 
@@ -390,9 +371,6 @@ class SpeedTestRepositoryImplTest {
     assertEquals("AS1234", entity.asn)
   }
 
-  // ------------------------------------------------------------
-  // 4) Primary API success but metadata API fails → fallback → success
-  // ------------------------------------------------------------
   @Test
   fun `getClientInfoLiteData metadata fails then fallback api success`() = runBlocking {
 
@@ -510,9 +488,6 @@ class SpeedTestRepositoryImplTest {
     assertTrue(result is ResultState.Failure)
   }
 
-  // ------------------------------------------------------------
-  // 5) Everything fails → return Failure
-  // ------------------------------------------------------------
   @Test
   fun `getClientInfoLiteData all api calls fail returns Failure`() = runBlocking {
 
@@ -526,9 +501,6 @@ class SpeedTestRepositoryImplTest {
     assertEquals("Get client info api failed", error.message)
   }
 
-  // ------------------------------------------------------------
-  // 6) Exception thrown → Failure
-  // ------------------------------------------------------------
   @Test
   fun `getClientInfoLiteData exception caught returns Failure`() = runBlocking {
 
@@ -539,9 +511,6 @@ class SpeedTestRepositoryImplTest {
     assertTrue(result is ResultState.Failure)
   }
 
-  // -------------------------
-  // TEST #3 — server info success
-  // -------------------------
   @Test
   fun `getServerInfoData returns Success`() = runBlocking {
 
@@ -563,9 +532,6 @@ class SpeedTestRepositoryImplTest {
     assertTrue(result is ResultState.Success)
   }
 
-  // -------------------------
-  // TEST #4 — publishSpeedTestData successful POST
-  // -------------------------
   @Test
   fun `publishSpeedTestData returns Success when post is successful`() = runBlocking {
 
@@ -581,9 +547,6 @@ class SpeedTestRepositoryImplTest {
     assertTrue(result is ResultState.Success)
   }
 
-  // -------------------------
-  // TEST #4 — publishSpeedTestData successful POST
-  // -------------------------
   @Test
   fun `publishSpeedTestData returns Failure when post is successful`() = runBlocking {
     whenever(mockSpeedTestApi.postSpeedTestData(anyOrNull(), anyOrNull()))
@@ -600,7 +563,6 @@ class SpeedTestRepositoryImplTest {
 
     assertTrue(result is ResultState.Failure)
   }
-
 }
 
 
