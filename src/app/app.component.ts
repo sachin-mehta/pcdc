@@ -70,7 +70,7 @@ export class AppComponent {
     private modalController: ModalController,
     private hardwareIdService: HardwareIdService,
     private router: Router,
-    private schoolService: SchoolService
+    private schoolService: SchoolService,
   ) {
     this.filteredOptions = [];
     this.selectedLanguage =
@@ -520,6 +520,7 @@ export class AppComponent {
       // Get hardware ID and giga ID before clearing storage
       const hardwareId = this.hardwareIdService.getHardwareId();
       const gigaId = this.storage.get('gigaId');
+      await this.localStorageService.deleteAllDatabases();
 
       // Deactivate device on backend if we have the required IDs
       if (hardwareId && gigaId) {

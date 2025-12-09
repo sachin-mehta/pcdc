@@ -199,35 +199,71 @@ export class IndexedDBService {
     const db = await this.openMeasurementDatabase();
     const tx = db.transaction('measurements', 'readwrite');
     const store = tx.objectStore('measurements');
+
     const now = Date.now();
     const retentionPeriod = 30 * 24 * 60 * 60 * 1000; // 30 days
+    const syncedRetentionPeriod = 3 * 24 * 60 * 60 * 1000; // 3 days
 
     return new Promise((resolve, reject) => {
-      const request = store.getAll();
+      const request = store.getAll(); // Fetch all records
 
       request.onsuccess = () => {
         const records = request.result;
-        const deletePromises: Promise<void>[] = [];
 
         records.forEach((record) => {
-          if (record.status === 'synced' || now - record.createdAt >= retentionPeriod) {
-            const deleteRequest = store.delete(record.id);
+          const age = now - record.createdAt;
 
-            const deletePromise = new Promise<void>((res, rej) => {
-              deleteRequest.onsuccess = () => res();
-              deleteRequest.onerror = () => rej(deleteRequest.error);
-            });
-
-            deletePromises.push(deletePromise);
+          // Delete if:
+          // 1. Synced and older than 3 days, OR
+          // 2. Older than 30 days
+          if (
+            (record.status === 'synced' && age >= syncedRetentionPeriod) ||
+            age >= retentionPeriod
+          ) {
+            store.delete(record.id); // delete by primary key
           }
         });
-
-        Promise.all(deletePromises)
-          .then(() => resolve())
-          .catch(reject);
+        // Wait for transaction completion
       };
 
-      request.onerror = () => reject(request.error);
+      request.onerror = () => {
+        db.close();
+        reject(request.error);
+      };
+
+      tx.oncomplete = () => {
+        db.close();
+        resolve();
+      };
+
+      tx.onerror = (e) => {
+        db.close();
+        reject(e);
+      };
     });
   }
+  async deleteAllDatabases(): Promise<void> {
+    return new Promise((resolve, reject) => {
+      let pending = 2; // delete 2 DBs
+
+      const onSuccess = () => {
+        pending--;
+        if (pending === 0) resolve();
+      };
+
+      const onError = (err: any) => reject(err);
+
+      // Delete ping DB
+      const pingDelete = indexedDB.deleteDatabase(this.dbName);
+      pingDelete.onsuccess = onSuccess;
+      pingDelete.onerror = onError;
+
+      // Delete measurements DB
+      const measurementDelete = indexedDB.deleteDatabase(this.measurementDbName);
+      measurementDelete.onsuccess = onSuccess;
+      measurementDelete.onerror = onError;
+    });
+  }
+
+
 }
