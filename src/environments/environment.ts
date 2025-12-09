@@ -52,5 +52,10 @@ export const environment = {
       label: 'French',
       code: 'fr',
     },
+    {
+      name: 'Uz',
+      label: "O'zbekcha",
+      code: 'uz',
+    },
   ],
 };
