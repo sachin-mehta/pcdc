@@ -23,7 +23,7 @@
         <div class="try_again"  [translate]="'schoolNotFound.tryAgainPlaceholder'"></div>
       </div>
     </div>
-    <div class="bottom-layout">
+    <div [ngClass]="isNativeApp() ? 'bottom-layout-native' : 'bottom-layout'">
       <ion-button color="primary" (click)="backToSearchDetail()" block class="dailycheck_btn submit_button_size"
         [translate]="'tryAgain'"></ion-button>
     </div>
