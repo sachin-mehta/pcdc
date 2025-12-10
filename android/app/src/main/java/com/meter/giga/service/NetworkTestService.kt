@@ -152,7 +152,7 @@ class NetworkTestService : LifecycleService() {
     return NotificationCompat.Builder(this, CHANNEL_ID)
       .setContentTitle(this.applicationContext.getString(R.string.notification_header))
       .setContentText(content)
-      .setSmallIcon(R.mipmap.ic_launcher_round)
+      .setSmallIcon(R.mipmap.ic_launcher)
       .setOngoing(true)
       .setOnlyAlertOnce(true)
       .setPriority(NotificationCompat.PRIORITY_HIGH)
