@@ -470,3 +470,26 @@ ion-breadcrumb::part(native) {
 }
 
 /* Canvas Confetti is handled by the library - no custom CSS needed */
+
+/* Logout Modal Styles */
+.logout-modal {
+  --width: auto;
+  --height: auto;
+  --min-width: 320px;
+  --max-width: 450px;
+  --border-radius: 12px;
+  --box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  --backdrop-opacity: 0.5;
+}
+
+.logout-modal ion-backdrop {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.logout-modal .modal-wrapper {
+  background: white;
+  border-radius: 12px;
+  margin: 0;
+  max-height: 80vh;
+  overflow-y: auto;
+}

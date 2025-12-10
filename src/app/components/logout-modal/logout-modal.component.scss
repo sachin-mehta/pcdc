@@ -1,0 +1,192 @@
+.modal-wrapper {
+  padding: 20px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  max-width: 100%;
+  position: relative;
+}
+
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.logout-icon {
+  font-size: 24px;
+  color: #dc3545;
+}
+
+.header-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+}
+
+.close-button {
+  background: none;
+  border: none;
+  padding: 4px;
+  cursor: pointer;
+  color: #999;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.close-button:hover {
+  background: #f5f5f5;
+  color: #666;
+}
+
+.close-button ion-icon {
+  font-size: 20px;
+}
+
+.modal-content {
+  padding: 0;
+}
+
+.warning-section {
+  padding: 0 5px;
+}
+
+.warning-message {
+  margin-bottom: 20px;
+  padding: 16px;
+  background: #fff8e1;
+  border-left: 4px solid #ffc107;
+  border-radius: 4px;
+}
+
+.main-text {
+  font-size: 14px;
+  color: #333;
+  margin: 0 0 12px 0;
+  line-height: 1.5;
+}
+
+.sub-text {
+  font-size: 13px;
+  color: #666;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.school-id-highlight {
+  font-weight: 600;
+  color: #dc3545;
+  background: #ffe6e6;
+  padding: 2px 6px;
+  border-radius: 3px;
+  font-family: 'Courier New', monospace;
+}
+
+.input-section {
+  margin-bottom: 20px;
+}
+
+.confirmation-input {
+  --background: #f8f9fa;
+  --border-radius: 8px;
+  --padding-start: 16px;
+  --padding-end: 16px;
+  border: 1px solid #dee2e6;
+  border-radius: 8px;
+  margin-bottom: 8px;
+
+  ion-input {
+    --color: #333;
+    --placeholder-color: #999;
+    font-size: 14px;
+  }
+}
+
+.confirmation-input.ion-focused {
+  border-color: #007bff;
+  box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.error-message {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: #dc3545;
+  padding: 8px 12px;
+  background: #ffe6e6;
+  border-radius: 4px;
+  margin-top: 8px;
+
+  ion-icon {
+    font-size: 16px;
+    flex-shrink: 0;
+  }
+}
+
+.button-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.logout-button {
+  --background: #dc3545;
+  --background-hover: #c82333;
+  --background-activated: #bd2130;
+  --background-focused: #bd2130;
+  font-weight: 600;
+  text-transform: none;
+  font-size: 14px;
+  height: 44px;
+  margin: 0;
+}
+
+.logout-button[disabled] {
+  --background: #e9ecef;
+  --color: #adb5bd;
+  opacity: 0.6;
+}
+
+.cancel-button {
+  --border-color: #6c757d;
+  --color: #6c757d;
+  font-weight: 500;
+  text-transform: none;
+  font-size: 14px;
+  height: 44px;
+  margin: 0;
+}
+
+.cancel-button:hover {
+  --background: #f8f9fa;
+}
+
+/* Responsive adjustments */
+@media (max-width: 480px) {
+  .modal-wrapper {
+    padding: 16px;
+  }
+
+  .header-title {
+    font-size: 18px;
+  }
+
+  .main-text {
+    font-size: 13px;
+  }
+
+  .sub-text {
+    font-size: 12px;
+  }
+}
+

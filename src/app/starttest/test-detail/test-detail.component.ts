@@ -117,6 +117,31 @@ export class TestDetailComponent implements OnInit {
 
     return triggerMapping[notes] || notes || '-';
   }
+
+  /**
+   * Get sync status text based on synced attribute
+   * @param measurement The measurement data
+   * @returns Status text
+   */
+  getSyncStatusText(measurement: any): string {
+    if (measurement.synced === undefined || measurement.synced === null) {
+      return '-';
+    }
+    return measurement.synced ? 'Synced' : 'Not Synced';
+  }
+
+  /**
+   * Get CSS class for sync status
+   * @param measurement The measurement data
+   * @returns CSS class name
+   */
+  getSyncStatusClass(measurement: any): string {
+    if (measurement.synced === undefined || measurement.synced === null) {
+      return '';
+    }
+    return measurement.synced ? 'green_color' : 'orange_color';
+  }
+
   openExternalUrl() {
     this.settingsService.getShell().shell.openExternal('https://www.google.com/maps?q=' + this.locationDetail?.location?.lat + ',' + this.locationDetail?.location?.lng);
   }
