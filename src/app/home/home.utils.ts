@@ -12,6 +12,7 @@ export const removeUnregisterSchool = async (
 ) => {
   const gigaId = storage.get('gigaId');
   const countryCode = storage.get('country_code');
+  const localUserId = storage.get('schoolUserId');
   let response;
 
   try {
@@ -30,10 +31,21 @@ export const removeUnregisterSchool = async (
     console.log('Existing school on the device not found on backend');
     captureMessage('Existing school on the device not found on backend');
     return false;
-  } else {
-    return true;
   }
-};
+
+  const exists = Array.isArray(response)
+    ? response.some((item: any) => item.user_id === localUserId)
+    : false;
+
+  if (!exists) {
+    storage.clear();
+    console.log('Existing school user not found on backend');
+    captureMessage('Existing school user not found on backend');
+    return false;
+  }
+    return true;
+}
+
 
 /**
  *  This function takes the gigaId checks if is
