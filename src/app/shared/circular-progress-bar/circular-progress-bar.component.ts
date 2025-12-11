@@ -1,4 +1,5 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, NgZone } from '@angular/core';
+import { ChangeDetectorRef } from '@angular/core';
 
 @Component({
   selector: 'app-circular-progress-bar',
@@ -30,39 +31,45 @@ export class CircularProgressBarComponent {
   @Output() startTest = new EventEmitter<void>();
   @Output() showError = new EventEmitter<boolean>();
 
-
   isSpinnerVisible = false;
   private hideTimeout: any = null;
 
+  constructor(private ngZone: NgZone, private cd: ChangeDetectorRef) {}
 
   private _onSecondLabelChange(label: string | null) {
-
-
-    if (label === 'DOWNLOAD' || label === 'UPLOAD') {
-
-
-      if (this.hideTimeout) {
-        clearTimeout(this.hideTimeout);
-        this.hideTimeout = null;
-      }
-
-      this.isSpinnerVisible = true;
-      return;
-    }
-
-
-    this.hideTimeout = setTimeout(() => {
-      this.isSpinnerVisible = false;
+  if (label === 'DOWNLOAD' || label === 'UPLOAD') {
+    if (this.hideTimeout) {
+      clearTimeout(this.hideTimeout);
       this.hideTimeout = null;
+    }
+    this.ngZone.run(() => {
+      this.isSpinnerVisible = true;
+      this.cd.markForCheck(); // fuerza Angular a actualizar el template
+    });
+    return;
+  }
+
+  if (label === 'TEST AGAIN' || label === null) {
+    if (this.hideTimeout) clearTimeout(this.hideTimeout);
+    this.hideTimeout = setTimeout(() => {
+      this.ngZone.run(() => {
+        this.isSpinnerVisible = false;
+        this.hideTimeout = null;
+        this.cd.markForCheck();
+      });
     }, 200);
   }
-
+}
 
   handleClick() {
-    if (this.progressValue === 0 || this.progressValue === 100) {
-      this.startTest.emit();
-    }
+  if (this.progressValue === 0 || this.progressValue === 100) {
+    this.ngZone.run(() => {
+      this.isSpinnerVisible = true;
+      this.cd.markForCheck();
+    });
+    this.startTest.emit();
   }
+}
 
   getStrokeDashOffset(): string {
     if (!this.error) {
