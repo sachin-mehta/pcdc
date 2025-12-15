@@ -3,12 +3,14 @@ package com.meter.giga.service
 import android.app.Notification
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Intent
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.lifecycle.LifecycleService
 import androidx.lifecycle.lifecycleScope
 import com.google.gson.Gson
+import com.meter.giga.MainActivity
 import com.meter.giga.R
 import com.meter.giga.domain.entity.request.ClientInfoRequestEntity
 import com.meter.giga.domain.entity.request.ServerInfoRequestEntity
@@ -149,6 +151,16 @@ class NetworkTestService : LifecycleService() {
    * show if any task is getting executing in background
    */
   private fun createNotification(content: String): Notification {
+    val intent = Intent(this, MainActivity::class.java).apply {
+      flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+    }
+
+    val pendingIntent = PendingIntent.getActivity(
+      this,
+      0,
+      intent,
+      PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+    )
     return NotificationCompat.Builder(this, CHANNEL_ID)
       .setContentTitle(this.applicationContext.getString(R.string.notification_header))
       .setContentText(content)
@@ -156,6 +168,7 @@ class NetworkTestService : LifecycleService() {
       .setOngoing(true)
       .setOnlyAlertOnce(true)
       .setPriority(NotificationCompat.PRIORITY_HIGH)
+      .setContentIntent(pendingIntent)
       .build()
   }
 

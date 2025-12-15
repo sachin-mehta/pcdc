@@ -42,7 +42,6 @@ android {
       debuggable false
       minifyEnabled true
       shrinkResources true
-      applicationIdSuffix ".debug" // Need to remove it once we got the crashlytics json config
       proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
       signingConfig signingConfigs.release
     }
