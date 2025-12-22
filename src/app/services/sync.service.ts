@@ -3,6 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { IndexedDBService } from './indexed-db.service';
 import { StorageService } from './storage.service';
 import { environment } from 'src/environments/environment';
+import { captureMessage, withScope } from '@sentry/browser';
+import { Severity } from '@sentry/types';
 
 @Injectable({
   providedIn: 'root',
@@ -62,6 +64,12 @@ export class SyncService {
         .toPromise();
     } catch (error) {
       console.warn('Initial sync attempt failed. Retrying...');
+
+      withScope(scope => {
+      scope.setLevel(Severity.Info);
+      captureMessage('Initial sync attempt failed. Retrying...');
+    });
+
       try {
         await this.http
           .post(
