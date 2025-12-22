@@ -6,34 +6,49 @@ import { LoadingController } from '@ionic/angular';
 export class LoadingService {
   isLoading = false;
   loadingObj:any;
+  loadingElement:any;
   constructor( public loadingController: LoadingController ) { }
 
   /**
-   * Open loading 
+   * Open loading
    * @returns loader
    */
   async present(msg?: string, duration?: number, cssClass?: string, spinner?) {
-    this.isLoading = true;
-    this.loadingObj = {};
+  if (this.loadingElement) {
+    return;
+  }
 
-    if(spinner) {
-      this.loadingObj.spinner = spinner;
+  this.isLoading = true;
+  this.loadingObj = {};
+
+  if(spinner) {
+    this.loadingObj.spinner = spinner;
+  }
+
+  if(msg){
+    this.loadingObj.message = msg;
+  }
+
+  if(duration){
+    this.loadingObj.duration = duration;
+  }
+
+  if(cssClass){
+    this.loadingObj.cssClass = cssClass;
+  }
+
+  this.loadingElement = await this.loadingController.create(this.loadingObj);
+
+  this.loadingElement.present().then(() => {
+    if (!this.isLoading) {
+      this.loadingElement.dismiss().then(() => console.log('abort presenting'));
+      this.loadingElement = null;
     }
+  });
+}
 
-    if(msg){
-      this.loadingObj.message = msg;
-    }
 
-    if(duration){
-      this.loadingObj.duration = duration;
-    }
-
-    if(cssClass){
-      this.loadingObj.cssClass = cssClass;
-    }
-
-    
-    return await this.loadingController.create(this.loadingObj).then(a => {
+/*    return await this.loadingController.create(this.loadingObj).then(a => {
       a.present().then(() => {
         if (!this.isLoading) {
           a.dismiss().then(() => console.log('abort presenting'));
@@ -41,21 +56,40 @@ export class LoadingService {
       });
     });
   }
+    */
 
   /**
    * Close the loader
-   * @returns 
+   * @returns
    */
-  async dismiss() {
+/*  async dismiss() {
     this.isLoading = false;
     return await this.loadingController.dismiss().then(() => console.log('dismissed'));
   }
+*/
+async dismiss() {
+    this.isLoading = false;
+
+    if (!this.loadingElement) {
+      return;
+    }
+
+    return this.loadingElement.dismiss()
+      .then(() => {
+        console.log('dismissed');
+        this.loadingElement = null;
+      })
+      .catch(() => {
+        this.loadingElement = null;
+      });
+  }
+
 
   /**
    * Check the current loading status
    * @returns boolean
    */
   isStillLoading(){
-    return this.isLoading;
-  }
+  return !!this.loadingElement;
+}
 }

@@ -378,9 +378,10 @@ export class StarttestPage implements OnInit, OnDestroy {
       this.loading.present(loadingMsg, 15000, 'pdcaLoaderClass', 'null');
       this.networkService.getNetInfo().then((res) => {
         this.connectionStatus = 'success';
-        if (this.loading.isStillLoading()) {
+        this.loading.dismiss();
+        /*if (this.loading.isStillLoading()) {
           this.loading.dismiss();
-        }
+        }*/
         if (res) {
           this.accessInformation = res;
           console.log(this.accessInformation);
