@@ -588,9 +588,16 @@ export class StarttestPage implements OnInit, OnDestroy {
       this.countryService.getPcdcCountryByCode(this.school.country).subscribe(
         (response) => {
           this.selectedCountry = response[0].name;
+          this.storage.set('countryName', response[0].name);
         },
         (err) => {
           console.log('ERROR: ' + err);
+          if (
+            this.storage.get('countryName') &&
+            this.storage.get('countryName') !== null
+          ) {
+            this.selectedCountry = this.storage.get('countryName');
+          }
           this.loading.dismiss();
         }
       );
