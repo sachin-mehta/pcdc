@@ -1,3 +1,4 @@
+import './app/utils/fetch-guard';
 import { enableProdMode } from '@angular/core';
 import { platformBrowserDynamic } from '@angular/platform-browser-dynamic';
 import { AppModule } from './app/app.module';
@@ -28,6 +29,11 @@ if (window.require) {
     remoteMain.enable(win.webContents);
   }
 }
+
+window.addEventListener('unhandledrejection', (event) => {
+  // Prevent Electron/Angular from turning normal aborts into production errors
+  event.preventDefault();
+});
 
 platformBrowserDynamic().bootstrapModule(AppModule)
   .catch(err => {
