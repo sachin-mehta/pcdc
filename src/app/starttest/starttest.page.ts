@@ -342,6 +342,8 @@ export class StarttestPage implements OnInit, OnDestroy {
   /**
    * Initialize country-related data
    */
+
+  /*
   private initializeCountryData() {
     if (this.school?.country) {
       this.countryService.getPcdcCountryByCode(this.school.country).subscribe(
@@ -354,6 +356,30 @@ export class StarttestPage implements OnInit, OnDestroy {
         }
       );
     }
+  }
+    */
+  private initializeCountryData() {
+  if (this.school?.country) {
+    this.countryService.getPcdcCountryByCode(this.school.country).subscribe(
+      (response) => {
+        if (Array.isArray(response) && response.length > 0 && response[0]?.name) {
+          this.selectedCountry = response[0].name;
+        } else {
+          this.selectedCountry = 'Unknown';
+          console.warn(
+            '[starttest] Empty or invalid country response for:',
+            this.school.country,
+            response
+          );
+        }
+      },
+      (err) => {
+        console.log('ERROR: ', err);
+        this.selectedCountry = 'Unknown';
+        this.loading.dismiss();
+      }
+    );
+  }
   }
 
   measureReady() {
