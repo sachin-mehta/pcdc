@@ -222,3 +222,20 @@ Acknowledgments</h2>
 * Thanks to Ericsson and Mlab for helping build this application! 
 * This project is tested with BrowserStack 
 </div>
+
+## GitHub Actions CI/CD (Windows build & release)
+
+This repository includes a GitHub Actions workflow at `.github/workflows/pcdc-deploy.yml` that builds the app on a Windows runner and either uploads an ephemeral artifact for development builds or creates a prerelease and uploads the `.exe` for production builds.
+
+Quick notes:
+- **Runner**: `windows-latest` (can be switched to a self-hosted Windows runner if needed)
+- **Environment input**: workflow accepts `environment` (values: `prod` or `dev`)
+- **Type-fix script**: `scripts/modify-lines.js` is provided to perform simple string replacements (use `fix_types=true` when dispatching the workflow)
+- **Artifacts**: dev builds upload `**/*.exe` as an artifact (retention days configurable). Prod builds create a prerelease and upload the `.exe` as a release asset.
+
+Example manual dispatch from GitHub UI:
+
+1. Open the "Actions" tab, choose "PCDC Build & Release" -> "Run workflow".
+2. Select `environment` = `prod` or `dev`.
+3. (Optional) set `fix_types` = `true` if you want the CI-run type-fix to run.
+
