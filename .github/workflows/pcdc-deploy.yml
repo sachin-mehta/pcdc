@@ -42,9 +42,13 @@ jobs:
         run: |
           echo "Creating environment file for ${{ github.event.inputs.environment }}"
           if ($env:GITHUB_EVENT_INPUTS_environment -eq 'prod') {
-            node -e "const fs=require('fs'); fs.writeFileSync('src/environments/_environment.prod.ts', 'export const environment = { production: true, name: \"prod\" };\n');"
+          @'
+            export const environment = { production: true, name: "prod" };
+            '@ | Out-File -FilePath src/environments/_environment.prod.ts -Encoding utf8
           } else {
-            node -e "const fs=require('fs'); fs.writeFileSync('src/environments/_environment.prod.ts', 'export const environment = { production: false, name: \"dev\" };\n');"
+          @'
+            export const environment = { production: false, name: "dev" };
+            '@ | Out-File -FilePath src/environments/_environment.prod.ts -Encoding utf8
           }
         shell: pwsh
 
