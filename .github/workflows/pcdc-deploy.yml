@@ -42,13 +42,9 @@ jobs:
         run: |
           echo "Creating environment file for ${{ github.event.inputs.environment }}"
           if ($env:GITHUB_EVENT_INPUTS_environment -eq 'prod') {
-          @'
-            export const environment = { production: true, name: "prod" };
-            '@ | Out-File -FilePath src/environments/_environment.prod.ts -Encoding utf8
+            Set-Content -Path 'src/environments/_environment.prod.ts' -Value "export const environment = { production: true, name: `"prod`" };" -Encoding utf8
           } else {
-          @'
-            export const environment = { production: false, name: "dev" };
-            '@ | Out-File -FilePath src/environments/_environment.prod.ts -Encoding utf8
+            Set-Content -Path 'src/environments/_environment.prod.ts' -Value "export const environment = { production: false, name: `"dev`" };" -Encoding utf8
           }
         shell: pwsh
 
