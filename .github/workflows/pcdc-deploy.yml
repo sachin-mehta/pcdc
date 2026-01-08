@@ -72,6 +72,8 @@ jobs:
       - name: Production create prerelease and upload .exe
         if: ${{ github.event.inputs.environment == 'prod' }}
         uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         id: create_release
         with:
           tag_name: release-${{ github.run_number }}-${{ github.sha }}
@@ -83,6 +85,8 @@ jobs:
       - name: Production upload .exe to release
         if: ${{ github.event.inputs.environment == 'prod' }}
         uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
           asset_path: ${{ steps.find-exe.outputs.exe }}
