@@ -1,4 +1,4 @@
-name: PCDC Build & Release
+name: PCDC Build & Deploy
 
 on:
   workflow_dispatch:
